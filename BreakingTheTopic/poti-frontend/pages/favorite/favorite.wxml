@@ -1,0 +1,80 @@
+<view class="page">
+  <view class="search-header">
+    <view class="search-bar">
+      <van-icon name="search" size="18px" color="#999" />
+      <input 
+        class="search-input" 
+        placeholder="搜索题目" 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="doSearch"
+      />
+      <van-icon wx:if="{{searchKeyword}}" name="clear" size="18px" color="#999" bindtap="clearSearch" />
+    </view>
+    <view class="search-btn" bindtap="doSearch">
+      <text>搜索</text>
+    </view>
+  </view>
+
+  <view class="filter-tags" wx:if="{{favoriteList.length > 0 || searchKeyword}}">
+    <view class="filter-item {{activeDifficulty === 'all' ? 'filter-active' : ''}}" bindtap="filterByDifficulty" data-difficulty="all">
+      <text>全部</text>
+    </view>
+    <view class="filter-item {{activeDifficulty === 'easy' ? 'filter-active' : ''}}" bindtap="filterByDifficulty" data-difficulty="easy">
+      <text>简单</text>
+    </view>
+    <view class="filter-item {{activeDifficulty === 'medium' ? 'filter-active' : ''}}" bindtap="filterByDifficulty" data-difficulty="medium">
+      <text>中等</text>
+    </view>
+    <view class="filter-item {{activeDifficulty === 'hard' ? 'filter-active' : ''}}" bindtap="filterByDifficulty" data-difficulty="hard">
+      <text>困难</text>
+    </view>
+  </view>
+
+  <scroll-view class="content-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="result-info" wx:if="{{filteredList.length > 0}}">
+      <text>共 {{filteredList.length}} 道题目</text>
+      <text class="clear-btn" bindtap="clearAllFavorites">清空</text>
+    </view>
+
+    <view class="favorite-list" wx:if="{{filteredList.length > 0}}">
+      <view class="question-card" wx:for="{{filteredList}}" wx:key="id" bindtap="viewQuestion" data-id="{{item.questionId}}">
+        <view class="card-content">
+          <text class="card-question">{{item.title || '题目内容'}}</text>
+        </view>
+        <view class="card-meta">
+          <text class="meta-difficulty">{{item.difficultyText}}</text>
+          <text class="meta-divider">·</text>
+          <text class="meta-type">{{item.typeText}}</text>
+        </view>
+        <view class="card-footer">
+          <text class="footer-time">{{item.createTime}}</text>
+          <view class="footer-actions">
+            <view class="action-btn" catchtap="removeFavorite" data-id="{{item.questionId}}">
+              <text>取消收藏</text>
+              <text class="action-arrow">></text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-wrap" wx:if="{{filteredList.length === 0 && favoriteList.length > 0}}">
+      <view class="empty-icon">
+        <van-icon name="search" size="64px" color="#ccc" />
+      </view>
+      <text class="empty-text">未找到相关题目</text>
+      <text class="empty-tip">换个关键词试试</text>
+    </view>
+
+    <view class="empty-wrap" wx:if="{{favoriteList.length === 0}}">
+      <view class="empty-icon">
+        <van-icon name="like-o" size="64px" color="#ccc" />
+      </view>
+      <text class="empty-text">暂无收藏</text>
+      <text class="empty-tip">刷题时点击收藏按钮即可添加</text>
+    </view>
+
+    <view style="height: 40rpx;"></view>
+  </scroll-view>
+</view>

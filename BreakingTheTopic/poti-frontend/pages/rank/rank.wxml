@@ -1,0 +1,121 @@
+<view class="page">
+  <view class="header">
+    <view class="tab-bar">
+      <view class="tab-item {{activeTab === 'total' ? 'active' : ''}}" bindtap="switchTab" data-tab="total">
+        <text>累计刷题</text>
+      </view>
+      <view class="tab-item {{activeTab === 'today' ? 'active' : ''}}" bindtap="switchTab" data-tab="today">
+        <text>今日刷题</text>
+      </view>
+      <view class="tab-item {{activeTab === 'accuracy' ? 'active' : ''}}" bindtap="switchTab" data-tab="accuracy">
+        <text>正确率</text>
+      </view>
+      <view class="tab-item {{activeTab === 'streak' ? 'active' : ''}}" bindtap="switchTab" data-tab="streak">
+        <text>连续签到</text>
+      </view>
+    </view>
+    
+    <view class="sub-tab-bar">
+      <view class="sub-tab {{activeSubTab === 'world' ? 'active' : ''}}" bindtap="switchSubTab" data-subtab="world">
+        <text>世界榜</text>
+      </view>
+      <view class="sub-tab {{activeSubTab === 'friends' ? 'active' : ''}}" bindtap="switchSubTab" data-subtab="friends">
+        <text>好友榜</text>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="main-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="top-three" wx:if="{{topThree.length >= 3}}">
+      <view class="rank-item second">
+        <view class="rank-avatar-wrap">
+          <image class="rank-avatar" src="{{topThree[1].avatarUrl || '/images/default-avatar.png'}}"></image>
+          <view class="rank-badge">2</view>
+        </view>
+        <text class="rank-name">{{topThree[1].nickname || '匿名用户'}}</text>
+        <text class="rank-score">{{topThree[1].score}}</text>
+      </view>
+      
+      <view class="rank-item first">
+        <view class="crown">👑</view>
+        <view class="rank-avatar-wrap">
+          <image class="rank-avatar" src="{{topThree[0].avatarUrl || '/images/default-avatar.png'}}"></image>
+          <view class="rank-badge gold">1</view>
+        </view>
+        <text class="rank-name">{{topThree[0].nickname || '匿名用户'}}</text>
+        <text class="rank-score">{{topThree[0].score}}</text>
+      </view>
+      
+      <view class="rank-item third">
+        <view class="rank-avatar-wrap">
+          <image class="rank-avatar" src="{{topThree[2].avatarUrl || '/images/default-avatar.png'}}"></image>
+          <view class="rank-badge">3</view>
+        </view>
+        <text class="rank-name">{{topThree[2].nickname || '匿名用户'}}</text>
+        <text class="rank-score">{{topThree[2].score}}</text>
+      </view>
+    </view>
+    
+    <view class="top-three top-three-simple" wx:elif="{{topThree.length > 0 && topThree.length < 3}}">
+      <view class="rank-item first" wx:if="{{topThree[0]}}">
+        <view class="crown">👑</view>
+        <view class="rank-avatar-wrap">
+          <image class="rank-avatar" src="{{topThree[0].avatarUrl || '/images/default-avatar.png'}}"></image>
+          <view class="rank-badge gold">1</view>
+        </view>
+        <text class="rank-name">{{topThree[0].nickname || '匿名用户'}}</text>
+        <text class="rank-score">{{topThree[0].score}}</text>
+      </view>
+      
+      <view class="rank-item second" wx:if="{{topThree[1]}}">
+        <view class="rank-avatar-wrap">
+          <image class="rank-avatar" src="{{topThree[1].avatarUrl || '/images/default-avatar.png'}}"></image>
+          <view class="rank-badge">2</view>
+        </view>
+        <text class="rank-name">{{topThree[1].nickname || '匿名用户'}}</text>
+        <text class="rank-score">{{topThree[1].score}}</text>
+      </view>
+    </view>
+
+    <view class="my-rank" wx:if="{{myRank}}">
+      <view class="my-rank-left">
+        <text class="my-rank-number">{{myRank.rank}}</text>
+        <image class="my-rank-avatar" src="{{myRank.avatarUrl || '/images/default-avatar.png'}}"></image>
+        <view class="my-rank-info">
+          <text class="my-rank-name">{{myRank.nickname || '我'}}</text>
+          <text class="my-rank-tag">我的排名</text>
+        </view>
+      </view>
+      <text class="my-rank-score">{{myRank.score}}</text>
+    </view>
+
+    <view class="rank-list">
+      <view class="rank-list-header">
+        <text class="header-rank">排名</text>
+        <text class="header-user">用户</text>
+        <text class="header-score">{{scoreLabel}}</text>
+      </view>
+      
+      <view class="rank-list-item" wx:for="{{rankList}}" wx:key="id">
+        <text class="item-rank {{item.rank <= 3 ? 'top-rank' : ''}}">{{item.rank}}</text>
+        <image class="item-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}"></image>
+        <text class="item-name">{{item.nickname || '匿名用户'}}</text>
+        <text class="item-score">{{item.score}}</text>
+      </view>
+      
+      <view class="load-more" wx:if="{{hasMore}}" bindtap="loadMore">
+        <text>{{loading ? '加载中...' : '加载更多'}}</text>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{topThree.length === 0 && rankList.length === 0 && !myRank && !loading}}">
+      <van-icon name="{{activeSubTab === 'friends' ? 'friends-o' : 'ranking'}}" size="60px" color="#ddd" />
+      <text class="empty-text">{{activeSubTab === 'friends' ? '暂无好友数据，快去添加好友吧' : '暂无排行数据'}}</text>
+      <view class="empty-action" wx:if="{{activeSubTab === 'friends'}}" bindtap="goToFriendRecommend">
+        <text class="empty-action-text">添加好友</text>
+      </view>
+    </view>
+
+    <view style="height: 40rpx;"></view>
+  </scroll-view>
+</view>

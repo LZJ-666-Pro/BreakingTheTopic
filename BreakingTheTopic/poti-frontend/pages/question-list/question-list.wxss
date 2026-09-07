@@ -1,0 +1,137 @@
+.page {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.category-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.question-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.practice-btn {
+  font-size: 26rpx;
+  color: #333;
+  padding: 14rpx 28rpx;
+  background: #f0f0f0;
+  border-radius: 6rpx;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 80rpx 0;
+}
+
+.list {
+  padding: 16rpx 24rpx;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 20rpx;
+  background: #fff;
+  margin-bottom: 12rpx;
+  border-radius: 8rpx;
+}
+
+.item-left {
+  margin-right: 20rpx;
+}
+
+.num {
+  font-size: 26rpx;
+  color: #999;
+  width: 40rpx;
+  text-align: center;
+  display: block;
+}
+
+.item-center {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 28rpx;
+  color: #333;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 10rpx;
+  line-height: 1.4;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.tag {
+  font-size: 22rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 4rpx;
+  color: #666;
+  background: #f5f5f5;
+}
+
+.diff-easy {
+  color: #52c41a;
+  background: #f6ffed;
+}
+
+.diff-medium {
+  color: #fa8c16;
+  background: #fff7e6;
+}
+
+.diff-hard {
+  color: #f5222d;
+  background: #fff1f0;
+}
+
+.view-count {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.item-right {
+  margin-left: 16rpx;
+}
+
+.more {
+  text-align: center;
+  padding: 28rpx 0;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.empty {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}

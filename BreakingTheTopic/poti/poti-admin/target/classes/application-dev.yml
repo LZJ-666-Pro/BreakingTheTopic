@@ -1,0 +1,110 @@
+server:
+  port: 8088
+
+jwt:
+  secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
+  expire: 86400000
+
+spring:
+  application:
+    name: poti-admin
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  boot:
+    admin:
+      client:
+        enabled: true
+        url: http://localhost:8888
+        instance:
+          service-host-type: ip
+  datasource:
+    dynamic:
+      primary: admin
+      strict: false
+      datasource:
+        admin:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_admin?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 5
+            maximum-pool-size: 20
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
+        question:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_question?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
+        user:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_HOST:localhost}:8848
+      config:
+        server-addr: ${NACOS_HOST:localhost}:8848
+        file-extension: yml
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.poti.admin: INFO
+
+upload:
+  path: ./uploads
+  url: ${UPLOAD_URL:http://localhost:8088/uploads}
+
+ai:
+  provider: ${AI_PROVIDER:zhipu}
+  api-key: ${AI_API_KEY:37dcefbb79ac4311895829544de4fb4d.Zp7iMJWtuAaiCXX2}
+  base-url: ${AI_BASE_URL:https://open.bigmodel.cn/api/paas/v4}
+  model: ${AI_MODEL:glm-4-flash}
+  max-tokens: 4000
+  temperature: 0.7

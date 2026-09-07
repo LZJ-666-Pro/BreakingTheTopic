@@ -1,0 +1,6 @@
+分类ID,题目内容,题目类型,难度,选项A,选项B,选项C,选项D,选项E,选项F,正确答案,解析,标签
+1,Java中哪个关键字用于定义类？,1,1,class,struct,define,type,,,A,class关键字用于定义类,Java,基础,关键字
+1,Java中main方法的正确签名是？,1,1,public static void main(String args),public static void main(String[] args),public void main(String[] args),static void main(String[] args),,,B,main方法必须是public static void,参数必须是String数组类型,Java,基础,main方法
+1,Java中哪个不是基本数据类型？,1,1,int,boolean,String,char,,,C,String是引用类型,不是基本数据类型,Java,基础,数据类型
+3,MySQL中InnoDB和MyISAM的区别？,2,2,支持事务,支持行锁,支持外键,以上都对,,,D,InnoDB支持事务、行锁、外键,MySQL,存储引擎,InnoDB
+3,MySQL中索引的类型有哪些？,2,2,B+树索引,哈希索引,全文索引,以上都是,,,D,MySQL索引类型：B+树索引、哈希索引、全文索引,MySQL,索引,类型

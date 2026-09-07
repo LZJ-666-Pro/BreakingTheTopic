@@ -1,0 +1,189 @@
+<view class="page">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <van-icon name="arrow-left" size="20px" color="#333" />
+    </view>
+    <view class="app-title">题目详情</view>
+    <view class="back-btn" style="visibility: hidden;">
+      <van-icon name="arrow-left" size="20px" color="#333" />
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <van-loading size="24px" color="#07C160" />
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view wx:else class="content">
+    <view class="question-card">
+      <view class="question-header">
+        <view class="question-title">{{question.title}}</view>
+        <view class="question-tags">
+          <view class="tag difficulty-{{question.difficulty}}">
+            {{difficultyName}}
+          </view>
+          <view class="tag type-tag">
+            {{typeName}}
+          </view>
+          <view class="tag category-tag" wx:if="{{question.categoryName}}">
+            {{question.categoryName}}
+          </view>
+        </view>
+      </view>
+
+      <view class="question-content">
+        <text>{{question.content}}</text>
+      </view>
+
+      <view wx:if="{{options.length > 0}}" class="options-section">
+        <view class="options-title">选项</view>
+        <view class="options-list">
+          <view class="option-item {{selectedOption === index ? 'selected' : ''}}" 
+                wx:for="{{options}}" 
+                wx:key="index"
+                bindtap="selectOption"
+                data-index="{{index}}">
+            <view class="option-label">{{item.label}}</view>
+            <view class="option-text">{{item.text}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="action-bar">
+      <view class="action-item {{isFavorited ? 'active' : ''}}" bindtap="toggleFavorite">
+        <van-icon name="{{isFavorited ? 'star' : 'star-o'}}" size="20px" color="{{isFavorited ? '#FF9500' : '#666'}}" />
+        <text>{{isFavorited ? '已收藏' : '收藏'}}</text>
+      </view>
+      <view class="action-item {{isMarked ? 'active' : ''}}" bindtap="markQuestion">
+        <van-icon name="{{isMarked ? 'bookmark' : 'bookmark-o'}}" size="20px" color="{{isMarked ? '#1890FF' : '#666'}}" />
+        <text>{{isMarked ? '已标记' : '标记'}}</text>
+      </view>
+      <view class="action-item" bindtap="shareQuestion">
+        <van-icon name="share-o" size="20px" color="#666" />
+        <text>分享</text>
+      </view>
+    </view>
+
+    <view class="tabs">
+      <view class="tab {{currentTab === 'analysis' ? 'active' : ''}}" bindtap="switchTab" data-tab="analysis">
+        <text>题解</text>
+      </view>
+      <view class="tab {{currentTab === 'test' ? 'active' : ''}}" bindtap="switchTab" data-tab="test">
+        <text>自测</text>
+      </view>
+      <view class="tab {{currentTab === 'video' ? 'active' : ''}}" bindtap="switchTab" data-tab="video">
+        <text>视频讲解</text>
+      </view>
+      <view class="tab {{currentTab === 'discussion' ? 'active' : ''}}" bindtap="switchTab" data-tab="discussion">
+        <text>讨论</text>
+      </view>
+    </view>
+
+    <view class="tab-content">
+      <view wx:if="{{currentTab === 'analysis'}}" class="analysis-section">
+        <view wx:if="{{!showAnswer}}" class="show-answer-btn" bindtap="showAnswerHandler">
+          <van-icon name="eye-o" size="20px" color="#07C160" />
+          <text>点击查看答案</text>
+        </view>
+        
+        <view wx:else class="answer-section">
+          <view class="answer-title">
+            <van-icon name="checked" size="18px" color="#07C160" />
+            <text>参考答案</text>
+          </view>
+          <view class="answer-content">{{question.answer}}</view>
+          
+          <view wx:if="{{question.analysis}}" class="analysis-detail">
+            <view class="analysis-title">
+              <van-icon name="info-o" size="18px" color="#1890FF" />
+              <text>答案解析</text>
+            </view>
+            <view class="analysis-text">{{question.analysis}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{currentTab === 'test'}}" class="test-section">
+        <view class="test-tip">
+          <van-icon name="info-o" size="16px" color="#999" />
+          <text>点击下方按钮开始答题</text>
+        </view>
+        <view class="start-test-btn" bindtap="startAnswer">
+          <text>开始答题</text>
+        </view>
+      </view>
+
+      <view wx:if="{{currentTab === 'video'}}" class="video-section">
+        <view class="empty-tip">
+          <van-icon name="video-o" size="48px" color="#ccc" />
+          <text>暂无视频讲解</text>
+        </view>
+      </view>
+
+      <view wx:if="{{currentTab === 'discussion'}}" class="discussion-section">
+        <view wx:if="{{discussions.length === 0}}" class="empty-tip">
+          <van-icon name="chat-o" size="48px" color="#ccc" />
+          <text>暂无讨论</text>
+          <text class="empty-sub">快来发表第一条评论吧</text>
+        </view>
+        <view wx:else class="discussion-list">
+          <view class="discussion-item" wx:for="{{discussions}}" wx:key="id">
+            <view class="discussion-header">
+              <image class="discussion-avatar" src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+              <view class="discussion-info">
+                <text class="discussion-name">{{item.userName}}</text>
+                <text class="discussion-time">{{item.createTime}}</text>
+              </view>
+              <view class="discussion-more" wx:if="{{item.isOwner}}" bindtap="showDiscussionActions" data-id="{{item.id}}">
+                <van-icon name="ellipsis" size="16px" color="#999" />
+              </view>
+            </view>
+            <view class="discussion-content">{{item.content}}</view>
+            <view class="discussion-actions">
+              <view class="action-btn {{item.isLiked ? 'liked' : ''}}" bindtap="likeDiscussion" data-id="{{item.id}}">
+                <van-icon name="{{item.isLiked ? 'good-job' : 'good-job-o'}}" size="16px" color="{{item.isLiked ? '#FF6B6B' : '#999'}}" />
+                <text>{{item.likeCount || 0}}</text>
+              </view>
+              <view class="action-btn" bindtap="replyDiscussion" data-id="{{item.id}}" data-name="{{item.userName}}">
+                <van-icon name="chat-o" size="16px" color="#999" />
+                <text>回复</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="discussion-input">
+          <input class="input-field" 
+                 placeholder="发表你的看法..." 
+                 value="{{discussionContent}}"
+                 bindinput="onDiscussionInput" />
+          <view class="send-btn" bindtap="submitDiscussion">发送</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="more-section">
+      <view class="more-header">
+        <text class="more-title">更多题目</text>
+        <view class="more-action" bindtap="refreshMore">
+          <van-icon name="replay" size="16px" color="#666" />
+          <text>换一批</text>
+        </view>
+      </view>
+      <view class="more-list">
+        <view class="more-item" wx:for="{{moreQuestions}}" wx:key="id" bindtap="goToQuestion" data-item="{{item}}">
+          <view class="more-content">
+            <view class="more-question-title">{{item.title}}</view>
+            <view class="more-meta">
+              <text class="more-type">{{item.typeName || item.type}}</text>
+              <text class="more-difficulty difficulty-{{item.difficulty}}">{{item.difficultyName || '中等'}}</text>
+            </view>
+          </view>
+          <van-icon name="arrow" size="16px" color="#ccc" />
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<van-toast id="van-toast" />

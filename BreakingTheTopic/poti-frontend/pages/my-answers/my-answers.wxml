@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="header">
+    <view class="stats">
+      <text class="stats-number">{{answers.length}}</text>
+      <text class="stats-label">我的回答</text>
+    </view>
+  </view>
+
+  <view class="content">
+    <van-loading wx:if="{{loading}}" size="24px" vertical>加载中...</van-loading>
+    
+    <van-empty wx:elif="{{answers.length === 0}}" description="还没有回答过问题" />
+    
+    <view wx:else class="answer-list">
+      <view class="answer-item" wx:for="{{answers}}" wx:key="id" bindtap="goToQuestion" data-id="{{item.questionId}}">
+        <view class="answer-header">
+          <view class="question-info">
+            <text class="question-title">{{item.questionTitle || '题目'}}</text>
+          </view>
+          <text class="answer-time">{{item.createTime}}</text>
+        </view>
+        
+        <view class="answer-content">{{item.content}}</view>
+        
+        <view class="answer-footer">
+          <view class="action-item">
+            <van-icon name="good-job-o" size="14px" color="#999" />
+            <text>{{item.likeCount || 0}}</text>
+          </view>
+          <view class="action-item">
+            <van-icon name="chat-o" size="14px" color="#999" />
+            <text>查看详情</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

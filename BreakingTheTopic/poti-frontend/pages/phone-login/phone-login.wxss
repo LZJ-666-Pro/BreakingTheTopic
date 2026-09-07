@@ -1,0 +1,166 @@
+.page {
+  min-height: 100vh;
+  background: #f5f6f8;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60rpx 32rpx 40rpx;
+  background: #fff;
+}
+
+.back-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f6f8;
+  border-radius: 50%;
+}
+
+.back-icon {
+  font-size: 32rpx;
+  color: #333;
+}
+
+.title {
+  font-size: 34rpx;
+  font-weight: 400;
+  color: #1a1a1a;
+}
+
+.placeholder {
+  width: 64rpx;
+}
+
+.content {
+  flex: 1;
+  padding: 32rpx;
+}
+
+.login-tabs {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.tab {
+  flex: 1;
+  padding: 20rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  color: #999;
+  background: #fff;
+  border-radius: 8rpx;
+  transition: all 0.2s ease;
+}
+
+.tab.active {
+  color: #333;
+  background: #fff;
+  border: 2rpx solid #333;
+  font-weight: 500;
+}
+
+.form-section {
+  margin-bottom: 48rpx;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s ease;
+}
+
+.input-group:focus-within {
+  border-color: #333;
+}
+
+.input-field {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.send-code-btn {
+  background: #fff;
+  color: #333;
+  font-size: 26rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 8rpx;
+  margin-left: 20rpx;
+  white-space: nowrap;
+  border: 2rpx solid #333;
+}
+
+.send-code-btn.disabled {
+  background: #fff;
+  color: #999;
+  border-color: #ddd;
+}
+
+.toggle-password {
+  padding: 10rpx;
+  margin-left: 10rpx;
+}
+
+.toggle-icon {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.login-btn {
+  width: 100%;
+  height: 96rpx;
+  background: #fff;
+  border-radius: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40rpx;
+  transition: all 0.2s ease;
+  border: 2rpx solid #333;
+}
+
+.login-btn.btn-loading {
+  opacity: 0.7;
+}
+
+.login-btn:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+.btn-text {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 32rpx;
+}
+
+.link-divider {
+  font-size: 28rpx;
+  color: #ddd;
+  margin: 0 24rpx;
+}
+
+.link-btn {
+  font-size: 28rpx;
+  color: #666;
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="poti-interview" />
+        <module name="poti-monitor" />
+        <module name="poti-common-core" />
+        <module name="poti-gateway" />
+        <module name="poti-admin" />
+        <module name="poti-common-redis" />
+        <module name="poti-user" />
+        <module name="poti-practice" />
+        <module name="poti-common-security" />
+        <module name="poti-favorite" />
+        <module name="poti-search" />
+        <module name="poti-wrongbook" />
+        <module name="poti-common-swagger" />
+        <module name="poti-auth" />
+        <module name="poti-question" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="poti-auth" options="" />
+      <module name="poti-favorite" options="" />
+      <module name="poti-gateway" options="" />
+      <module name="poti-interview" options="" />
+      <module name="poti-monitor" options="" />
+      <module name="poti-practice" options="" />
+      <module name="poti-question" options="" />
+      <module name="poti-search" options="" />
+      <module name="poti-user" options="" />
+      <module name="poti-wrongbook" options="" />
+    </option>
+  </component>
+</project>

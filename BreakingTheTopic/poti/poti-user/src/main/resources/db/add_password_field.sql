@@ -1,0 +1,5 @@
+USE poti_user;
+
+ALTER TABLE user ADD COLUMN password VARCHAR(255) DEFAULT NULL COMMENT '密码' AFTER email;
+
+DESC user;

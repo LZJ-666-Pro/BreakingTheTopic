@@ -1,0 +1,318 @@
+2026-05-28 21:15:18,663 INFO Starting Nacos v2.2.0 using Java 1.8.0_352 on 8655ff90c1db with PID 1 (/home/nacos/target/nacos-server.jar started by root in /home/nacos)
+
+2026-05-28 21:15:18,699 INFO The following 1 profile is active: "standalone"
+
+2026-05-28 21:15:38,503 INFO Tomcat initialized with port(s): 8848 (http)
+
+2026-05-28 21:15:38,607 INFO Starting service [Tomcat]
+
+2026-05-28 21:15:38,609 INFO Starting Servlet engine: [Apache Tomcat/9.0.63]
+
+2026-05-28 21:15:39,007 INFO Initializing Spring embedded WebApplicationContext
+
+2026-05-28 21:15:39,008 INFO Root WebApplicationContext: initialization completed in 18688 ms
+
+2026-05-28 21:15:41,282 INFO Nacos-related cluster resource initialization
+
+2026-05-28 21:15:41,459 INFO Load com.alibaba.nacos.core.ability.RemoteAbilityInitializer for ServerAbilityInitializer
+
+2026-05-28 21:15:41,480 INFO Load com.alibaba.nacos.naming.ability.NamingAbilityInitializer for ServerAbilityInitializer
+
+2026-05-28 21:15:41,540 INFO The cluster resource is initialized
+
+2026-05-28 21:15:46,943 INFO HikariPool-1 - Starting...
+
+2026-05-28 21:15:46,965 WARN Registered driver with driverClassName=org.apache.derby.jdbc.EmbeddedDriver was not found, trying direct instantiation.
+
+2026-05-28 21:15:48,242 INFO HikariPool-1 - Driver does not support get/set network timeout for connections. (Feature not implemented: No details.)
+
+2026-05-28 21:15:48,260 INFO HikariPool-1 - Start completed.
+
+2026-05-28 21:15:50,303 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.ConfigInfoAggrMapperByMySql) datasource(mysql) tableName(config_info_aggr) successfully.
+
+2026-05-28 21:15:50,314 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.ConfigInfoBetaMapperByMySql) datasource(mysql) tableName(config_info_beta) successfully.
+
+2026-05-28 21:15:50,319 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.ConfigInfoMapperByMySql) datasource(mysql) tableName(config_info) successfully.
+
+2026-05-28 21:15:50,320 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.ConfigInfoTagMapperByMySql) datasource(mysql) tableName(config_info_tag) successfully.
+
+2026-05-28 21:15:50,321 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.ConfigTagsRelationMapperByMySql) datasource(mysql) tableName(config_tags_relation) successfully.
+
+2026-05-28 21:15:50,326 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.HistoryConfigInfoMapperByMySql) datasource(mysql) tableName(his_config_info) successfully.
+
+2026-05-28 21:15:50,328 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.TenantInfoMapperByMySql) datasource(mysql) tableName(tenant_info) successfully.
+
+2026-05-28 21:15:50,328 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.TenantCapacityMapperByMySql) datasource(mysql) tableName(tenant_capacity) successfully.
+
+2026-05-28 21:15:50,329 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.mysql.GroupCapacityMapperByMysql) datasource(mysql) tableName(group_capacity) successfully.
+
+2026-05-28 21:15:50,333 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.ConfigInfoAggrMapperByDerby) datasource(derby) tableName(config_info_aggr) successfully.
+
+2026-05-28 21:15:50,348 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.ConfigInfoBetaMapperByDerby) datasource(derby) tableName(config_info_beta) successfully.
+
+2026-05-28 21:15:50,349 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.ConfigInfoMapperByDerby) datasource(derby) tableName(config_info) successfully.
+
+2026-05-28 21:15:50,351 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.ConfigInfoTagMapperByDerby) datasource(derby) tableName(config_info_tag) successfully.
+
+2026-05-28 21:15:50,351 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.ConfigInfoTagsRelationMapperByDerby) datasource(derby) tableName(config_tags_relation) successfully.
+
+2026-05-28 21:15:50,353 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.HistoryConfigInfoMapperByDerby) datasource(derby) tableName(his_config_info) successfully.
+
+2026-05-28 21:15:50,354 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.TenantInfoMapperByDerby) datasource(derby) tableName(tenant_info) successfully.
+
+2026-05-28 21:15:50,354 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.TenantCapacityMapperByDerby) datasource(derby) tableName(tenant_capacity) successfully.
+
+2026-05-28 21:15:50,362 INFO [MapperManager] Load Mapper(class com.alibaba.nacos.plugin.datasource.impl.derby.GroupCapacityMapperByDerby) datasource(derby) tableName(group_capacity) successfully.
+
+2026-05-28 21:15:51,323 INFO [MapperManager] findMapper dataSource: derby, tableName: config_info
+
+2026-05-28 21:15:51,832 INFO [MapperManager] findMapper dataSource: derby, tableName: config_info_beta
+
+2026-05-28 21:15:51,892 INFO [MapperManager] findMapper dataSource: derby, tableName: config_info_tag
+
+2026-05-28 21:15:51,924 INFO [MapperManager] findMapper dataSource: derby, tableName: config_info_aggr
+
+2026-05-28 21:15:53,700 INFO Fail to find connection runtime ejector for name nacos,use default
+
+2026-05-28 21:15:54,027 WARN Fail to found tps control manager of name ：nacos
+
+2026-05-28 21:15:54,085 INFO Found  rule parser of name=nacos,class=NacosRuleParser
+
+2026-05-28 21:15:54,106 WARN Fail to rule parser of name ：nacos
+
+2026-05-28 21:15:54,112 INFO Load connection metrics collector,size=2,[com.alibaba.nacos.config.server.service.LongPollingConnectionMetricsCollector@27eedb64, com.alibaba.nacos.core.remote.LongConnectionMetricsCollector@31c7528f]
+
+2026-05-28 21:15:54,124 INFO No connection rule content found ,use default empty rule 
+
+2026-05-28 21:15:54,167 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:15:54,198 INFO Found tps barrier creator of name : nacos
+
+2026-05-28 21:15:54,212 WARN Fail to found tps rule creator of name : nacos,use  default local simple creator
+
+2026-05-28 21:15:54,221 INFO No tps control rule of CONFIG_PUSH_COUNT found  
+
+2026-05-28 21:15:54,224 INFO No tps control rule of CONFIG_PUSH_SUCCESS found  
+
+2026-05-28 21:15:54,225 INFO No tps control rule of CONFIG_PUSH_FAIL found  
+
+2026-05-28 21:15:54,713 INFO Connection check task start
+
+2026-05-28 21:15:54,742 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:15:54,742 INFO Connection check task end
+
+2026-05-28 21:15:57,198 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:15:57,754 INFO Connection check task start
+
+2026-05-28 21:15:57,755 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:15:57,763 INFO Connection check task end
+
+2026-05-28 21:16:01,185 INFO Connection check task start
+
+2026-05-28 21:16:01,205 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:01,208 INFO Connection check task end
+
+2026-05-28 21:16:01,186 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:04,211 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:04,211 INFO Connection check task start
+
+2026-05-28 21:16:04,220 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:04,224 INFO Connection check task end
+
+2026-05-28 21:16:07,222 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:07,224 INFO Connection check task start
+
+2026-05-28 21:16:07,227 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:07,228 INFO Connection check task end
+
+2026-05-28 21:16:07,365 INFO Adding welcome page: class path resource [static/index.html]
+
+2026-05-28 21:16:11,849 INFO Connection check task start
+
+2026-05-28 21:16:11,849 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:11,855 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:11,858 INFO Connection check task end
+
+2026-05-28 21:16:13,725 WARN You are asking Spring Security to ignore Ant [pattern='/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+
+2026-05-28 21:16:13,729 INFO Will not secure Ant [pattern='/**']
+
+2026-05-28 21:16:13,806 INFO Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7cbee484, org.springframework.security.web.context.SecurityContextPersistenceFilter@11acdc30, org.springframework.security.web.header.HeaderWriterFilter@7997b197, org.springframework.security.web.csrf.CsrfFilter@192f2f27, org.springframework.security.web.authentication.logout.LogoutFilter@611f8234, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@4a8ab068, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@76a82f33, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7f811d00, org.springframework.security.web.session.SessionManagementFilter@460f76a6, org.springframework.security.web.access.ExceptionTranslationFilter@29cfd92b]
+
+2026-05-28 21:16:13,892 INFO Exposing 1 endpoint(s) beneath base path '/actuator'
+
+2026-05-28 21:16:14,116 INFO Tomcat started on port(s): 8848 (http) with context path '/nacos'
+
+2026-05-28 21:16:14,185 INFO No tps control rule of ConfigPublish found  
+
+2026-05-28 21:16:14,188 INFO No tps control rule of ConfigQuery found  
+
+2026-05-28 21:16:14,190 INFO No tps control rule of ClusterConfigChangeNotify found  
+
+2026-05-28 21:16:14,191 INFO No tps control rule of ConfigListen found  
+
+2026-05-28 21:16:14,192 INFO No tps control rule of ConfigRemove found  
+
+2026-05-28 21:16:14,193 INFO No tps control rule of HealthCheck found  
+
+2026-05-28 21:16:14,211 INFO Started Nacos in 64.051 seconds (JVM running for 70.694)
+
+2026-05-28 21:16:14,213 INFO Nacos started successfully in stand alone mode. use embedded storage
+
+2026-05-28 21:16:14,857 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:14,863 INFO Connection check task start
+
+2026-05-28 21:16:14,865 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:14,867 INFO Connection check task end
+
+2026-05-28 21:16:17,867 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:17,875 INFO Connection check task start
+
+2026-05-28 21:16:17,888 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:17,899 INFO Connection check task end
+
+2026-05-28 21:16:20,887 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:20,902 INFO Connection check task start
+
+2026-05-28 21:16:20,906 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:20,907 INFO Connection check task end
+
+2026-05-28 21:16:23,889 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:23,907 INFO Connection check task start
+
+2026-05-28 21:16:23,908 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:23,909 INFO Connection check task end
+
+2026-05-28 21:16:26,892 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:26,910 INFO Connection check task start
+
+2026-05-28 21:16:26,911 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:26,911 INFO Connection check task end
+
+2026-05-28 21:16:29,886 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:29,903 INFO Connection check task start
+
+2026-05-28 21:16:29,905 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:29,915 INFO Connection check task end
+
+2026-05-28 21:16:32,891 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:32,915 INFO Connection check task start
+
+2026-05-28 21:16:32,916 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:32,919 INFO Connection check task end
+
+2026-05-28 21:16:33,761 INFO Initializing Spring DispatcherServlet 'dispatcherServlet'
+
+2026-05-28 21:16:33,766 INFO Initializing Servlet 'dispatcherServlet'
+
+2026-05-28 21:16:33,784 INFO Completed initialization in 6 ms
+
+2026-05-28 21:16:35,901 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:35,920 INFO Connection check task start
+
+2026-05-28 21:16:35,922 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:35,922 INFO Connection check task end
+
+2026-05-28 21:16:38,903 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:38,924 INFO Connection check task start
+
+2026-05-28 21:16:38,924 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:38,925 INFO Connection check task end
+
+2026-05-28 21:16:41,905 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:41,927 INFO Connection check task start
+
+2026-05-28 21:16:41,928 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:41,929 INFO Connection check task end
+
+2026-05-28 21:16:44,908 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:44,944 INFO Connection check task start
+
+2026-05-28 21:16:44,955 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:44,956 INFO Connection check task end
+
+2026-05-28 21:16:47,929 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:47,959 INFO Connection check task start
+
+2026-05-28 21:16:47,981 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:47,984 INFO Connection check task end
+
+2026-05-28 21:16:50,931 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:50,986 INFO Connection check task start
+
+2026-05-28 21:16:50,987 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:50,987 INFO Connection check task end
+
+2026-05-28 21:16:53,933 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:53,989 INFO Connection check task start
+
+2026-05-28 21:16:53,991 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:53,993 INFO Connection check task end
+
+2026-05-28 21:16:56,936 INFO ConnectionMetrics, totalCount = 0, detail = {long_connection=0, long_polling=0}
+
+2026-05-28 21:16:56,995 INFO Connection check task start
+
+2026-05-28 21:16:56,998 INFO Long connection metrics detail ,Total count =0, sdkCount=0,clusterCount=0
+
+2026-05-28 21:16:57,003 INFO Connection check task end
+
+2026-05-28 21:16:57,023 WARN [ThreadPoolManager] Start destroying ThreadPool
+
+2026-05-28 21:16:57,025 WARN [NotifyCenter] Start destroying Publisher
+
+2026-05-28 21:16:57,024 WARN [ConfigServer-HttpClientManager] Start destroying NacosRestTemplate
+
+2026-05-28 21:16:57,043 WARN [NotifyCenter] Destruction of the end
+
+2026-05-28 21:16:57,043 WARN [WatchFileCenter] start close
+
+2026-05-28 21:16:57,088 WARN [HttpClientBeanHolder] Start destroying common HttpClient
+
+2026-05-28 21:16:57,093 WARN [WatchFileCenter] start to shutdown this watcher which is watch : /home/nacos/conf
+
+2026-05-28 21:16:57,115 WARN [WatchFileCenter] already closed
+
+2026-05-28 21:16:57,115 WARN [ConfigServer-HttpClientManager] Destruction of the end
+
+2026-05-28 21:16:57,115 WARN [HttpClientBeanHolder] Destruction of the end
+

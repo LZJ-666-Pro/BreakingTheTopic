@@ -1,0 +1,137 @@
+<view class="page">
+  <view class="nav-bar">
+    <view class="nav-back" bindtap="goBack">
+      <van-icon name="arrow-left" size="18px" color="#333" />
+    </view>
+    <view class="nav-center">
+      <text class="nav-title">{{categoryName}}</text>
+    </view>
+    <view class="nav-actions">
+      <view class="nav-action" bindtap="toggleAnswerSheet">
+        <van-icon name="apps-o" size="20px" color="#333" />
+      </view>
+      <view class="nav-action" bindtap="toggleFavorite">
+        <van-icon name="{{isFavorite ? 'star' : 'star-o'}}" size="20px" color="{{isFavorite ? '#FF9500' : '#333'}}" />
+      </view>
+    </view>
+  </view>
+
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <van-loading size="24px" color="#07C160">加载中...</van-loading>
+  </view>
+
+  <view class="progress-wrap" wx:if="{{!loading && questions.length > 0}}">
+    <view class="progress-header">
+      <text class="progress-label">{{currentIndex + 1}} / {{questions.length}}</text>
+      <text class="timer-text">⏱️ {{timerText}}</text>
+    </view>
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{(currentIndex + 1) / questions.length * 100}}%;"></view>
+    </view>
+  </view>
+
+  <scroll-view class="main-scroll" scroll-y enhanced show-scrollbar="{{false}}" wx:if="{{!loading && currentQuestion}}">
+    <view class="question-card font-size-{{fontSize}}">
+      <view class="q-tags">
+        <view class="q-tag q-tag-type">
+          <text>{{currentQuestion.type === 'single' ? '单选' : '多选'}}</text>
+        </view>
+        <view class="q-tag q-tag-{{currentQuestion.difficultyLevel || 'medium'}}">
+          <text>{{currentQuestion.difficulty || '中等'}}</text>
+        </view>
+        <view class="q-tag q-tag-num">
+          <text>第 {{currentIndex + 1}} 题</text>
+        </view>
+      </view>
+      <text class="q-content">{{currentQuestion.content}}</text>
+    </view>
+
+    <view class="options-list font-size-{{fontSize}}">
+      <view class="option-item {{selectedOption === index ? 'option-selected' : ''}} {{isAnswered && index === currentQuestion.answer ? 'option-correct' : ''}} {{isAnswered && selectedOption === index && index !== currentQuestion.answer ? 'option-wrong' : ''}}"
+            wx:for="{{currentQuestion.options}}" wx:key="label"
+            bindtap="selectOption" data-index="{{index}}">
+        <view class="option-letter {{selectedOption === index ? 'letter-active' : ''}} {{isAnswered && index === currentQuestion.answer ? 'letter-correct' : ''}} {{isAnswered && selectedOption === index && index !== currentQuestion.answer ? 'letter-wrong' : ''}}">
+          <text>{{item.label}}</text>
+        </view>
+        <text class="option-text">{{item.text}}</text>
+        <view class="option-icon" wx:if="{{isAnswered && index === currentQuestion.answer}}">
+          <van-icon name="success" size="18px" color="#07C160" />
+        </view>
+        <view class="option-icon" wx:if="{{isAnswered && selectedOption === index && index !== currentQuestion.answer}}">
+          <van-icon name="cross" size="18px" color="#FA5151" />
+        </view>
+      </view>
+    </view>
+
+    <view class="result-area" wx:if="{{isAnswered}}">
+      <view class="result-banner result-{{selectedOption === currentQuestion.answer ? 'right' : 'wrong'}}">
+        <van-icon name="{{selectedOption === currentQuestion.answer ? 'checked' : 'close'}}" size="18px" color="#fff" />
+        <text class="result-text">{{selectedOption === currentQuestion.answer ? '回答正确' : '回答错误'}}</text>
+      </view>
+      <view class="analysis-card" wx:if="{{currentQuestion.analysis || selectedOption !== currentQuestion.answer}}">
+        <view class="analysis-header">
+          <van-icon name="info-o" size="16px" color="#07C160" />
+          <text class="analysis-label">解析</text>
+        </view>
+        <view class="analysis-correct" wx:if="{{selectedOption !== currentQuestion.answer}}">
+          <text class="correct-label">正确答案：</text>
+          <text class="correct-value">{{currentQuestion.options[currentQuestion.answer].label}}</text>
+        </view>
+        <text class="analysis-body" wx:if="{{currentQuestion.analysis}}">{{currentQuestion.analysis}}</text>
+      </view>
+    </view>
+
+    <view style="height: 200rpx;"></view>
+  </scroll-view>
+
+  <view class="empty-state" wx:if="{{!loading && questions.length === 0}}">
+    <van-icon name="description" size="80px" color="#ddd" />
+    <text class="empty-text">暂无题目</text>
+  </view>
+
+  <view class="bottom-bar" wx:if="{{questions.length > 0}}">
+    <view class="bottom-btn bottom-prev {{currentIndex === 0 ? 'btn-off' : ''}}" bindtap="prevQuestion" wx:if="{{!isSingleQuestion}}">
+      <van-icon name="arrow-left" size="16px" />
+      <text>上一题</text>
+    </view>
+    <view class="bottom-btn bottom-next {{!isAnswered && selectedOption === null ? 'btn-off' : ''}} {{isSingleQuestion ? 'btn-single' : ''}}"
+          wx:if="{{!isAnswered}}" bindtap="submitAnswer">
+      <text>提交答案</text>
+    </view>
+    <view class="bottom-btn bottom-next {{isSingleQuestion ? 'btn-single' : ''}}"
+          wx:else bindtap="nextQuestion">
+      <text>{{isSingleQuestion ? '返回' : (currentIndex < questions.length - 1 ? '下一题' : '查看结果')}}</text>
+      <van-icon name="{{isSingleQuestion ? 'arrow-left' : 'arrow'}}" size="16px" />
+    </view>
+  </view>
+
+  <van-action-sheet show="{{showAnswerSheet}}" bind:close="toggleAnswerSheet" title="答题卡" round>
+    <view class="sheet-content">
+      <view class="sheet-stats">
+        <view class="sheet-stat">
+          <view class="sheet-dot dot-answered"></view>
+          <text class="sheet-stat-text">已答 {{answeredCount}}</text>
+        </view>
+        <view class="sheet-stat">
+          <view class="sheet-dot dot-correct"></view>
+          <text class="sheet-stat-text">正确 {{correctCount}}</text>
+        </view>
+        <view class="sheet-stat">
+          <view class="sheet-dot dot-wrong"></view>
+          <text class="sheet-stat-text">错误 {{wrongCount}}</text>
+        </view>
+        <view class="sheet-stat">
+          <view class="sheet-dot dot-unanswered"></view>
+          <text class="sheet-stat-text">未答 {{questions.length - answeredCount}}</text>
+        </view>
+      </view>
+      <view class="sheet-grid">
+        <view class="sheet-cell {{answerList[index] ? (answerList[index].isCorrect ? 'cell-correct' : 'cell-wrong') : 'cell-unanswered'}} {{currentIndex === index ? 'cell-current' : ''}}"
+              wx:for="{{questions}}" wx:key="index"
+              bindtap="goToQuestion" data-index="{{index}}">
+          <text>{{index + 1}}</text>
+        </view>
+      </view>
+    </view>
+  </van-action-sheet>
+</view>

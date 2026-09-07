@@ -1,0 +1,40 @@
+<view class="page">
+  <view class="header">
+    <view class="header-left">
+      <text class="category-name">{{categoryName}}</text>
+      <text class="question-count">共{{questions.length}}题</text>
+    </view>
+    <view class="practice-btn" bindtap="startPractice">开始刷题</view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <van-loading size="24px" color="#333">加载中...</van-loading>
+  </view>
+
+  <view class="list" wx:else>
+    <view class="item" wx:for="{{displayQuestions}}" wx:key="id" bindtap="goToQuestion" data-id="{{item.id}}">
+      <view class="item-left">
+        <text class="num">{{index + 1}}</text>
+      </view>
+      <view class="item-center">
+        <text class="title">{{item.title}}</text>
+        <view class="tags">
+          <text class="tag type-tag">{{item.type}}</text>
+          <text class="tag diff-{{item.difficultyClass}}">{{item.difficulty}}</text>
+          <text class="view-count">{{item.viewCount}}人浏览</text>
+        </view>
+      </view>
+      <view class="item-right">
+        <van-icon name="arrow" size="16px" color="#ccc" />
+      </view>
+    </view>
+
+    <view class="more" wx:if="{{questions.length > 20}}" bindtap="toggleShowAll">
+      <text>{{showAll ? '收起' : '查看全部 ' + questions.length + ' 题'}}</text>
+    </view>
+
+    <view class="empty" wx:if="{{questions.length === 0 && !loading}}">
+      <text>暂无题目</text>
+    </view>
+  </view>
+</view>

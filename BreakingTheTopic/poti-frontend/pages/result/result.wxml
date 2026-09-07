@@ -1,0 +1,72 @@
+<view class="page">
+  <view class="result-header">
+    <view class="result-card">
+      <view class="result-main">
+        <view class="result-rate">
+          <text class="rate-num">{{result.correctRate}}</text>
+          <text class="rate-unit">%</text>
+        </view>
+        <text class="rate-label">正确率</text>
+      </view>
+      <view class="result-stats">
+        <view class="stat-item">
+          <text class="stat-value">{{result.correctCount}}/{{result.totalCount}}</text>
+          <text class="stat-label">答对</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-value">{{result.wrongCount}}</text>
+          <text class="stat-label">答错</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-value">{{formatTime}}</text>
+          <text class="stat-label">用时</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="main-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="section-header">
+      <text class="section-title">答题详情</text>
+      <text class="section-count">共 {{result.questions.length}} 题</text>
+    </view>
+
+    <view class="question-list">
+      <view class="question-item" wx:for="{{result.questions}}" wx:key="id">
+        <view class="q-header">
+          <view class="q-index {{item.isCorrect ? 'index-correct' : 'index-wrong'}}">
+            <text>{{index + 1}}</text>
+          </view>
+          <text class="q-content">{{item.content}}</text>
+        </view>
+        
+        <view class="answer-compare">
+          <view class="answer-row">
+            <text class="answer-label">你的答案</text>
+            <text class="answer-value {{item.isCorrect ? 'answer-correct' : 'answer-wrong'}}">
+              {{item.userAnswer !== undefined && item.userAnswer !== null ? item.options[item.userAnswer].label : '未答'}}
+            </text>
+          </view>
+          <view class="answer-row" wx:if="{{!item.isCorrect}}">
+            <text class="answer-label">正确答案</text>
+            <text class="answer-value answer-correct">{{item.options[item.answer].label}}</text>
+          </view>
+        </view>
+
+        <view class="analysis-section" wx:if="{{item.analysis}}">
+          <text class="analysis-label">解析</text>
+          <text class="analysis-content">{{item.analysis}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view style="height: 140rpx;"></view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <view class="btn-back" bindtap="goBack">返回题库</view>
+    <view class="btn-retry" bindtap="retryPractice">再来一组</view>
+  </view>
+</view>

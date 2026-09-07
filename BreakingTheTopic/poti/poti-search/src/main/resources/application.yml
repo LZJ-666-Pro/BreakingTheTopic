@@ -1,0 +1,16 @@
+server:
+  port: 8800
+
+spring:
+  elasticsearch:
+    rest:
+      uris: http://localhost:9201
+
+logging:
+  level:
+    com.poti.search: debug
+    org.elasticsearch: warn
+    tracer: warn
+
+elasticsearch:
+  enabled: true

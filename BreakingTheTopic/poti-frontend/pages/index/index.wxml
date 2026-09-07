@@ -1,0 +1,127 @@
+<view class="page">
+  <view class="header">
+    <view class="header-left" bindtap="goToUser">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <text class="user-name">{{userInfo.nickname || '面试鸭8384'}}</text>
+    </view>
+    <view class="header-right">
+      <view class="header-action" bindtap="goToSearch">
+        <van-icon name="search" size="20px" color="#666" />
+      </view>
+      <view class="header-action" bindtap="goToWrongbook">
+        <van-icon name="warning-o" size="20px" color="#666" />
+        <view class="action-badge" wx:if="{{wrongCount > 0}}">{{wrongCount}}</view>
+      </view>
+      <view class="header-action" bindtap="goToFavorite">
+        <van-icon name="star-o" size="20px" color="#666" />
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="main-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="continue-card" wx:if="{{hasUnfinished}}" bindtap="continuePractice">
+      <van-icon name="play-circle-o" size="24px" color="#07C160" />
+      <view class="continue-content">
+        <text class="continue-title">继续上次练习</text>
+        <text class="continue-desc">{{unfinishedCategory}} · 已完成 {{unfinishedProgress}}%</text>
+      </view>
+      <van-icon name="arrow" size="16px" color="#CCC" />
+    </view>
+
+    <swiper class="banner-swiper" indicator-dots autoplay circular indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#fff">
+      <swiper-item wx:for="{{banners}}" wx:key="id" bindtap="onBannerTap" data-type="{{item.type}}" data-id="{{item.id}}">
+        <view class="banner-card banner-{{item.theme}}">
+          <view class="banner-decor">
+            <view class="decor-circle decor-circle-1"></view>
+            <view class="decor-circle decor-circle-2"></view>
+            <view class="decor-circle decor-circle-3"></view>
+          </view>
+          <view class="banner-icon-wrap">
+            <text class="banner-icon" wx:if="{{item.theme === 'fire'}}">🔥</text>
+            <text class="banner-icon" wx:if="{{item.theme === 'gold'}}">🏆</text>
+            <text class="banner-icon" wx:if="{{item.theme === 'growth'}}">📚</text>
+          </view>
+          <view class="banner-content">
+            <view class="banner-info">
+              <text class="banner-title">{{item.title}}</text>
+              <text class="banner-desc">{{item.desc}}</text>
+            </view>
+            <view class="banner-action">
+              <view class="banner-btn banner-btn-{{item.theme}}">
+                <text>{{item.btnText}}</text>
+                <van-icon name="arrow" size="14px" />
+              </view>
+            </view>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+
+    <view class="stats-section">
+      <view class="stats-item">
+        <text class="stats-num">{{todayCount}}</text>
+        <text class="stats-label">今日</text>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <text class="stats-num">{{accuracy}}%</text>
+        <text class="stats-label">正确率</text>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item checkin-item {{hasCheckedIn ? 'checked' : ''}}" bindtap="handleCheckIn">
+        <text class="stats-num">{{streakDays}}</text>
+        <text class="stats-label">{{hasCheckedIn ? '已签到' : '签到'}}</text>
+      </view>
+    </view>
+
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="goToWrongbook">
+        <van-icon name="warning-o" size="22px" color="#FA5151" />
+        <text class="quick-name">错题本</text>
+        <text class="quick-count">{{wrongCount}}</text>
+      </view>
+      <view class="quick-item" bindtap="goToFavorite">
+        <van-icon name="star-o" size="22px" color="#FF9500" />
+        <text class="quick-name">收藏</text>
+        <text class="quick-count">{{favoriteCount}}</text>
+      </view>
+      <view class="quick-item" bindtap="randomPractice">
+        <van-icon name="exchange" size="22px" color="#7B61FF" />
+        <text class="quick-name">随机刷题</text>
+        <text class="quick-count">{{totalQuestions}}</text>
+      </view>
+      <view class="quick-item" bindtap="goToHistory">
+        <van-icon name="clock-o" size="22px" color="#1890FF" />
+        <text class="quick-name">刷题记录</text>
+        <text class="quick-count">{{historyCount}}</text>
+      </view>
+    </view>
+
+    <view class="category-section">
+      <view class="section-header">
+        <text class="section-title">题库</text>
+        <view class="section-more" bindtap="goToQuestion">
+          <text class="more-text">全部</text>
+          <van-icon name="arrow" size="14px" color="#999" />
+        </view>
+      </view>
+      
+      <view class="card-grid">
+        <view class="practice-card" wx:for="{{displayCategories}}" wx:key="id" bindtap="selectCategory" data-type="{{item.type}}">
+          <view class="card-icon-wrap" style="background: {{item.bgColor}}15;">
+            <text class="card-icon">{{item.icon}}</text>
+          </view>
+          <text class="card-name">{{item.name}}</text>
+          <text class="card-count">{{item.questionCount}}题</text>
+        </view>
+      </view>
+      
+      <view class="category-toggle" wx:if="{{categories.length > 8}}" bindtap="toggleCategories">
+        <text>{{showAllCategories ? '收起' : '展开全部'}}</text>
+        <van-icon name="{{showAllCategories ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#666" />
+      </view>
+    </view>
+
+    <view style="height: 120rpx;"></view>
+  </scroll-view>
+</view>

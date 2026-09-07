@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="header">
+    <text class="title">消息</text>
+  </view>
+  
+  <view class="conversation-list">
+    <view wx:if="{{conversations.length === 0}}" class="empty-tip">
+      <text>暂无会话</text>
+    </view>
+    
+    <view wx:for="{{conversations}}" wx:key="id" class="conversation-item" bindtap="openChat" data-item="{{item}}">
+      <image class="avatar" src="{{item.avatar_url || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="conversation-info">
+        <view class="conversation-header">
+          <text class="nickname">{{item.nickname || '用户'}}</text>
+          <text class="time">{{item.last_message_time}}</text>
+        </view>
+        <view class="conversation-footer">
+          <text class="last-message">{{item.last_message || '暂无消息'}}</text>
+          <view wx:if="{{item.unread > 0}}" class="unread-badge">
+            <text>{{item.unread > 99 ? '99+' : item.unread}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

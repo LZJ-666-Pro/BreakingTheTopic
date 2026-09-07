@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="header">
+    <text class="header-title">面试记录</text>
+    <view class="header-action" wx:if="{{list.length > 0}}" bindtap="clearAll">清空</view>
+  </view>
+
+  <view class="list" wx:if="{{list.length > 0}}">
+    <view class="item" wx:for="{{list}}" wx:key="id">
+      <view class="item-left" bindtap="viewDetail" data-id="{{item.id}}">
+        <view class="item-title">{{item.title || '模拟面试'}}</view>
+        <view class="item-info">
+          <text>{{item.totalQuestions}}题</text>
+          <text class="dot">·</text>
+          <text>答对{{item.correctCount}}题</text>
+          <text class="dot">·</text>
+          <text>{{formatTime(item.spendSeconds)}}</text>
+        </view>
+        <view class="item-date">{{formatDate(item.createTime)}}</view>
+      </view>
+      <view class="item-right">
+        <view class="score-box">
+          <text class="item-score">{{item.score}}</text>
+          <text class="item-unit">分</text>
+        </view>
+        <view class="item-delete" catchtap="deleteItem" data-id="{{item.id}}" data-index="{{index}}">
+          <text class="delete-icon">×</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无面试记录</text>
+    <text class="empty-tip">完成面试后记录将显示在这里</text>
+  </view>
+</view>

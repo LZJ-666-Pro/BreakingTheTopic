@@ -1,0 +1,47 @@
+server:
+  port: 8100
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  boot:
+    admin:
+      client:
+        enabled: true
+        url: http://localhost:8888
+        instance:
+          service-host-type: ip
+  cloud:
+    nacos:
+      discovery:
+        ip: 127.0.0.1
+        server-addr: 127.0.0.1:8848
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+
+wx:
+  appid: wx920f3d57f4121af7
+  secret: 1a1df381bfb417d942beee26ef809b09
+
+jwt:
+  secret: poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz
+  expire: 86400000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

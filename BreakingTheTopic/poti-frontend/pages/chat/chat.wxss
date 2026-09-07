@@ -1,0 +1,153 @@
+.container {
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+.chat-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-list {
+  flex: 1;
+  padding: 20rpx;
+  background: #f5f5f5;
+}
+
+.message-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 30rpx;
+}
+
+.message-left {
+  justify-content: flex-start;
+}
+
+.message-right {
+  justify-content: flex-end;
+}
+
+.message-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.message-left .message-avatar {
+  margin-right: 20rpx;
+}
+
+.message-right .message-avatar {
+  margin-left: 20rpx;
+}
+
+.message-content {
+  max-width: 500rpx;
+  padding: 20rpx 30rpx;
+  border-radius: 20rpx;
+  word-wrap: break-word;
+}
+
+.message-left .message-content {
+  background: #fff;
+  border-top-left-radius: 0;
+}
+
+.message-right .message-content {
+  background: #07c160;
+  border-top-right-radius: 0;
+}
+
+.message-text {
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+.message-left .message-text {
+  color: #333;
+}
+
+.message-right .message-text {
+  color: #fff;
+}
+
+.message-image {
+  width: 300rpx;
+  border-radius: 10rpx;
+}
+
+.message-voice {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  min-width: 100rpx;
+}
+
+.voice-icon {
+  font-size: 32rpx;
+}
+
+.voice-duration {
+  font-size: 24rpx;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background: #fff;
+  border-top: 1rpx solid #eee;
+}
+
+.input-tools {
+  display: flex;
+  gap: 20rpx;
+  margin-right: 20rpx;
+}
+
+.tool-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 50%;
+}
+
+.tool-btn.recording {
+  background: #ff4d4f;
+}
+
+.tool-icon {
+  font-size: 32rpx;
+}
+
+.message-input {
+  flex: 1;
+  height: 70rpx;
+  padding: 0 20rpx;
+  background: #f5f5f5;
+  border-radius: 35rpx;
+  font-size: 28rpx;
+}
+
+.send-btn {
+  margin-left: 20rpx;
+  width: 140rpx;
+  height: 70rpx;
+  background: #07c160;
+  color: #fff;
+  border-radius: 35rpx;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-btn[disabled] {
+  background: #ccc;
+}

@@ -1,0 +1,130 @@
+<view class="register-container">
+  <view class="register-header">
+    <text class="title">注册账号</text>
+  </view>
+
+  <view class="register-form">
+    <view class="form-item avatar-item">
+      <view class="avatar-upload" bindtap="chooseAvatar">
+        <image wx:if="{{form.avatarUrl}}" src="{{form.avatarUrl}}" class="avatar-image" mode="aspectFill"></image>
+        <view wx:else class="avatar-placeholder">
+          <text class="avatar-icon">+</text>
+          <text class="avatar-text">上传头像</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <input 
+        class="input {{errors.nickname ? 'error' : ''}}"
+        placeholder="请输入昵称"
+        value="{{form.nickname}}"
+        data-field="nickname"
+        bindinput="onInputChange"
+      />
+      <text class="error-text" wx:if="{{errors.nickname}}">{{errors.nickname}}</text>
+    </view>
+
+    <view class="form-item">
+      <input 
+        class="input {{errors.phone ? 'error' : ''}}"
+        type="number"
+        placeholder="请输入手机号"
+        value="{{form.phone}}"
+        data-field="phone"
+        bindinput="onInputChange"
+        maxlength="11"
+      />
+      <text class="error-text" wx:if="{{errors.phone}}">{{errors.phone}}</text>
+    </view>
+
+    <view class="form-item code-item">
+      <input 
+        class="input code-input {{errors.verifyCode ? 'error' : ''}}"
+        type="number"
+        placeholder="请输入验证码"
+        value="{{form.verifyCode}}"
+        data-field="verifyCode"
+        bindinput="onInputChange"
+        maxlength="6"
+      />
+      <view class="send-code-btn {{canSendCode ? '' : 'disabled'}}" bindtap="sendVerifyCode">
+        <text>{{countdown > 0 ? countdown + 's' : '获取验证码'}}</text>
+      </view>
+      <text class="error-text" wx:if="{{errors.verifyCode}}">{{errors.verifyCode}}</text>
+    </view>
+
+    <view class="form-item">
+      <view class="gender-section">
+        <text class="gender-label">性别</text>
+        <radio-group class="gender-group" bindchange="onGenderChange">
+          <label class="gender-option">
+            <radio value="1" checked="{{form.gender === 1}}" color="#333"/>男
+          </label>
+          <label class="gender-option">
+            <radio value="2" checked="{{form.gender === 2}}" color="#333"/>女
+          </label>
+        </radio-group>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <input 
+        class="input"
+        placeholder="请输入邮箱（选填）"
+        value="{{form.email}}"
+        data-field="email"
+        bindinput="onInputChange"
+      />
+    </view>
+
+    <view class="form-item">
+      <input 
+        class="input {{errors.password ? 'error' : ''}}"
+        password
+        placeholder="请输入密码（至少6位）"
+        value="{{form.password}}"
+        data-field="password"
+        bindinput="onInputChange"
+      />
+      <text class="error-text" wx:if="{{errors.password}}">{{errors.password}}</text>
+    </view>
+
+    <view class="form-item">
+      <input 
+        class="input {{errors.confirmPassword ? 'error' : ''}}"
+        password
+        placeholder="请确认密码"
+        value="{{form.confirmPassword}}"
+        data-field="confirmPassword"
+        bindinput="onInputChange"
+      />
+      <text class="error-text" wx:if="{{errors.confirmPassword}}">{{errors.confirmPassword}}</text>
+    </view>
+
+    <view class="form-item">
+      <input 
+        class="input {{errors.uniqueId ? 'error' : ''}}"
+        placeholder="唯一ID（选填，用于好友搜索）"
+        value="{{form.uniqueId}}"
+        data-field="uniqueId"
+        bindinput="onInputChange"
+      />
+      <text class="error-text" wx:if="{{errors.uniqueId}}">{{errors.uniqueId}}</text>
+      <text class="hint-text">只能包含字母、数字和下划线，4-20个字符</text>
+    </view>
+
+    <button 
+      class="register-btn {{loading ? 'loading' : ''}}"
+      bindtap="handleRegister"
+      disabled="{{loading}}"
+    >
+      {{loading ? '注册中...' : '注册'}}
+    </button>
+
+    <view class="login-link">
+      <text>已有账号？</text>
+      <text class="link" bindtap="goToLogin">立即登录</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,160 @@
+page {
+  background: #F6F7F9;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 24rpx 28rpx;
+}
+
+.settings-group {
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+}
+
+.group-title {
+  padding: 24rpx 28rpx 16rpx;
+  font-size: 28rpx;
+  color: #999;
+  font-weight: 500;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.item-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.item-label {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.item-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+}
+
+.font-size-options {
+  display: flex;
+  gap: 12rpx;
+}
+
+.size-option {
+  padding: 12rpx 20rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: #F5F5F5;
+  border: 2rpx solid transparent;
+  transition: all 0.3s;
+}
+
+.option-active {
+  background: rgba(7, 193, 96, 0.1);
+  color: #07C160;
+  border-color: #07C160;
+  font-weight: 500;
+}
+
+.clear-btn {
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #FF9500;
+  background: rgba(255, 149, 0, 0.1);
+}
+
+.cache-info {
+  padding: 20rpx 28rpx;
+  background: #F9FAFB;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.info-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.preview-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+}
+
+.preview-title {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+  font-weight: 500;
+}
+
+.preview-card {
+  background: #F6F7F9;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.preview-content {
+  margin-bottom: 16rpx;
+  line-height: 1.6;
+}
+
+.preview-content:last-child {
+  margin-bottom: 0;
+}
+
+.preview-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.preview-text {
+  color: #333;
+}
+
+.font-size-small .preview-label,
+.font-size-small .preview-text {
+  font-size: 26rpx;
+}
+
+.font-size-normal .preview-label,
+.font-size-normal .preview-text {
+  font-size: 30rpx;
+}
+
+.font-size-large .preview-label,
+.font-size-large .preview-text {
+  font-size: 34rpx;
+}
+
+.font-size-xlarge .preview-label,
+.font-size-xlarge .preview-text {
+  font-size: 38rpx;
+}

@@ -1,0 +1,202 @@
+<view class="page">
+  <view class="nav-bar">
+    <view class="nav-tabs">
+      <view class="nav-tab {{activeTab === 'interview' ? 'tab-active' : ''}}" bindtap="switchTab" data-tab="interview">
+        <text>面试题</text>
+      </view>
+      <view class="nav-tab {{activeTab === 'choice' ? 'tab-active' : ''}}" bindtap="switchTab" data-tab="choice">
+        <text>选择题</text>
+      </view>
+      <view class="nav-tab {{activeTab === 'wrong' ? 'tab-active' : ''}}" bindtap="switchTab" data-tab="wrong">
+        <text>错题本</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="filter-bar" wx:if="{{activeTab === 'wrong'}}">
+    <view class="filter-item {{activeFilter === 'all' ? 'filter-active' : ''}}" bindtap="switchFilter" data-filter="all">
+      <text>全部</text>
+    </view>
+    <view class="filter-item {{activeFilter === 'failed' ? 'filter-active' : ''}}" bindtap="switchFilter" data-filter="failed">
+      <text>未通过</text>
+    </view>
+    <view class="filter-item {{activeFilter === 'passed' ? 'filter-active' : ''}}" bindtap="switchFilter" data-filter="passed">
+      <text>已通过</text>
+    </view>
+  </view>
+
+  <scroll-view class="main-scroll {{activeTab === 'wrong' ? 'with-filter' : ''}}" scroll-y enhanced show-scrollbar="{{false}}">
+    
+    <view wx:if="{{activeTab === 'interview'}}">
+      <view class="question-list" wx:if="{{interviewWrongList.length > 0}}">
+        <view class="question-card" wx:for="{{interviewWrongList}}" wx:key="id" bindtap="viewInterviewQuestion" data-item="{{item}}">
+          <view class="card-content">
+            <text class="card-question">{{item.title || '题目内容'}}</text>
+          </view>
+
+          <view class="card-meta">
+            <text class="meta-category">{{item.interviewTitle || '模拟面试'}}</text>
+            <text class="meta-divider">·</text>
+            <text class="meta-difficulty">面试题</text>
+          </view>
+
+          <view class="card-answer">
+            <view class="answer-row">
+              <text class="answer-label">你的答案：</text>
+              <text class="answer-value answer-wrong">{{item.userAnswerContent || '未作答'}}</text>
+            </view>
+            <view class="answer-row">
+              <text class="answer-label">正确答案：</text>
+              <text class="answer-value answer-correct">{{item.correctAnswerContent || '参考答案'}}</text>
+            </view>
+          </view>
+
+          <view class="card-footer">
+            <text class="footer-time">{{item.createTimeText}}</text>
+            <view class="footer-actions">
+              <view class="action-btn" catchtap="removeInterviewWrong" data-id="{{item.id}}">
+                <van-icon name="delete-o" size="14px" color="#999" />
+                <text>移除</text>
+              </view>
+              <view class="action-btn" catchtap="retryInterviewQuestion" data-item="{{item}}">
+                <van-icon name="replay" size="14px" color="#333" />
+                <text>重做</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-wrap" wx:if="{{interviewWrongList.length === 0}}">
+        <view class="empty-icon">
+          <van-icon name="chat-o" size="80px" color="#999" />
+        </view>
+        <text class="empty-title">暂无面试错题</text>
+        <text class="empty-desc">去参加模拟面试吧！</text>
+      </view>
+    </view>
+
+    <view wx:if="{{activeTab === 'choice'}}">
+      <view class="section" wx:if="{{practiceRecords.length > 0}}">
+        <view class="section-header">
+          <view class="section-title">
+            <text>练习记录</text>
+          </view>
+          <view class="section-actions">
+            <text class="section-count">共 {{practiceRecords.length}} 条</text>
+            <text class="clear-btn" bindtap="clearAllRecords">清空</text>
+          </view>
+        </view>
+        
+        <view class="record-list">
+          <view class="record-item" wx:for="{{practiceRecords}}" wx:key="id">
+            <view class="record-top">
+              <view class="record-question">{{item.questionTitle}}</view>
+              <view class="record-actions">
+                <view class="record-action danger" catchtap="deleteRecord" data-id="{{item.id}}" data-index="{{index}}">
+                  <text>移除</text>
+                </view>
+                <view class="record-action" bindtap="retryPractice" data-question-id="{{item.questionId}}">
+                  <text>再测一次</text>
+                  <text class="action-arrow">></text>
+                </view>
+              </view>
+            </view>
+            <view class="record-info">
+              <text class="info-text">完成时间：{{item.completeTime}}</text>
+              <text class="info-divider">|</text>
+              <text class="info-text">正确率：{{item.correctRate}}%</text>
+              <text class="info-divider">|</text>
+              <text class="info-text">用时：{{item.spendSeconds}}秒</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-wrap" wx:if="{{practiceRecords.length === 0}}">
+        <view class="empty-icon">📝</view>
+        <text class="empty-title">还没有练习记录</text>
+        <text class="empty-desc">快去做几道题试试吧</text>
+      </view>
+    </view>
+
+    <view wx:if="{{activeTab === 'wrong'}}">
+      <view class="question-list" wx:if="{{filteredList.length > 0}}">
+        <view class="question-card" wx:for="{{filteredList}}" wx:key="id" bindtap="viewQuestion" data-id="{{item.questionId}}">
+          <view class="card-content">
+            <text class="card-question">{{item.title || '题目内容'}}</text>
+          </view>
+
+          <view class="card-meta">
+            <text class="meta-category">{{item.categoryName || '综合'}}</text>
+            <text class="meta-divider">·</text>
+            <text class="meta-difficulty">{{item.difficultyText}}</text>
+          </view>
+
+          <view class="card-answer">
+            <view class="answer-row">
+              <text class="answer-label">你的答案：</text>
+              <text class="answer-value answer-wrong">{{item.userAnswer || 'A'}}</text>
+            </view>
+            <view class="answer-row">
+              <text class="answer-label">正确答案：</text>
+              <text class="answer-value answer-correct">{{item.correctAnswer || 'B'}}</text>
+            </view>
+          </view>
+
+          <view class="card-footer">
+            <text class="footer-time">{{item.createTime}}</text>
+            <view class="footer-actions">
+              <view class="action-btn" catchtap="removeWrong" data-id="{{item.questionId}}">
+                <van-icon name="delete-o" size="14px" color="#999" />
+                <text>移除</text>
+              </view>
+              <view class="action-btn" catchtap="retryQuestion" data-id="{{item.questionId}}">
+                <van-icon name="replay" size="14px" color="#333" />
+                <text>重做</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-wrap" wx:if="{{filteredList.length === 0}}">
+        <view class="empty-icon">
+          <van-icon name="passed" size="80px" color="#999" />
+        </view>
+        <text class="empty-title">太棒了，暂无错题！</text>
+        <text class="empty-desc">继续保持，加油！</text>
+      </view>
+    </view>
+
+    <view style="height: 40rpx;"></view>
+  </scroll-view>
+
+  <view class="bottom-bar" wx:if="{{activeTab === 'wrong' && filteredList.length > 0}}">
+    <view class="bottom-info">
+      <text class="info-text">共 {{filteredList.length}} 道错题</text>
+    </view>
+    <view class="bottom-btns">
+      <view class="bottom-btn danger" bindtap="clearAllWrongbook">
+        <text>全部移除</text>
+      </view>
+      <view class="bottom-btn" bindtap="retryAll">
+        <text>全部重做</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar" wx:if="{{activeTab === 'interview' && interviewWrongList.length > 0}}">
+    <view class="bottom-info">
+      <text class="info-text">共 {{interviewWrongList.length}} 道错题</text>
+    </view>
+    <view class="bottom-btns">
+      <view class="bottom-btn danger" bindtap="clearAllInterviewWrong">
+        <text>全部移除</text>
+      </view>
+      <view class="bottom-btn" bindtap="retryAllInterview">
+        <text>全部重做</text>
+      </view>
+    </view>
+  </view>
+</view>

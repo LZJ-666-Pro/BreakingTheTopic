@@ -1,0 +1,196 @@
+<view class="page">
+  <view class="header">
+    <view class="header-top">
+      <view class="back-btn" bindtap="goBack">
+        <van-icon name="arrow-left" size="20px" color="#333" />
+      </view>
+      <view class="app-title">破题 - 搜索专项练习题</view>
+      <view class="back-btn" style="visibility: hidden;">
+        <van-icon name="arrow-left" size="20px" color="#333" />
+      </view>
+    </view>
+    <view class="search-row">
+      <view class="search-box">
+        <van-icon name="search" size="18px" color="#999" />
+        <input wx:if="{{showInput}}"
+               class="search-input" 
+               placeholder="搜索面试题、知识点" 
+               value="{{keyword}}" 
+               bindinput="onInput" 
+               bindconfirm="onSearch"
+               focus="{{true}}"
+               confirm-type="search" />
+        <van-icon wx:if="{{keyword}}" name="clear" size="18px" color="#ccc" bindtap="clearInput" />
+      </view>
+      <view class="search-btn" bindtap="onSearch">
+        <text>搜索</text>
+      </view>
+    </view>
+    
+    <view wx:if="{{showSuggestions && suggestions.length > 0}}" class="suggestions-wrap">
+      <view class="suggestion-item" wx:for="{{suggestions}}" wx:key="*this" bindtap="selectSuggestion" data-keyword="{{item}}">
+        <van-icon name="search" size="16px" color="#999" />
+        <text class="suggestion-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="content">
+    <view wx:if="{{loading}}" class="loading-wrap">
+      <van-loading size="24px" color="#07C160" />
+      <text class="loading-text">搜索中...</text>
+    </view>
+
+    <view wx:elif="{{searched && results.length === 0}}" class="empty-wrap">
+      <van-icon name="search" size="64px" color="#ccc" />
+      <text class="empty-title">未找到相关题目</text>
+      <text class="empty-tip">换个关键词试试吧</text>
+      <view class="recommend-keywords">
+        <text class="recommend-title">热门推荐</text>
+        <view class="recommend-list">
+          <view class="recommend-item" wx:for="{{hotKeywords}}" wx:key="*this" bindtap="searchKeyword" data-keyword="{{item}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:elif="{{searched}}" class="result-section">
+      <view class="result-header">
+        <text class="result-count">找到 {{total}} 道相关题目</text>
+        <view class="filter-btn" bindtap="showFilter">
+          <van-icon name="filter-o" size="16px" color="#666" />
+          <text>筛选</text>
+        </view>
+      </view>
+      
+      <view class="filter-tags" wx:if="{{activeFilters.length > 0}}">
+        <view class="filter-tag" wx:for="{{activeFilters}}" wx:key="value">
+          <text>{{item.label}}</text>
+          <van-icon name="cross" size="14px" bindtap="removeFilter" data-filter="{{item}}" />
+        </view>
+      </view>
+      
+      <view class="result-list">
+        <view class="result-item" wx:for="{{results}}" wx:key="id" bindtap="goToQuestion" data-item="{{item}}">
+          <view class="result-title">{{item.title}}</view>
+          <view class="result-content" wx:if="{{item.content}}">{{item.content}}</view>
+          <view class="result-meta">
+            <view class="result-type {{item.type}}">{{item.typeName || item.type}}</view>
+            <view class="result-difficulty difficulty-{{item.difficulty}}">{{item.difficultyName || '中等'}}</view>
+            <view class="result-time" wx:if="{{item.createTime}}">{{item.createTime}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <view wx:if="{{hasMore && results.length > 0}}" class="load-more" bindtap="loadMore">
+        <text>加载更多</text>
+      </view>
+      <view wx:if="{{!hasMore && results.length > 0}}" class="no-more">
+        <text>没有更多了</text>
+      </view>
+    </view>
+
+    <block wx:if="{{!searched && !loading}}">
+      <view class="section" wx:if="{{historyList.length > 0}}">
+        <view class="section-header">
+          <view class="section-title">
+            <van-icon name="clock-o" size="16px" color="#999" />
+            <text>搜索历史</text>
+          </view>
+          <view class="section-action" bindtap="clearHistory">
+            <van-icon name="delete-o" size="14px" color="#999" />
+            <text>清空</text>
+          </view>
+        </view>
+        <view class="history-tags">
+          <view class="history-tag" wx:for="{{historyList}}" wx:key="*this" bindtap="searchKeyword" data-keyword="{{item}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="section-header">
+          <view class="section-title">
+            <van-icon name="fire-o" size="16px" color="#FF9500" />
+            <text>热门搜索</text>
+          </view>
+        </view>
+        <view class="hot-keywords-cloud">
+          <view class="keyword-tag" 
+                wx:for="{{hotKeywords}}" 
+                wx:key="*this" 
+                bindtap="searchKeyword" 
+                data-keyword="{{item}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="section-header">
+          <view class="section-title">
+            <text>大家都在看</text>
+          </view>
+        </view>
+        <view class="hot-list">
+          <view class="hot-item" wx:for="{{hotQuestions}}" wx:key="id" bindtap="goToQuestion" data-item="{{item}}">
+            <view class="hot-content">
+              <view class="hot-title">{{item.title}}</view>
+              <view class="hot-meta">
+                <text class="hot-views">{{item.viewText}}人浏览</text>
+              </view>
+            </view>
+            <van-icon name="arrow" size="16px" color="#ccc" />
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+  
+  <van-action-sheet show="{{showFilterSheet}}" bind:close="closeFilter" title="筛选条件">
+    <view class="filter-sheet">
+      <view class="filter-group">
+        <view class="filter-group-title">题目类型</view>
+        <view class="filter-options">
+          <view class="filter-option {{currentType === '' ? 'active' : ''}}" bindtap="selectType" data-type="">全部</view>
+          <view class="filter-option {{currentType === 'java' ? 'active' : ''}}" bindtap="selectType" data-type="java">Java</view>
+          <view class="filter-option {{currentType === 'python' ? 'active' : ''}}" bindtap="selectType" data-type="python">Python</view>
+          <view class="filter-option {{currentType === 'cpp' ? 'active' : ''}}" bindtap="selectType" data-type="cpp">C/C++</view>
+          <view class="filter-option {{currentType === 'go' ? 'active' : ''}}" bindtap="selectType" data-type="go">Go</view>
+          <view class="filter-option {{currentType === 'js' ? 'active' : ''}}" bindtap="selectType" data-type="js">JavaScript</view>
+          <view class="filter-option {{currentType === 'mysql' ? 'active' : ''}}" bindtap="selectType" data-type="mysql">MySQL</view>
+          <view class="filter-option {{currentType === 'redis' ? 'active' : ''}}" bindtap="selectType" data-type="redis">Redis</view>
+          <view class="filter-option {{currentType === 'spring' ? 'active' : ''}}" bindtap="selectType" data-type="spring">Spring</view>
+          <view class="filter-option {{currentType === 'mq' ? 'active' : ''}}" bindtap="selectType" data-type="mq">消息队列</view>
+          <view class="filter-option {{currentType === 'ds' ? 'active' : ''}}" bindtap="selectType" data-type="ds">数据结构</view>
+          <view class="filter-option {{currentType === 'os' ? 'active' : ''}}" bindtap="selectType" data-type="os">操作系统</view>
+          <view class="filter-option {{currentType === 'network' ? 'active' : ''}}" bindtap="selectType" data-type="network">计算机网络</view>
+          <view class="filter-option {{currentType === 'docker' ? 'active' : ''}}" bindtap="selectType" data-type="docker">Docker</view>
+          <view class="filter-option {{currentType === 'vue' ? 'active' : ''}}" bindtap="selectType" data-type="vue">Vue</view>
+          <view class="filter-option {{currentType === 'react' ? 'active' : ''}}" bindtap="selectType" data-type="react">React</view>
+          <view class="filter-option {{currentType === 'ml' ? 'active' : ''}}" bindtap="selectType" data-type="ml">机器学习</view>
+          <view class="filter-option {{currentType === 'linux' ? 'active' : ''}}" bindtap="selectType" data-type="linux">Linux</view>
+          <view class="filter-option {{currentType === 'algo' ? 'active' : ''}}" bindtap="selectType" data-type="algo">算法面试</view>
+          <view class="filter-option {{currentType === 'hr' ? 'active' : ''}}" bindtap="selectType" data-type="hr">HR面试</view>
+        </view>
+      </view>
+      
+      <view class="filter-group">
+        <view class="filter-group-title">难度等级</view>
+        <view class="filter-options">
+          <view class="filter-option {{currentDifficulty === '' ? 'active' : ''}}" bindtap="selectDifficulty" data-difficulty="">全部</view>
+          <view class="filter-option {{currentDifficulty === '1' ? 'active' : ''}}" bindtap="selectDifficulty" data-difficulty="1">简单</view>
+          <view class="filter-option {{currentDifficulty === '2' ? 'active' : ''}}" bindtap="selectDifficulty" data-difficulty="2">中等</view>
+          <view class="filter-option {{currentDifficulty === '3' ? 'active' : ''}}" bindtap="selectDifficulty" data-difficulty="3">困难</view>
+        </view>
+      </view>
+      
+      <view class="filter-actions">
+        <view class="filter-btn-reset" bindtap="resetFilter">重置</view>
+        <view class="filter-btn-confirm" bindtap="confirmFilter">确定</view>
+      </view>
+    </view>
+  </van-action-sheet>
+</view>

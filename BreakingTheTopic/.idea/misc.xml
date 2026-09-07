@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/poti/poti/pom.xml" />
+        <option value="$PROJECT_DIR$/poti-common/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-user/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-auth/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-question/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-practice/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-wrongbook/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-favorite/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-interview/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-search/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-monitor/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-dependencies/pom.xml" />
+        <option value="$PROJECT_DIR$/poti/poti-common/poti-common-security/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/poti-common/pom.xml" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="17" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

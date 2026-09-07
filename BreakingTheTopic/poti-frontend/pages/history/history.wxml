@@ -1,0 +1,78 @@
+<view class="page">
+  <scroll-view class="main-scroll" scroll-y enhanced show-scrollbar="{{false}}" 
+               bindscrolltolower="onReachBottom" lower-threshold="100">
+    
+    <view class="stats-section">
+      <view class="stats-row">
+        <view class="stat-box">
+          <text class="stat-num">{{statistics.totalQuestionCount}}</text>
+          <text class="stat-desc">累计刷题</text>
+        </view>
+        <view class="stat-box">
+          <text class="stat-num num-correct">{{statistics.correctCount}}</text>
+          <text class="stat-desc">答对</text>
+        </view>
+        <view class="stat-box">
+          <text class="stat-num num-wrong">{{statistics.wrongCount}}</text>
+          <text class="stat-desc">答错</text>
+        </view>
+        <view class="stat-box">
+          <text class="stat-num">{{statistics.correctRate}}%</text>
+          <text class="stat-desc">正确率</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="history-section" wx:if="{{historyList.length > 0}}">
+      <view class="section-header">
+        <text class="section-title">答题记录</text>
+        <view class="section-actions">
+          <text class="section-count">共 {{historyList.length}} 条</text>
+          <text class="section-clear" bindtap="clearAll">清空</text>
+        </view>
+      </view>
+
+      <view class="history-list">
+        <view class="history-item" wx:for="{{historyList}}" wx:key="id">
+          <view class="item-left" bindtap="viewQuestion" data-id="{{item.questionId}}">
+            <view class="item-header">
+              <text class="item-question">{{item.questionTitle}}</text>
+              <text class="item-time">{{item.practiceTime}}</text>
+            </view>
+            
+            <view class="item-body">
+              <view class="item-detail">
+                <text class="detail-label">你的答案：</text>
+                <text class="detail-value {{item.isCorrect ? 'value-right' : 'value-wrong'}}">{{item.userAnswer}}</text>
+              </view>
+              <view class="item-timer">
+                <van-icon name="clock-o" size="12px" color="#999" />
+                <text>{{item.spendSeconds}}秒</text>
+              </view>
+            </view>
+          </view>
+          <view class="item-delete" catchtap="deleteItem" data-id="{{item.id}}" data-index="{{index}}">
+            <van-icon name="delete-o" size="18px" color="#999" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="loading-wrap" wx:if="{{loading}}">
+      <van-loading size="24px" color="#999">加载中...</van-loading>
+    </view>
+
+    <view class="no-more" wx:if="{{!hasMore && historyList.length > 0}}">
+      <text>已经到底啦～</text>
+    </view>
+
+    <view class="empty-state" wx:if="{{!loading && historyList.length === 0}}">
+      <view class="empty-icon">📝</view>
+      <text class="empty-text">还没有刷题记录</text>
+      <text class="empty-desc">快去刷几道题试试吧</text>
+      <view class="empty-btn" bindtap="goToPractice">去刷题</view>
+    </view>
+
+    <view style="height: 40rpx;"></view>
+  </scroll-view>
+</view>

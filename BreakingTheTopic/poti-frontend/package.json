@@ -1,0 +1,13 @@
+{
+  "name": "poti-frontend",
+  "version": "1.0.0",
+  "description": "破题微信小程序",
+  "main": "app.js",
+  "scripts": {
+    "dev": "echo '开发模式'",
+    "build": "echo '构建项目'"
+  },
+  "dependencies": {
+    "@vant/weapp": "^1.11.6"
+  }
+}

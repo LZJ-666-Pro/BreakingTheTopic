@@ -1,0 +1,74 @@
+<view class="page">
+  <view class="settings-group">
+    <view class="group-title">显示设置</view>
+    
+    <view class="setting-item">
+      <view class="item-left">
+        <text class="item-label">字号调节</text>
+      </view>
+      <view class="item-right">
+        <view class="font-size-options">
+          <view class="size-option {{fontSize === 'small' ? 'option-active' : ''}}" bindtap="setFontSize" data-size="small">
+            <text>小</text>
+          </view>
+          <view class="size-option {{fontSize === 'normal' ? 'option-active' : ''}}" bindtap="setFontSize" data-size="normal">
+            <text>标准</text>
+          </view>
+          <view class="size-option {{fontSize === 'large' ? 'option-active' : ''}}" bindtap="setFontSize" data-size="large">
+            <text>大</text>
+          </view>
+          <view class="size-option {{fontSize === 'xlarge' ? 'option-active' : ''}}" bindtap="setFontSize" data-size="xlarge">
+            <text>特大</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="setting-item">
+      <view class="item-left">
+        <text class="item-label">默认展示答案</text>
+        <text class="item-desc">开启后自动显示答案和解析</text>
+      </view>
+      <view class="item-right">
+        <van-switch checked="{{showAnswer}}" size="24px" active-color="#07C160" bind:change="toggleShowAnswer" />
+      </view>
+    </view>
+  </view>
+
+  <view class="settings-group">
+    <view class="group-title">缓存管理</view>
+    
+    <view class="setting-item">
+      <view class="item-left">
+        <text class="item-label">题目缓存</text>
+        <text class="item-desc">已缓存 {{cachedCount}}/100 道题目</text>
+      </view>
+      <view class="item-right">
+        <view class="clear-btn" bindtap="clearCache">
+          <text>清除缓存</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="cache-info">
+      <view class="info-item">
+        <van-icon name="info-o" size="16px" color="#999" />
+        <text class="info-text">缓存题目可在无网络时继续刷题</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="preview-section">
+    <view class="preview-title">字号预览</view>
+    <view class="preview-card">
+      <view class="preview-content font-size-{{fontSize}}">
+        <text class="preview-label">题目：</text>
+        <text class="preview-text">Java中哪个关键字用于定义类？</text>
+      </view>
+      <view class="preview-content font-size-{{fontSize}}">
+        <text class="preview-label">选项：</text>
+        <text class="preview-text">A. class  B. struct  C. define  D. object</text>
+      </view>
+    </view>
+  </view>
+</view>

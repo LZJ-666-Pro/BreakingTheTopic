@@ -1,0 +1,296 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7.0-alpine
+    container_name: poti-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    networks:
+      - poti-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nacos:
+    image: nacos/nacos-server:v2.2.0
+    container_name: poti-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    volumes:
+      - ./nacos/logs:/home/nacos/logs
+    networks:
+      - poti-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  elasticsearch:
+    image: elasticsearch:7.17.0
+    container_name: poti-es
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+    networks:
+      - poti-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  poti-gateway:
+    build:
+      context: ./poti-gateway
+      dockerfile: Dockerfile
+    container_name: poti-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-auth:
+    build:
+      context: ./poti-auth
+      dockerfile: Dockerfile
+    container_name: poti-auth
+    restart: unless-stopped
+    ports:
+      - "8100:8100"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-user:
+    build:
+      context: ./poti-user
+      dockerfile: Dockerfile
+    container_name: poti-user
+    restart: unless-stopped
+    ports:
+      - "8200:8200"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-question:
+    build:
+      context: ./poti-question
+      dockerfile: Dockerfile
+    container_name: poti-question
+    restart: unless-stopped
+    ports:
+      - "8300:8300"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-practice:
+    build:
+      context: ./poti-practice
+      dockerfile: Dockerfile
+    container_name: poti-practice
+    restart: unless-stopped
+    ports:
+      - "8400:8400"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-wrongbook:
+    build:
+      context: ./poti-wrongbook
+      dockerfile: Dockerfile
+    container_name: poti-wrongbook
+    restart: unless-stopped
+    ports:
+      - "8500:8500"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-favorite:
+    build:
+      context: ./poti-favorite
+      dockerfile: Dockerfile
+    container_name: poti-favorite
+    restart: unless-stopped
+    ports:
+      - "8600:8600"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-interview:
+    build:
+      context: ./poti-interview
+      dockerfile: Dockerfile
+    container_name: poti-interview
+    restart: unless-stopped
+    ports:
+      - "8700:8700"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-search:
+    build:
+      context: ./poti-search
+      dockerfile: Dockerfile
+    container_name: poti-search
+    restart: unless-stopped
+    ports:
+      - "8800:8800"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  poti-admin:
+    build:
+      context: ./poti-admin
+      dockerfile: Dockerfile
+    container_name: poti-admin
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+    networks:
+      - poti-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  poti-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  nacos-logs:
+  elasticsearch-data:

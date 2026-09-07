@@ -1,0 +1,41 @@
+<view class="page">
+  <view class="header">
+    <text class="header-title">加入交流群</text>
+    <text class="header-desc">与更多小伙伴一起学习进步</text>
+  </view>
+
+  <view class="section">
+    <view class="section-title">QQ交流群</view>
+    <view class="group-list">
+      <view class="group-item" wx:for="{{groups}}" wx:key="id">
+        <view class="group-left">
+          <text class="group-name">{{item.name}}</text>
+          <text class="group-qq" wx:if="{{item.qqNumber}}">群号：{{item.qqNumber}}</text>
+        </view>
+        <view class="copy-btn" data-qq="{{item.qqNumber}}" bindtap="copyQQNumber" wx:if="{{item.qqNumber}}">
+          复制
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">微信小助手</view>
+    <view class="helper-box">
+      <view class="helper-info">
+        <text class="helper-name">面试鸭小助手</text>
+        <text class="helper-tip">添加微信，备注"刷题"邀请入群</text>
+      </view>
+      <view class="helper-action">
+        <text class="wechat-id" wx:if="{{wechatHelper}}">{{wechatHelper}}</text>
+        <view class="copy-btn" bindtap="copyWechat" wx:if="{{wechatHelper}}">
+          复制
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tips-box">
+    <text class="tips-text">入群须知：禁止广告，文明交流</text>
+  </view>
+</view>

@@ -1,0 +1,67 @@
+<view class="page">
+  <view class="header">
+    <view class="search-bar" bindtap="goToSearch">
+      <van-icon name="search" size="16px" color="#999" />
+      <text class="search-placeholder">搜索题库、知识点</text>
+    </view>
+  </view>
+
+  <view class="category-section">
+    <view class="tag-container" wx:if="{{!showAllTags}}">
+      <scroll-view class="tag-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="tag-list">
+          <view class="tag-item {{activeTag === item.key ? 'tag-active' : ''}}" 
+                wx:for="{{displayTagList}}" wx:key="key" bindtap="selectTag" data-tag="{{item.key}}">
+            <text>{{item.name}}</text>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="tag-more-btn" bindtap="toggleTags">
+        <text>更多</text>
+        <van-icon name="arrow-down" size="12px" color="#666" />
+      </view>
+    </view>
+    
+    <view class="tag-expand" wx:if="{{showAllTags}}">
+      <view class="tag-grid">
+        <view class="tag-item {{activeTag === item.key ? 'tag-active' : ''}}" 
+              wx:for="{{tagList}}" wx:key="key" bindtap="selectTag" data-tag="{{item.key}}">
+          <text>{{item.name}}</text>
+        </view>
+      </view>
+      <view class="tag-collapse-btn" bindtap="toggleTags">
+        <text>收起</text>
+        <van-icon name="arrow-up" size="12px" color="#666" />
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="main-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="section-header">
+      <text class="section-title">{{activeTagName}}</text>
+      <text class="section-count">共 {{categories.length}} 个题库</text>
+    </view>
+    
+    <view class="card-grid">
+      <view class="practice-card" wx:for="{{filteredCategories}}" wx:key="id" bindtap="goToCategory" data-type="{{item.type}}">
+        <view class="card-icon-wrap" style="background: {{item.bgColor}}15;">
+          <text class="card-icon">{{item.icon}}</text>
+        </view>
+        <text class="card-name">{{item.name}}</text>
+        <text class="card-count">{{item.questionCount}}题</text>
+      </view>
+    </view>
+    
+    <view class="category-toggle" wx:if="{{categories.length > 8 && activeTag === 'all'}}" bindtap="toggleCategories">
+      <text>{{showAllCategories ? '收起' : '展开全部'}}</text>
+      <van-icon name="{{showAllCategories ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#666" />
+    </view>
+    
+    <view class="empty-state" wx:if="{{filteredCategories.length === 0}}">
+      <van-icon name="search" size="60px" color="#ddd" />
+      <text class="empty-text">暂无相关题库</text>
+    </view>
+    
+    <view style="height: 120rpx;"></view>
+  </scroll-view>
+</view>

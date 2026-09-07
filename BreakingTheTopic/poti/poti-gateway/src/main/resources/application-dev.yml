@@ -1,0 +1,118 @@
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
+  expire: 86400000
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  boot:
+    admin:
+      client:
+        enabled: true
+        url: http://localhost:8888
+        instance:
+          service-host-type: ip
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      httpclient:
+        connect-timeout: 10000
+        response-timeout: 600s
+      routes:
+
+        - id: poti-user
+          uri: lb://poti-user
+          predicates:
+            - Path=/user/**
+
+        - id: poti-sms
+          uri: lb://poti-user
+          predicates:
+            - Path=/sms/**
+
+
+        - id: poti-auth
+          uri: lb://poti-auth
+          predicates:
+            - Path=/auth/**
+
+
+        - id: poti-question
+          uri: lb://poti-question
+          predicates:
+            - Path=/question/**
+
+
+        - id: poti-practice
+          uri: lb://poti-practice
+          predicates:
+            - Path=/practice/**
+
+
+        - id: poti-wrongbook
+          uri: lb://poti-wrongbook
+          predicates:
+            - Path=/wrongbook/**
+
+
+        - id: poti-favorite
+          uri: lb://poti-favorite
+          predicates:
+            - Path=/favorite/**
+
+
+        - id: poti-interview
+          uri: lb://poti-interview
+          predicates:
+            - Path=/interview/**
+
+
+        - id: poti-search
+          uri: lb://poti-search
+          predicates:
+            - Path=/search/**
+
+
+        - id: poti-monitor
+          uri: lb://poti-monitor
+          predicates:
+            - Path=/monitor/**
+          filters:
+            - StripPrefix=1
+
+        - id: poti-admin
+          uri: lb://poti-admin
+          predicates:
+            - Path=/admin/**
+
+        - id: poti-discussion
+          uri: lb://poti-user
+          predicates:
+            - Path=/discussion/**
+
+        - id: poti-checkin
+          uri: lb://poti-user
+          predicates:
+            - Path=/checkin/**
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.poti.gateway: INFO

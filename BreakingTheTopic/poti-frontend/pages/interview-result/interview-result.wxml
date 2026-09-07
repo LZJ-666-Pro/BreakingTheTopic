@@ -1,0 +1,80 @@
+<view class="page">
+  <view class="header">
+    <text class="header-title">面试结果</text>
+  </view>
+
+  <view class="result-card">
+    <view class="score-section">
+      <text class="score-value">{{result.score}}</text>
+      <text class="score-unit">分</text>
+    </view>
+    <view class="score-desc">
+      <text wx:if="{{result.score >= 80}}">表现优秀</text>
+      <text wx:elif="{{result.score >= 60}}">表现良好</text>
+      <text wx:else>继续加油</text>
+    </view>
+  </view>
+
+  <view class="stats-card">
+    <view class="stat-item">
+      <text class="stat-value">{{result.totalQuestions}}</text>
+      <text class="stat-label">总题数</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value correct">{{result.correctCount}}</text>
+      <text class="stat-label">答对</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{result.totalQuestions - result.correctCount}}</text>
+      <text class="stat-label">答错</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{result.spendTime}}</text>
+      <text class="stat-label">用时</text>
+    </view>
+  </view>
+
+  <view class="feedback-card" wx:if="{{result.aiFeedback}}">
+    <view class="card-header">
+      <text class="card-title">面试评语</text>
+    </view>
+    <text class="feedback-text">{{result.aiFeedback}}</text>
+  </view>
+
+  <view class="detail-card">
+    <view class="card-header">
+      <text class="card-title">答题详情</text>
+    </view>
+
+    <view class="detail-list">
+      <view class="detail-item" wx:for="{{details}}" wx:key="id">
+        <view class="item-header">
+          <view class="item-num {{item.isCorrect ? 'correct' : ''}}">{{item.orderNum}}</view>
+          <view class="item-status {{item.isCorrect ? 'correct' : 'wrong'}}">
+            {{item.isCorrect ? '正确' : '错误'}}
+          </view>
+        </view>
+        <view class="item-question">{{item.questionContent}}</view>
+        <view class="item-answer" wx:if="{{item.userAnswer}}">
+          <text class="answer-label">你的回答：</text>
+          <text class="answer-text">{{item.userAnswer}}</text>
+        </view>
+        <view class="item-answer skip" wx:else>
+          <text class="skip-text">未作答</text>
+        </view>
+        <view class="item-comment" wx:if="{{item.aiComment}}">
+          <text class="comment-label">点评：</text>
+          <text class="comment-text">{{item.aiComment}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <view class="btn-back" bindtap="goBack">返回首页</view>
+    <view class="btn-retry" bindtap="retryInterview">再次挑战</view>
+  </view>
+</view>

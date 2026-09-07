@@ -1,0 +1,61 @@
+<view class="container">
+  <view class="chat-container">
+    <scroll-view 
+      class="message-list" 
+      scroll-y 
+      scroll-into-view="{{scrollToView}}"
+      scroll-with-animation
+    >
+      <view wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}">
+        <view wx:if="{{item.sender_id === userId}}" class="message-item message-right">
+          <view class="message-content" bindlongpress="deleteMessage" data-id="{{item.id}}">
+            <text wx:if="{{item.type === 1}}" class="message-text">{{item.content}}</text>
+            <image wx:elif="{{item.type === 2}}" class="message-image" src="{{item.media_url}}" mode="widthFix" bindtap="previewImage" data-url="{{item.media_url}}"></image>
+            <view wx:elif="{{item.type === 3}}" class="message-voice" bindtap="playVoice" data-url="{{item.media_url}}">
+              <text class="voice-icon">🎤</text>
+              <text class="voice-duration">{{item.duration}}''</text>
+            </view>
+          </view>
+          <image class="message-avatar" src="{{userAvatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        </view>
+        
+        <view wx:else class="message-item message-left">
+          <image class="message-avatar" src="{{friendAvatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="message-content">
+            <text wx:if="{{item.type === 1}}" class="message-text">{{item.content}}</text>
+            <image wx:elif="{{item.type === 2}}" class="message-image" src="{{item.media_url}}" mode="widthFix" bindtap="previewImage" data-url="{{item.media_url}}"></image>
+            <view wx:elif="{{item.type === 3}}" class="message-voice" bindtap="playVoice" data-url="{{item.media_url}}">
+              <text class="voice-icon">🎤</text>
+              <text class="voice-duration">{{item.duration}}''</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+    
+    <view class="input-container">
+      <view class="input-tools">
+        <view class="tool-btn" bindtap="chooseImage">
+          <text class="tool-icon">📷</text>
+        </view>
+        <view class="tool-btn" bindtap="startRecord" wx:if="{{!isRecording}}">
+          <text class="tool-icon">🎤</text>
+        </view>
+        <view class="tool-btn recording" bindtap="stopRecord" wx:else>
+          <text class="tool-icon">⏹️</text>
+        </view>
+      </view>
+      <input 
+        class="message-input" 
+        placeholder="输入消息..." 
+        value="{{inputMessage}}"
+        bindinput="onInput"
+        confirm-type="send"
+        bindconfirm="sendMessage"
+      />
+      <button class="send-btn" bindtap="sendMessage" disabled="{{!inputMessage}}">
+        发送
+      </button>
+    </view>
+  </view>
+</view>

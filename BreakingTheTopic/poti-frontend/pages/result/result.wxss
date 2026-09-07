@@ -1,0 +1,269 @@
+page {
+  background: #F6F7F9;
+  box-sizing: border-box;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.result-header {
+  padding: 24rpx;
+  padding-top: calc(24rpx + env(safe-area-inset-top));
+  box-sizing: border-box;
+}
+
+.result-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+.result-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 28rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.result-rate {
+  display: flex;
+  align-items: baseline;
+}
+
+.rate-num {
+  font-size: 80rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1;
+}
+
+.rate-unit {
+  font-size: 32rpx;
+  color: #666;
+  margin-left: 4rpx;
+}
+
+.rate-label {
+  font-size: 26rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.result-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 28rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 6rpx;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 40rpx;
+  background: #E5E5E5;
+}
+
+.main-scroll {
+  flex: 1;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.section-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.question-item {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.q-header {
+  display: flex;
+  align-items: flex-start;
+}
+
+.q-index {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  background: #F0F0F0;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.index-correct {
+  background: #07C160;
+  color: #fff;
+}
+
+.index-wrong {
+  background: #FA5151;
+  color: #fff;
+}
+
+.q-content {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.5;
+  margin-left: 16rpx;
+  flex: 1;
+}
+
+.answer-compare {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #F5F5F5;
+}
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.answer-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.answer-value {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.answer-correct {
+  color: #07C160;
+}
+
+.answer-wrong {
+  color: #FA5151;
+}
+
+.analysis-section {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #FAFAFA;
+  border-radius: 8rpx;
+}
+
+.analysis-label {
+  font-size: 24rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.analysis-content {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+  display: block;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.btn-back {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  background: #fff;
+  border: 2rpx solid #E0E0E0;
+  border-radius: 16rpx;
+  box-sizing: border-box;
+}
+
+.btn-back:active {
+  background: #F8F8F8;
+}
+
+.btn-retry {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  background: #fff;
+  border: 2rpx solid #333;
+  border-radius: 16rpx;
+  box-sizing: border-box;
+}
+
+.btn-retry:active {
+  background: #F8F8F8;
+}

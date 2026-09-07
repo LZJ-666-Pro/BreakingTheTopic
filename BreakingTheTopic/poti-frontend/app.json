@@ -1,0 +1,85 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/question/question",
+    "pages/question-list/question-list",
+    "pages/question-detail/question-detail",
+    "pages/practice/practice",
+    "pages/user/user",
+    "pages/login/login",
+    "pages/register/register",
+    "pages/phone-login/phone-login",
+    "pages/wrongbook/wrongbook",
+    "pages/favorite/favorite",
+    "pages/interview/interview",
+    "pages/search/search",
+    "pages/answer/answer",
+    "pages/result/result",
+    "pages/history/history",
+    "pages/settings/settings",
+    "pages/rank/rank",
+    "pages/achievement/achievement",
+    "pages/friends/friends",
+    "pages/chat/chat-list",
+    "pages/chat/chat",
+    "pages/my-answers/my-answers",
+    "pages/interview-answer/interview-answer",
+    "pages/interview-result/interview-result",
+    "pages/interview-history/interview-history",
+    "pages/agreement/agreement",
+    "pages/privacy/privacy",
+    "pages/forgot-password/forgot-password",
+    "pages/feedback/feedback",
+    "pages/contact/contact",
+    "pages/group/group"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "破题",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#7A7E83",
+    "selectedColor": "#3cc51f",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/question/question",
+        "text": "题库"
+      },
+      {
+        "pagePath": "pages/practice/practice",
+        "text": "刷题"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-toast": "@vant/weapp/toast/index",
+    "van-dialog": "@vant/weapp/dialog/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-tab": "@vant/weapp/tab/index",
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-radio": "@vant/weapp/radio/index",
+    "van-radio-group": "@vant/weapp/radio-group/index",
+    "van-action-sheet": "@vant/weapp/action-sheet/index"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,52 @@
+.container {
+  min-height: 100vh;
+  background: #fff;
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+  margin-bottom: 32rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 16rpx;
+}
+
+.update-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.content {
+  
+}
+
+.section {
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.section-content {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.8;
+  display: block;
+  margin-bottom: 12rpx;
+  text-align: justify;
+}

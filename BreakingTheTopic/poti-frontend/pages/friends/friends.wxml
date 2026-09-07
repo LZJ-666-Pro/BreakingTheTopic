@@ -1,0 +1,134 @@
+<view class="page">
+  <view class="search-section">
+    <van-search value="{{ searchKeyword }}" placeholder="搜索用户ID、昵称或手机号" use-action-slot bind:change="onSearchChange" bind:search="onSearch">
+      <view slot="action" bindtap="onSearch">搜索</view>
+    </van-search>
+  </view>
+  
+  <view class="action-buttons">
+    <view class="action-btn invite-btn" bindtap="showInviteCode">
+      <text class="btn-icon">🎁</text>
+      <text class="btn-text">我的邀请码</text>
+    </view>
+    <view class="action-btn recommend-btn" bindtap="showRecommendations">
+      <text class="btn-icon">👥</text>
+      <text class="btn-text">好友推荐</text>
+    </view>
+    <view class="action-btn code-btn" bindtap="showAddByCodeDialog">
+      <text class="btn-icon">✨</text>
+      <text class="btn-text">输入邀请码</text>
+    </view>
+  </view>
+
+  <view class="search-results" wx:if="{{ searchResults.length > 0 }}">
+    <view class="result-title">搜索结果</view>
+    <view class="user-item" wx:for="{{ searchResults }}" wx:key="id">
+      <image class="user-avatar" src="{{ item.avatarUrl || '/images/default-avatar.png' }}" mode="aspectFill"></image>
+      <view class="user-info">
+        <text class="user-name">{{ item.nickname || '未设置昵称' }}</text>
+        <text class="user-id">ID: {{ item.uniqueId || '未设置' }}</text>
+      </view>
+      <view class="add-btn" bindtap="sendRequest" data-user="{{ item }}">添加好友</view>
+    </view>
+  </view>
+
+  <van-tabs active="{{ activeTab }}" bind:change="onTabChange" color="#FFB800">
+    <van-tab title="好友列表">
+      <scroll-view scroll-y class="scroll-view">
+        <view class="empty-tip" wx:if="{{ friendList.length === 0 }}">暂无好友</view>
+        <view class="friend-item" wx:for="{{ friendList }}" wx:key="user_id">
+          <image class="friend-avatar" src="{{ item.avatar_url || '/images/default-avatar.png' }}" mode="aspectFill"></image>
+          <view class="friend-info">
+            <text class="friend-name">{{ item.nickname || '未设置昵称' }}</text>
+            <view class="friend-stats">
+              <text class="stat-item">刷题 {{ item.total_questions || 0 }}</text>
+              <text class="stat-divider">|</text>
+              <text class="stat-item">今日 {{ item.today_questions || 0 }}</text>
+              <text wx:if="{{ item.lastMessageTime }}" class="message-time">{{ item.lastMessageTime }}</text>
+            </view>
+            <view wx:if="{{ item.lastMessage }}" class="last-message">
+              <text>{{ item.lastMessage }}</text>
+            </view>
+          </view>
+          <view class="friend-right">
+            <view class="chat-btn" bindtap="openChat" data-friend="{{ item }}">
+              <text>发消息</text>
+              <view wx:if="{{ item.unreadCount > 0 }}" class="unread-badge">{{ item.unreadCount > 99 ? '99+' : item.unreadCount }}</view>
+            </view>
+            <view class="clear-btn" bindtap="deleteConversation" data-friend="{{ item }}">清空</view>
+            <view class="delete-btn" bindtap="deleteFriend" data-id="{{ item.user_id }}">删除</view>
+          </view>
+        </view>
+      </scroll-view>
+    </van-tab>
+
+    <van-tab title="好友申请">
+      <scroll-view scroll-y class="scroll-view">
+        <view class="empty-tip" wx:if="{{ pendingRequests.length === 0 }}">暂无好友申请</view>
+        <view class="request-item" wx:for="{{ pendingRequests }}" wx:key="id">
+          <image class="request-avatar" src="{{ item.avatar_url || '/images/default-avatar.png' }}" mode="aspectFill"></image>
+          <view class="request-info">
+            <text class="request-name">{{ item.nickname || '未设置昵称' }}</text>
+            <text class="request-message">{{ item.message || '请求添加你为好友' }}</text>
+          </view>
+          <view class="action-btns">
+            <view class="accept-btn" bindtap="acceptRequest" data-id="{{ item.id }}">接受</view>
+            <view class="reject-btn" bindtap="rejectRequest" data-id="{{ item.id }}">拒绝</view>
+          </view>
+        </view>
+      </scroll-view>
+    </van-tab>
+
+    <van-tab title="已发送">
+      <scroll-view scroll-y class="scroll-view">
+        <view class="empty-tip" wx:if="{{ sentRequests.length === 0 }}">暂无已发送申请</view>
+        <view class="sent-item" wx:for="{{ sentRequests }}" wx:key="id">
+          <image class="sent-avatar" src="{{ item.avatar_url || '/images/default-avatar.png' }}" mode="aspectFill"></image>
+          <view class="sent-info">
+            <text class="sent-name">{{ item.nickname || '未设置昵称' }}</text>
+            <text class="sent-status">{{ item.status === 0 ? '等待回复' : item.status === 1 ? '已同意' : '已拒绝' }}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </van-tab>
+  </van-tabs>
+
+  <van-dialog use-slot title="发送好友申请" show="{{ showRequestDialog }}" show-cancel-button bind:confirm="confirmSendRequest" bind:cancel="cancelSendRequest">
+    <view class="dialog-content">
+      <textarea class="message-input" placeholder="请输入申请留言（选填）" value="{{ requestMessage }}" bindinput="onMessageInput" maxlength="200"></textarea>
+    </view>
+  </van-dialog>
+  
+  <van-dialog use-slot title="我的邀请码" show="{{ showInviteDialog }}" show-cancel-button confirm-button-text="关闭" bind:confirm="closeInviteDialog" bind:cancel="closeInviteDialog">
+    <view class="invite-dialog-content">
+      <view class="invite-code-display">{{ inviteCode || '加载中...' }}</view>
+      <view class="invite-tip">分享此邀请码给好友，好友输入邀请码即可添加你为好友</view>
+      <view class="invite-actions">
+        <button class="copy-btn" bindtap="copyInviteCode">复制邀请码</button>
+      </view>
+    </view>
+  </van-dialog>
+  
+  <van-dialog use-slot title="好友推荐" show="{{ showRecommendDialog }}" show-cancel-button confirm-button-text="关闭" bind:confirm="closeRecommendDialog" bind:cancel="closeRecommendDialog">
+    <scroll-view scroll-y class="recommend-scroll">
+      <view class="empty-tip" wx:if="{{ recommendations.length === 0 }}">暂无推荐好友</view>
+      <view class="recommend-item" wx:for="{{ recommendations }}" wx:key="user_id">
+        <image class="recommend-avatar" src="{{ item.avatar_url || '/images/default-avatar.png' }}" mode="aspectFill"></image>
+        <view class="recommend-info">
+          <text class="recommend-name">{{ item.nickname || '未设置昵称' }}</text>
+          <view class="recommend-stats">
+            <text class="stat-item">刷题 {{ item.total_questions || 0 }}</text>
+            <text wx:if="{{ item.mutual_friends_count > 0 }}" class="mutual-friends">{{ item.mutual_friends_count }}个共同好友</text>
+          </view>
+        </view>
+        <view class="add-btn" bindtap="addRecommendFriend" data-user="{{ item }}">添加</view>
+      </view>
+    </scroll-view>
+  </van-dialog>
+  
+  <van-dialog use-slot title="输入邀请码" show="{{ showAddByCodeDialog }}" show-cancel-button bind:confirm="confirmAddByCode" bind:cancel="closeAddByCodeDialog">
+    <view class="dialog-content">
+      <input class="code-input" placeholder="请输入好友的邀请码" value="{{ inputInviteCode }}" bindinput="onInviteCodeInput" maxlength="20" />
+    </view>
+  </van-dialog>
+</view>

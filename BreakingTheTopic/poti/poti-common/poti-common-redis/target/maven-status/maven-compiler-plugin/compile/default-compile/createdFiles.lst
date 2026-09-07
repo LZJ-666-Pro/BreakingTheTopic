@@ -1,0 +1,4 @@
+com\poti\common\redis\config\RedisConfig.class
+com\poti\common\redis\service\RedisService.class
+com\poti\common\redis\config\RedisAutoConfiguration.class
+com\poti\common\redis\service\SearchCacheService.class
