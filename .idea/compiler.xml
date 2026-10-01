@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="poti-common-core" />
+        <module name="poti-interview" />
+        <module name="poti-monitor" />
+        <module name="poti-admin" />
+        <module name="poti-gateway" />
+        <module name="poti-common-redis" />
+        <module name="poti-user" />
+        <module name="poti-practice" />
+        <module name="poti-common-security" />
+        <module name="poti-favorite" />
+        <module name="poti-search" />
+        <module name="poti-wrongbook" />
+        <module name="poti-common-swagger" />
+        <module name="poti-auth" />
+        <module name="poti-question" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>

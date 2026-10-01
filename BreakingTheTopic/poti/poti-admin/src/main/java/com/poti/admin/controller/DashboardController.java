@@ -62,4 +62,15 @@ public class DashboardController {
             return R.error("获取数据失败");
         }
     }
+
+    @GetMapping("/recent-users")
+    public R<List<Map<String, Object>>> getRecentActiveUsers() {
+        try {
+            List<Map<String, Object>> data = dashboardService.getRecentActiveUsers();
+            return R.success(data);
+        } catch (Exception e) {
+            log.error("获取最近活跃用户失败", e);
+            return R.error("获取数据失败");
+        }
+    }
 }

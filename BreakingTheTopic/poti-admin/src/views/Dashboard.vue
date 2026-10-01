@@ -1,321 +1,354 @@
 <template>
   <div class="dashboard">
     <div class="page-header">
-      <h2>工作台</h2>
-      <p>欢迎回来，{{ userStore.userInfo?.nickname || '管理员' }}</p>
+      <div class="page-header-left">
+        <h2>工作台</h2>
+        <p class="page-desc">
+          欢迎回来，{{ nickname }} ·
+          今日新增 <b>{{ overview.todayQuestionCount || 0 }}</b> 道题目，<b>{{ overview.pendingFeedbackCount || 0 }}</b> 条反馈待处理
+        </p>
+      </div>
+      <el-button type="primary" size="large" class="add-btn" @click="$router.push('/question')">
+        <el-icon><Plus /></el-icon>
+        添加题目
+      </el-button>
     </div>
 
-    <el-row :gutter="16" class="stat-row">
-      <el-col :xs="24" :sm="12" :lg="6">
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-title">题目总数</span>
-            <el-icon class="stat-icon" :size="20"><Document /></el-icon>
-          </div>
-          <div class="stat-value">{{ animatedStats.questionCount }}</div>
+    <div class="stat-grid">
+      <div class="stat-card" v-for="card in statCards" :key="card.label">
+        <div class="stat-icon" :class="card.type">
+          <el-icon :size="22"><component :is="card.icon" /></el-icon>
+          <span v-if="card.badge > 0" class="stat-badge">{{ card.badge > 99 ? '99+' : card.badge }}</span>
         </div>
-      </el-col>
-      <el-col :xs="24" :sm="12" :lg="6">
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-title">分类数量</span>
-            <el-icon class="stat-icon" :size="20"><Folder /></el-icon>
-          </div>
-          <div class="stat-value">{{ animatedStats.categoryCount }}</div>
+        <div class="stat-meta">
+          <span class="stat-title">{{ card.label }}</span>
+          <span class="stat-value">{{ card.value }}</span>
         </div>
-      </el-col>
-      <el-col :xs="24" :sm="12" :lg="6">
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-title">用户数量</span>
-            <el-icon class="stat-icon" :size="20"><User /></el-icon>
-          </div>
-          <div class="stat-value">{{ animatedStats.userCount }}</div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="12" :lg="6">
-        <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-title">启用题目</span>
-            <el-icon class="stat-icon" :size="20"><CircleCheck /></el-icon>
-          </div>
-          <div class="stat-value">{{ animatedStats.enabledCount }}</div>
-        </div>
-      </el-col>
-    </el-row>
+      </div>
+    </div>
 
     <el-row :gutter="16">
-      <el-col :xs="24" :lg="12">
-        <el-card class="content-card" shadow="never">
-          <template #header>
-            <div class="card-header">
-              <span>数据统计</span>
+      <el-col :xs="24" :lg="14">
+        <div class="panel" v-loading="loading">
+          <div class="panel-header">
+            <span class="panel-title">数据概览</span>
+          </div>
+          <div class="panel-body">
+            <div class="section-title">题目难度分布</div>
+            <div class="difficulty-block">
+              <template v-if="difficultyTotal > 0">
+                <div ref="difficultyChart" class="pie-chart"></div>
+                <div class="difficulty-legend">
+                  <div class="legend-item" v-for="item in difficultyList" :key="item.name">
+                    <span class="legend-dot" :style="{ background: item.color }"></span>
+                    <span class="legend-name">{{ item.name }}</span>
+                    <span class="legend-value">{{ item.percent }}% ({{ item.value }})</span>
+                  </div>
+                </div>
+              </template>
+              <div v-else class="empty-tip">暂无难度数据</div>
             </div>
-          </template>
-          <div class="charts-wrapper">
-            <div class="chart-section">
-              <div class="chart-title">题目难度分布</div>
-              <div ref="difficultyChart" class="chart"></div>
+
+            <div class="section-title">题目分类分布（Top 10）</div>
+            <div class="category-bars">
+              <div class="bar-row" v-for="(item, index) in topCategories" :key="index">
+                <span class="bar-name" :title="item.categoryName">{{ item.categoryName }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" :style="{ width: item.percent + '%' }"></div>
+                </div>
+                <span class="bar-count">{{ item.questionCount }}</span>
+              </div>
+              <div v-if="topCategories.length === 0" class="empty-tip">暂无分类数据</div>
             </div>
-            <div class="chart-section">
-              <div class="chart-title">题目分类分布</div>
-              <div ref="categoryChart" class="chart"></div>
+
+            <div class="panel-footer">
+              <el-link type="primary" :underline="false" @click="$router.push('/category')">
+                查看全部分类
+                <el-icon><ArrowRight /></el-icon>
+              </el-link>
             </div>
           </div>
-        </el-card>
+        </div>
       </el-col>
-      <el-col :xs="24" :lg="12">
-        <el-card class="content-card" shadow="never">
-          <template #header>
-            <div class="card-header">
-              <span>用户状态分布</span>
-            </div>
-          </template>
-          <div class="chart-content">
-            <div class="status-item">
-              <div class="status-dot active"></div>
-              <div class="status-info">
-                <span class="status-label">活跃用户</span>
-                <span class="status-value">{{ userStats.activeCount }}</span>
+
+      <el-col :xs="24" :lg="10">
+        <div class="panel" v-loading="loading">
+          <div class="panel-header">
+            <span class="panel-title">用户动态</span>
+          </div>
+          <div class="panel-body">
+            <div class="section-title">最近活跃用户</div>
+            <div class="user-list">
+              <div class="user-item" v-for="item in recentUsers" :key="item.userId">
+                <el-avatar :size="40" :src="item.avatarUrl" class="user-avatar">
+                  {{ (item.nickname || '微').charAt(0) }}
+                </el-avatar>
+                <div class="user-info">
+                  <span class="user-name">{{ item.nickname || '微信用户' }}</span>
+                  <span class="user-sub">最近做题 {{ formatTimeAgo(item.lastPracticeTime) }}</span>
+                </div>
+                <span class="user-time"><i class="time-dot"></i>{{ shortTimeAgo(item.lastPracticeTime) }}</span>
               </div>
-              <span class="status-percent">{{ getPercentage(userStats.activeCount, stats.userCount) }}%</span>
+              <div v-if="recentUsers.length === 0 && !loading" class="empty-tip">暂无活跃用户</div>
             </div>
-            <div class="status-item">
-              <div class="status-dot disabled"></div>
-              <div class="status-info">
-                <span class="status-label">禁用用户</span>
-                <span class="status-value">{{ userStats.disabledCount }}</span>
+
+            <div class="activity-summary">
+              <div class="summary-item">
+                <span class="summary-label">今日活跃</span>
+                <span class="summary-value">{{ userStats.todayActiveCount || 0 }}</span>
               </div>
-              <span class="status-percent">{{ getPercentage(userStats.disabledCount, stats.userCount) }}%</span>
+              <div class="summary-item">
+                <span class="summary-label">本周活跃</span>
+                <span class="summary-value">{{ userStats.weekActiveCount || 0 }}</span>
+              </div>
             </div>
           </div>
-          <div class="quick-actions">
-            <el-button type="primary" @click="$router.push('/question')">
-              <el-icon><Plus /></el-icon>
-              添加题目
-            </el-button>
-            <el-button @click="$router.push('/user')">
-              <el-icon><User /></el-icon>
-              用户管理
-            </el-button>
-          </div>
-        </el-card>
+        </div>
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useUserStore } from '../stores/user'
 import api from '../utils/api'
-import { Document, Folder, User, CircleCheck, Plus } from '@element-plus/icons-vue'
+import { Document, Folder, User, ChatDotRound, Plus, ArrowRight } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 
 const userStore = useUserStore()
 const difficultyChart = ref(null)
-const categoryChart = ref(null)
 let difficultyChartInstance = null
-let categoryChartInstance = null
 
-const stats = ref({
+const loading = ref(true)
+
+const nickname = computed(() => userStore.userInfo?.nickname || '管理员')
+
+const overview = ref({
   questionCount: 0,
   categoryCount: 0,
   userCount: 0,
-  enabledCount: 0
+  enabledCount: 0,
+  todayQuestionCount: 0,
+  pendingFeedbackCount: 0,
+  weekActiveUserCount: 0
 })
 
 const animatedStats = ref({
   questionCount: 0,
   categoryCount: 0,
-  userCount: 0,
-  enabledCount: 0
+  weekActiveUserCount: 0,
+  pendingFeedbackCount: 0
 })
 
 const questionStats = ref({
   easyCount: 0,
   mediumCount: 0,
-  hardCount: 0,
-  enabledCount: 0,
-  difficultyStats: {}
+  hardCount: 0
 })
 
 const userStats = ref({
   activeCount: 0,
-  disabledCount: 0
+  disabledCount: 0,
+  todayActiveCount: 0,
+  weekActiveCount: 0
 })
 
 const categoryStats = ref([])
+const recentUsers = ref([])
 
-const getPercentage = (value, total) => {
-  if (total === 0) return 0
-  return Math.round((value / total) * 100)
+const statCards = computed(() => [
+  { label: '题目总数', value: animatedStats.value.questionCount, icon: Document, type: 'blue', badge: 0 },
+  { label: '分类数量', value: animatedStats.value.categoryCount, icon: Folder, type: 'blue', badge: 0 },
+  { label: '近7日活跃用户', value: animatedStats.value.weekActiveUserCount, icon: User, type: 'blue', badge: 0 },
+  { label: '待处理反馈', value: animatedStats.value.pendingFeedbackCount, icon: ChatDotRound, type: 'red', badge: overview.value.pendingFeedbackCount || 0 }
+])
+
+const difficultyMeta = [
+  { key: 'mediumCount', name: '中等', color: '#3b82f6' },
+  { key: 'easyCount', name: '简单', color: '#22c55e' },
+  { key: 'hardCount', name: '困难', color: '#ef4444' }
+]
+
+const difficultyTotal = computed(() =>
+  difficultyMeta.reduce((sum, item) => sum + (questionStats.value[item.key] || 0), 0)
+)
+
+const difficultyList = computed(() =>
+  difficultyMeta.map(item => {
+    const value = questionStats.value[item.key] || 0
+    return {
+      name: item.name,
+      color: item.color,
+      value,
+      percent: difficultyTotal.value > 0 ? Math.round((value / difficultyTotal.value) * 100) : 0
+    }
+  })
+)
+
+const topCategories = computed(() => {
+  const list = categoryStats.value.slice(0, 10)
+  const max = list.length > 0 ? Math.max(...list.map(item => Number(item.questionCount) || 0)) : 0
+  return list.map(item => ({
+    ...item,
+    percent: max > 0 ? Math.round(((Number(item.questionCount) || 0) / max) * 100) : 0
+  }))
+})
+
+const pad = (num) => String(num).padStart(2, '0')
+
+const parseTime = (time) => {
+  if (!time) return null
+  const date = new Date(String(time).replace(' ', 'T'))
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+const formatTimeAgo = (time) => {
+  const date = parseTime(time)
+  if (!date) return '暂无记录'
+  const diffMinutes = Math.floor((Date.now() - date.getTime()) / 60000)
+  if (diffMinutes < 1) return '刚刚'
+  if (diffMinutes < 60) return `${diffMinutes}分钟前`
+  const diffHours = Math.floor(diffMinutes / 60)
+  if (diffHours < 24) return `${diffHours}小时前`
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays === 1) return '昨天'
+  if (diffDays < 30) return `${diffDays}天前`
+  return `${date.getMonth() + 1}月${date.getDate()}日`
+}
+
+const shortTimeAgo = (time) => {
+  const date = parseTime(time)
+  if (!date) return '--'
+  const diffMinutes = Math.floor((Date.now() - date.getTime()) / 60000)
+  if (diffMinutes < 1) return '刚刚'
+  if (diffMinutes < 60) return `${diffMinutes}分前`
+  const diffHours = Math.floor(diffMinutes / 60)
+  if (diffHours < 24) return `${diffHours}时前`
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays === 1) return '昨天'
+  if (diffDays < 30) return `${diffDays}天前`
+  return `${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
 const initDifficultyChart = () => {
   if (!difficultyChart.value) return
-  
+
   if (difficultyChartInstance) {
     difficultyChartInstance.dispose()
+    difficultyChartInstance = null
   }
-  
+
   difficultyChartInstance = echarts.init(difficultyChart.value)
-  
-  const difficultyStats = questionStats.value.difficultyStats || {}
-  console.log('difficultyStats:', difficultyStats)
-  
-  const chartData = []
-  
-  for (const [name, value] of Object.entries(difficultyStats)) {
-    console.log(`难度: ${name}, 数量: ${value}`)
-    chartData.push({
-      name: name,
-      value: value || 0
-    })
-  }
-  
-  console.log('chartData:', chartData)
-  
-  if (chartData.length === 0) {
-    console.log('没有数据，跳过图表渲染')
-    return
-  }
-  
+
   const option = {
     tooltip: {
       trigger: 'item',
       formatter: '{b}: {c} ({d}%)'
     },
-    legend: {
-      orient: 'vertical',
-      right: '5%',
-      top: 'center'
-    },
     series: [
       {
         name: '题目难度',
         type: 'pie',
-        radius: '60%',
-        center: ['40%', '50%'],
-        data: chartData,
+        radius: '68%',
+        center: ['50%', '50%'],
+        data: difficultyList.value.map(item => ({
+          name: item.name,
+          value: item.value,
+          itemStyle: { color: item.color }
+        })),
+        label: {
+          show: true,
+          position: 'inside',
+          formatter: '{b}\n{d}%',
+          color: '#fff',
+          fontSize: 12,
+          lineHeight: 18
+        },
+        labelLine: { show: false },
         emphasis: {
           itemStyle: {
-            shadowBlur: 10,
+            shadowBlur: 12,
             shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.5)'
+            shadowColor: 'rgba(0, 0, 0, 0.2)'
           }
         }
       }
     ]
   }
-  
+
   difficultyChartInstance.setOption(option)
 }
 
-const initCategoryChart = () => {
-  if (!categoryChart.value) return
-  
-  if (categoryChartInstance) {
-    categoryChartInstance.dispose()
+const handleResize = () => {
+  if (difficultyChartInstance) {
+    difficultyChartInstance.resize()
   }
-  
-  categoryChartInstance = echarts.init(categoryChart.value)
-  
-  const categories = categoryStats.value.map(item => item.categoryName)
-  const counts = categoryStats.value.map(item => item.questionCount)
-  
-  const option = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'category',
-      data: categories,
-      axisLabel: {
-        interval: 0,
-        rotate: 30
-      }
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [
-      {
-        name: '题目数量',
-        type: 'bar',
-        data: counts,
-        itemStyle: {
-          color: '#409eff'
-        }
-      }
-    ]
-  }
-  
-  categoryChartInstance.setOption(option)
 }
 
 const animateNumber = (target, key, endValue) => {
   const duration = 800
   const startTime = Date.now()
   const startValue = 0
-  
+
   const animate = () => {
     const elapsed = Date.now() - startTime
     const progress = Math.min(elapsed / duration, 1)
     const easeProgress = 1 - Math.pow(1 - progress, 3)
     target[key] = Math.round(startValue + (endValue - startValue) * easeProgress)
-    
+
     if (progress < 1) {
       requestAnimationFrame(animate)
     }
   }
-  
+
   animate()
 }
 
 onMounted(async () => {
-  try {
-    const [overviewRes, questionRes, userRes, categoryRes] = await Promise.all([
-      api.get('/admin/dashboard/overview'),
-      api.get('/admin/dashboard/question-stats'),
-      api.get('/admin/dashboard/user-stats'),
-      api.get('/admin/dashboard/category-stats')
-    ])
-    
-    stats.value = overviewRes.data
-    stats.value.enabledCount = overviewRes.data.enabledCount || 0
-    questionStats.value = questionRes.data
-    userStats.value = userRes.data
-    categoryStats.value = categoryRes.data || []
-    
-    animateNumber(animatedStats.value, 'questionCount', stats.value.questionCount)
-    animateNumber(animatedStats.value, 'categoryCount', stats.value.categoryCount)
-    animateNumber(animatedStats.value, 'userCount', stats.value.userCount)
-    animateNumber(animatedStats.value, 'enabledCount', stats.value.enabledCount)
-    
-    await nextTick()
+  window.addEventListener('resize', handleResize)
+
+  const [overviewRes, questionRes, userRes, categoryRes, recentUsersRes] = await Promise.allSettled([
+    api.get('/admin/dashboard/overview'),
+    api.get('/admin/dashboard/question-stats'),
+    api.get('/admin/dashboard/user-stats'),
+    api.get('/admin/dashboard/category-stats'),
+    api.get('/admin/dashboard/recent-users')
+  ])
+
+  if (overviewRes.status === 'fulfilled') {
+    overview.value = { ...overview.value, ...overviewRes.value.data }
+    animateNumber(animatedStats.value, 'questionCount', overview.value.questionCount || 0)
+    animateNumber(animatedStats.value, 'categoryCount', overview.value.categoryCount || 0)
+    animateNumber(animatedStats.value, 'weekActiveUserCount', overview.value.weekActiveUserCount || 0)
+    animateNumber(animatedStats.value, 'pendingFeedbackCount', overview.value.pendingFeedbackCount || 0)
+  }
+  if (questionRes.status === 'fulfilled') {
+    questionStats.value = { ...questionStats.value, ...questionRes.value.data }
+  }
+  if (userRes.status === 'fulfilled') {
+    userStats.value = { ...userStats.value, ...userRes.value.data }
+  }
+  if (categoryRes.status === 'fulfilled') {
+    categoryStats.value = categoryRes.value.data || []
+  }
+  if (recentUsersRes.status === 'fulfilled') {
+    recentUsers.value = recentUsersRes.value.data || []
+  }
+
+  loading.value = false
+
+  await nextTick()
+  if (difficultyTotal.value > 0) {
     initDifficultyChart()
-    initCategoryChart()
-  } catch (error) {
-    console.error(error)
   }
 })
 
-window.addEventListener('resize', () => {
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
   if (difficultyChartInstance) {
-    difficultyChartInstance.resize()
-  }
-  if (categoryChartInstance) {
-    categoryChartInstance.resize()
+    difficultyChartInstance.dispose()
+    difficultyChartInstance = null
   }
 })
 </script>
@@ -326,210 +359,361 @@ window.addEventListener('resize', () => {
 }
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 24px;
 }
 
 .page-header h2 {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: #1a1a1a;
   margin: 0 0 8px 0;
 }
 
-.page-header p {
+.page-desc {
   font-size: 14px;
-  color: #999;
+  color: #8a919f;
   margin: 0;
 }
 
-.stat-row {
+.page-desc b {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.add-btn {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.add-btn .el-icon {
+  margin-right: 4px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   margin-bottom: 16px;
+}
+
+@media (max-width: 992px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stat-card {
   background: #fff;
-  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
   padding: 20px;
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.stat-header {
+.stat-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon.blue {
+  background: #e8f3ff;
+  color: #1890ff;
+}
+
+.stat-icon.red {
+  background: #ffece8;
+  color: #f5483b;
+}
+
+.stat-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #f5483b;
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.stat-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .stat-title {
   font-size: 14px;
-  color: #666;
-}
-
-.stat-icon {
-  color: #1890ff;
+  color: #8a919f;
 }
 
 .stat-value {
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 700;
   color: #1a1a1a;
   line-height: 1;
 }
 
-.content-card {
-  border-radius: 4px;
+.panel {
+  background: #fff;
   border: 1px solid #f0f0f0;
+  border-radius: 8px;
   margin-bottom: 16px;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.content-card :deep(.el-card__header) {
+.panel-header {
   padding: 16px 20px;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.content-card :deep(.el-card__body) {
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.panel-body {
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 20px;
 }
 
-.card-header {
-  font-size: 15px;
-  font-weight: 500;
-  color: #1a1a1a;
-}
-
-.chart-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px 0;
-}
-
-.charts-wrapper {
-  padding: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-}
-
-.chart-section {
-  margin-bottom: 0;
-}
-
-.chart-section:last-child {
-  margin-bottom: 0;
-}
-
-.chart-title {
+.section-title {
   font-size: 14px;
   font-weight: 500;
   color: #333;
   margin-bottom: 16px;
-  padding-left: 12px;
-  border-left: 3px solid #409eff;
 }
 
-.chart {
-  width: 100%;
-  height: 190px;
-}
-
-.chart-content {
-  padding: 4px 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.chart-item {
-  margin-bottom: 20px;
-}
-
-.chart-item:last-child {
-  margin-bottom: 0;
-}
-
-.chart-label {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #666;
-}
-
-.chart-value {
-  color: #1a1a1a;
-  font-weight: 500;
-}
-
-.status-item {
+.difficulty-block {
   display: flex;
   align-items: center;
-  padding: 24px 20px;
-  background: #fafafa;
-  border-radius: 4px;
+  gap: 24px;
   margin-bottom: 24px;
 }
 
-.status-item:last-child {
-  margin-bottom: 0;
+.pie-chart {
+  width: 220px;
+  height: 200px;
+  flex-shrink: 0;
 }
 
-.status-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-right: 16px;
-}
-
-.status-dot.active {
-  background: #52c41a;
-}
-
-.status-dot.disabled {
-  background: #ff4d4f;
-}
-
-.status-info {
+.difficulty-legend {
   flex: 1;
-}
-
-.status-label {
-  display: block;
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 6px;
-}
-
-.status-value {
-  font-size: 26px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.status-percent {
-  font-size: 18px;
-  font-weight: 500;
-  color: #1890ff;
-}
-
-.quick-actions {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #f0f0f0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-.quick-actions .el-button {
-  width: 100%;
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  color: #4e5969;
+}
+
+.legend-value {
+  margin-left: auto;
+  color: #86909c;
+}
+
+.category-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bar-name {
+  width: 88px;
+  font-size: 13px;
+  color: #4e5969;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.bar-track {
+  flex: 1;
+  height: 10px;
+  background: #f2f3f5;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: #8cbdfb;
+  transition: width 0.6s ease;
+}
+
+.bar-count {
+  width: 32px;
+  font-size: 13px;
+  color: #4e5969;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.panel-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.panel-footer .el-link {
+  font-size: 13px;
+}
+
+.panel-footer .el-icon {
+  margin-left: 2px;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.user-item + .user-item {
+  border-top: 1px solid #f7f8fa;
+}
+
+.user-avatar {
+  background: #e8f3ff;
+  color: #1890ff;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d2129;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-sub {
+  font-size: 13px;
+  color: #a1a7b3;
+}
+
+.user-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #a1a7b3;
+  flex-shrink: 0;
+}
+
+.time-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4d7de;
+}
+
+.activity-summary {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px 0;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-item + .summary-item {
+  border-left: 1px solid #f0f0f0;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: #8a919f;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.empty-tip {
+  padding: 24px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #a1a7b3;
 }
 </style>

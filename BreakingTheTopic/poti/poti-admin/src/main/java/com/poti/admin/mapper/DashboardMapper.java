@@ -54,4 +54,31 @@ public interface DashboardMapper {
             "GROUP BY c.id, c.name " +
             "ORDER BY questionCount DESC")
     List<Map<String, Object>> getCategoryStats();
+
+    @DS("question")
+    @Select("SELECT COUNT(*) FROM question WHERE deleted = 0 AND create_time >= CURDATE()")
+    Integer countTodayQuestions();
+
+    @DS("user")
+    @Select("SELECT COUNT(*) FROM feedback WHERE status = 0")
+    Integer countPendingFeedback();
+
+    @DS("practice")
+    @Select("SELECT COUNT(DISTINCT user_id) FROM practice_record " +
+            "WHERE deleted = 0 AND practice_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)")
+    Integer countWeekActiveUsers();
+
+    @DS("practice")
+    @Select("SELECT COUNT(DISTINCT user_id) FROM practice_record " +
+            "WHERE deleted = 0 AND practice_time >= CURDATE()")
+    Integer countTodayActiveUsers();
+
+    @DS("practice")
+    @Select("SELECT user_id as userId, MAX(practice_time) as lastPracticeTime, COUNT(*) as practiceCount " +
+            "FROM practice_record " +
+            "WHERE deleted = 0 " +
+            "GROUP BY user_id " +
+            "ORDER BY lastPracticeTime DESC " +
+            "LIMIT 8")
+    List<Map<String, Object>> getRecentPracticeUsers();
 }

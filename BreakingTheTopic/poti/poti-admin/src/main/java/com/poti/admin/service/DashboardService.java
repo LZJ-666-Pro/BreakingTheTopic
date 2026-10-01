@@ -12,4 +12,6 @@ public interface DashboardService {
     Map<String, Object> getUserStats();
      
     List<Map<String, Object>> getCategoryStats();
+
+    List<Map<String, Object>> getRecentActiveUsers();
 }

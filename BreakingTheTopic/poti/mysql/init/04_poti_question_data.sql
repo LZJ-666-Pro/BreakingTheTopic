@@ -1,0 +1,361 @@
+SET NAMES utf8mb4;
+USE `poti_question`;
+-- =============================================
+-- 破题刷题系统 - 题库初始化数据
+-- 包含：Java(50道)、MySQL(30道)、Redis(25道)、Spring(25道)、算法(20道)、网络(15道)
+-- 共计：165道题目
+-- =============================================
+
+-- 1. 题目分类
+INSERT IGNORE INTO `category` (`id`, `name`, `parent_id`, `sort`, `icon`, `icon_url`, `description`) VALUES
+(1, 'Java', 0, 1, 'java', 'https://img.icons8.com/color/96/java-coffee-cup-logo.png', 'Java编程语言相关题目'),
+(2, 'Python', 0, 2, 'python', 'https://img.icons8.com/color/96/python.png', 'Python编程语言相关题目'),
+(3, 'MySQL', 0, 3, 'mysql', 'https://img.icons8.com/color/96/mysql-logo.png', 'MySQL数据库相关题目'),
+(4, 'Redis', 0, 4, 'redis', 'https://img.icons8.com/color/96/redis.png', 'Redis缓存相关题目'),
+(5, 'Spring', 0, 5, 'spring', 'https://img.icons8.com/color/96/spring-logo.png', 'Spring框架相关题目'),
+(6, 'MQ', 0, 6, 'mq', 'https://img.icons8.com/color/96/message-group.png', '消息队列相关题目'),
+(7, '算法', 0, 7, 'algorithm', 'https://img.icons8.com/color/96/code.png', '算法与数据结构题目'),
+(8, '计算机网络', 0, 8, 'network', 'https://img.icons8.com/color/96/network.png', '计算机网络相关题目'),
+(9, '操作系统', 0, 9, 'os', 'https://img.icons8.com/color/96/operating-system.png', '操作系统相关题目'),
+(10, '设计模式', 0, 10, 'design', 'https://img.icons8.com/color/96/design.png', '设计模式相关题目');
+
+-- 2. Java题目 (50道)
+INSERT INTO `question` (`category_id`, `title`, `content`, `type`, `difficulty`, `options`, `answer`, `analysis`, `tags`, `status`) VALUES
+(1, 'Java中哪个关键字用于定义类？', 'Java中哪个关键字用于定义类？', 1, 1, '["A. class", "B. struct", "C. define", "D. type"]', 'A', 'class关键字用于定义类，是Java中最基本的关键字之一。', 'Java,基础,关键字', 1),
+(1, 'Java中main方法的正确签名是？', 'Java中main方法的正确签名是？', 1, 1, '["A. public static void main(String args)", "B. public static void main(String[] args)", "C. public void main(String[] args)", "D. static void main(String[] args)"]', 'B', 'main方法必须是public static void，参数必须是String数组类型。', 'Java,基础,main方法', 1),
+(1, 'Java中哪个不是基本数据类型？', 'Java中哪个不是基本数据类型？', 1, 1, '["A. int", "B. boolean", "C. String", "D. char"]', 'C', 'String是引用类型，不是基本数据类型。', 'Java,基础,数据类型', 1),
+(1, 'Java中equals()和==的区别是？', '关于Java中equals()方法和==运算符的区别，下列说法正确的是？', 1, 2, '["A. equals()比较的是引用地址", "B. ==比较的是内容", "C. equals()默认比较引用地址，可重写比较内容", "D. 两者没有区别"]', 'C', '==比较的是引用地址，equals()可以被重写来比较内容。', 'Java,基础,equals', 1),
+(1, 'Java中String是不可变的，这意味着？', 'Java中String是不可变的，这意味着什么？', 1, 2, '["A. String对象创建后不能修改", "B. String变量不能重新赋值", "C. String不能被继承", "D. String不能为null"]', 'A', 'String不可变意味着String对象一旦创建，其内容就不能被修改。', 'Java,基础,String', 1),
+(1, 'Java中final关键字可以修饰？', 'Java中final关键字可以修饰哪些内容？', 2, 2, '["A. 类", "B. 方法", "C. 变量", "D. 以上都可以"]', 'D', 'final可以修饰类、方法、变量。', 'Java,基础,final', 1),
+(1, 'Java中static关键字的作用是？', 'Java中static关键字的作用是什么？', 1, 2, '["A. 创建对象", "B. 表示类级别的成员", "C. 表示私有成员", "D. 表示常量"]', 'B', 'static关键字表示类级别的成员，属于类而不是对象。', 'Java,基础,static', 1),
+(1, 'Java中接口和抽象类的区别？', '关于Java中接口和抽象类的区别，下列说法正确的是？', 1, 3, '["A. 接口可以有构造方法", "B. 抽象类可以实例化", "C. 接口中的变量默认是public static final", "D. 抽象类不能有具体方法"]', 'C', '接口中的变量默认是public static final的。', 'Java,基础,接口,抽象类', 1),
+(1, 'Java中重载和重写的区别？', 'Java中方法重载和方法重写的区别是？', 1, 2, '["A. 重载发生在子类，重写发生在同一类中", "B. 重载要求方法签名不同，重写要求方法签名相同", "C. 重载用于继承，重写用于多态", "D. 两者没有区别"]', 'B', '重载发生在同一类中，方法名相同但参数列表不同；重写发生在子类中，方法签名必须相同。', 'Java,基础,重载,重写', 1),
+(1, 'Java中ArrayList和LinkedList的区别？', 'Java中ArrayList和LinkedList的主要区别是？', 1, 2, '["A. ArrayList基于数组，LinkedList基于链表", "B. ArrayList查询快，LinkedList增删快", "C. ArrayList线程安全，LinkedList线程不安全", "D. A和B都对"]', 'D', 'ArrayList基于数组，查询快；LinkedList基于链表，增删快。', 'Java,集合,ArrayList,LinkedList', 1),
+(1, 'Java中HashMap的底层实现是？', 'Java 8中HashMap的底层实现是？', 1, 3, '["A. 数组+链表", "B. 数组+红黑树", "C. 数组+链表+红黑树", "D. 红黑树"]', 'C', 'Java 8中HashMap底层采用数组+链表+红黑树实现。', 'Java,集合,HashMap', 1),
+(1, 'Java中ConcurrentHashMap如何保证线程安全？', 'Java 8中ConcurrentHashMap如何保证线程安全？', 1, 3, '["A. 使用synchronized锁整个表", "B. 使用ReentrantLock", "C. 使用CAS+synchronized锁桶", "D. 使用volatile"]', 'C', 'Java 8中ConcurrentHashMap使用CAS+synchronized来保证线程安全。', 'Java,集合,并发,ConcurrentHashMap', 1),
+(1, 'Java中volatile关键字的作用是？', 'Java中volatile关键字的主要作用是？', 1, 3, '["A. 保证原子性", "B. 保证可见性和禁止指令重排", "C. 保证线程安全", "D. 以上都是"]', 'B', 'volatile关键字保证变量的可见性和禁止指令重排，但不能保证原子性。', 'Java,并发,volatile', 1),
+(1, 'Java中synchronized和ReentrantLock的区别？', 'Java中synchronized和ReentrantLock的主要区别是？', 2, 3, '["A. synchronized是关键字，ReentrantLock是类", "B. synchronized自动释放锁，ReentrantLock需要手动释放", "C. ReentrantLock支持公平锁，synchronized不支持", "D. 以上都对"]', 'D', 'synchronized是关键字，自动释放锁；ReentrantLock是类，需要手动释放。', 'Java,并发,锁', 1),
+(1, 'Java中线程池的核心参数有哪些？', 'Java中ThreadPoolExecutor的核心参数包括哪些？', 2, 3, '["A. corePoolSize", "B. maximumPoolSize", "C. workQueue", "D. 以上都是"]', 'D', 'ThreadPoolExecutor的核心参数包括：corePoolSize、maximumPoolSize、workQueue等。', 'Java,并发,线程池', 1),
+(1, 'Java中JVM的内存模型包括哪些区域？', 'Java中JVM运行时数据区包括哪些区域？', 2, 3, '["A. 堆", "B. 栈", "C. 方法区", "D. 以上都是"]', 'D', 'JVM运行时数据区包括：堆、栈、方法区、程序计数器、本地方法栈。', 'Java,JVM,内存模型', 1),
+(1, 'Java中垃圾回收算法有哪些？', 'Java中常见的垃圾回收算法包括哪些？', 2, 3, '["A. 标记-清除", "B. 复制算法", "C. 标记-整理", "D. 以上都是"]', 'D', '常见的垃圾回收算法包括：标记-清除、复制算法、标记-整理、分代收集。', 'Java,JVM,GC', 1),
+(1, 'Java中类加载的过程是？', 'Java中类加载的过程包括哪些阶段？', 1, 3, '["A. 加载->链接->初始化", "B. 编译->运行->加载", "C. 解析->验证->初始化", "D. 加载->运行->卸载"]', 'A', '类加载过程：加载->链接（验证、准备、解析）->初始化。', 'Java,JVM,类加载', 1),
+(1, 'Java中双亲委派模型是什么？', 'Java中类加载器的双亲委派模型是指？', 1, 3, '["A. 子加载器先加载，父加载器后加载", "B. 父加载器先加载，子加载器后加载", "C. 只有父加载器加载", "D. 随机加载"]', 'B', '双亲委派模型：先委托父加载器加载，只有父加载器无法加载时，才由自己加载。', 'Java,JVM,类加载器', 1),
+(1, 'Java中OOM可能发生在哪些区域？', 'Java中OutOfMemoryError可能发生在哪些内存区域？', 2, 3, '["A. Java堆", "B. 方法区", "C. 虚拟机栈", "D. 以上都可能"]', 'D', 'OOM可能发生在：Java堆、方法区、虚拟机栈、本地方法栈、直接内存。', 'Java,JVM,OOM', 1),
+(1, 'Java中强引用、软引用、弱引用、虚引用的区别？', 'Java中四种引用类型的区别是？', 1, 3, '["A. 强引用不会被回收", "B. 软引用在内存不足时被回收", "C. 弱引用在GC时被回收", "D. 以上都对"]', 'D', '强引用不会被回收；软引用内存不足时回收；弱引用GC时回收。', 'Java,引用,GC', 1),
+(1, 'Java中如何避免内存泄漏？', 'Java中避免内存泄漏的常见方法包括？', 2, 2, '["A. 及时关闭资源", "B. 避免在循环中创建对象", "C. 使用弱引用", "D. 以上都是"]', 'D', '避免内存泄漏：及时关闭IO流、数据库连接；避免在循环中创建大量对象。', 'Java,内存泄漏,最佳实践', 1),
+(1, 'Java中异常处理的最佳实践？', 'Java中异常处理的最佳实践包括？', 2, 2, '["A. 不要捕获Error", "B. 使用try-with-resources", "C. 不要忽略异常", "D. 以上都是"]', 'D', '异常处理最佳实践：不要捕获Error；使用try-with-resources；不要忽略异常。', 'Java,异常处理,最佳实践', 1),
+(1, 'Java中泛型的类型擦除是什么？', 'Java中泛型的类型擦除是指？', 1, 3, '["A. 编译时擦除泛型类型信息", "B. 运行时擦除泛型类型信息", "C. 泛型类型不存在", "D. 泛型会保留类型信息"]', 'A', 'Java泛型在编译时进行类型检查，编译后会擦除泛型类型信息。', 'Java,泛型,类型擦除', 1),
+(1, 'Java中反射的性能问题？', 'Java中反射的主要性能问题是？', 1, 3, '["A. 编译时优化失效", "B. 方法调用开销大", "C. 安全检查开销", "D. 以上都是"]', 'D', '反射的性能问题：编译时优化失效、方法调用开销大、安全检查开销。', 'Java,反射,性能', 1),
+(1, 'Java中注解的工作原理？', 'Java中注解的工作原理是？', 1, 3, '["A. 编译时处理", "B. 运行时通过反射处理", "C. A和B都可以", "D. 注解只是注释"]', 'C', '注解可以通过编译时处理或运行时反射处理。', 'Java,注解,反射', 1),
+(1, 'Java中Lambda表达式的原理？', 'Java中Lambda表达式的实现原理是？', 1, 3, '["A. 编译为匿名内部类", "B. 使用invokedynamic指令", "C. 编译为普通方法", "D. 运行时动态生成类"]', 'B', 'Java 8中Lambda表达式使用invokedynamic指令实现。', 'Java,Lambda,invokedynamic', 1),
+(1, 'Java中Stream API的特点？', 'Java中Stream API的特点包括？', 2, 2, '["A. 声明式编程", "B. 可并行处理", "C. 惰性求值", "D. 以上都是"]', 'D', 'Stream API特点：声明式编程风格、支持并行处理、惰性求值。', 'Java,Stream,函数式编程', 1),
+(1, 'Java中Optional类的作用？', 'Java中Optional类的主要作用是？', 1, 2, '["A. 避免NullPointerException", "B. 表示可能为空的值", "C. 提供更优雅的空值处理", "D. 以上都对"]', 'D', 'Optional类用于表示可能为空的值，避免NullPointerException。', 'Java,Optional,空值处理', 1),
+(1, 'Java中CompletableFuture的作用？', 'Java中CompletableFuture的主要作用是？', 1, 3, '["A. 异步编程", "B. 组合多个Future", "C. 异常处理", "D. 以上都是"]', 'D', 'CompletableFuture支持异步计算、组合多个Future、链式调用。', 'Java,异步,CompletableFuture', 1),
+(1, 'Java中CAS的原理和问题？', 'Java中CAS的原理和问题是？', 1, 3, '["A. 原子操作", "B. ABA问题", "C. A和B都对", "D. 只能保证单个变量原子性"]', 'C', 'CAS是原子操作，存在ABA问题。', 'Java,并发,CAS', 1),
+(1, 'Java中AQS的原理？', 'Java中AQS的原理是？', 1, 3, '["A. 基于CLH队列", "B. 使用state变量表示状态", "C. 支持独占和共享模式", "D. 以上都对"]', 'D', 'AQS是基于CLH队列实现的同步器框架。', 'Java,并发,AQS', 1),
+(1, 'Java中ThreadLocal的原理和问题？', 'Java中ThreadLocal的原理和问题是？', 1, 3, '["A. 每个线程独立存储变量", "B. 可能导致内存泄漏", "C. A和B都对", "D. 线程安全"]', 'C', 'ThreadLocal为每个线程提供独立的变量副本，可能导致内存泄漏。', 'Java,并发,ThreadLocal', 1),
+(1, 'Java中CountDownLatch和CyclicBarrier的区别？', 'Java中CountDownLatch和CyclicBarrier的区别是？', 1, 3, '["A. CountDownLatch不可重用", "B. CyclicBarrier可重用", "C. CountDownLatch等待事件，CyclicBarrier等待线程", "D. 以上都对"]', 'D', 'CountDownLatch不可重用；CyclicBarrier可重用。', 'Java,并发,同步器', 1),
+(1, 'Java中Semaphore的作用？', 'Java中Semaphore的主要作用是？', 1, 2, '["A. 控制并发线程数", "B. 实现限流", "C. 资源访问控制", "D. 以上都对"]', 'D', 'Semaphore用于控制同时访问资源的线程数量。', 'Java,并发,Semaphore', 1),
+(1, 'Java中G1垃圾收集器的特点？', 'Java中G1垃圾收集器的主要特点是？', 2, 3, '["A. 分区收集", "B. 可预测停顿", "C. 并发标记", "D. 以上都对"]', 'D', 'G1特点：分区收集、可预测停顿、并发标记。', 'Java,JVM,G1', 1),
+(1, 'Java中ZGC的特点？', 'Java中ZGC的主要特点是？', 1, 3, '["A. 低延迟", "B. 并发整理", "C. 染色指针", "D. 以上都对"]', 'D', 'ZGC是低延迟垃圾收集器，停顿时间不超过10ms。', 'Java,JVM,ZGC', 1),
+(1, 'Java中JIT编译器的优化技术？', 'Java中JIT编译器的常见优化技术包括？', 2, 3, '["A. 方法内联", "B. 逃逸分析", "C. 循环优化", "D. 以上都是"]', 'D', 'JIT优化技术：方法内联、逃逸分析、循环优化。', 'Java,JVM,JIT', 1),
+(1, 'Java中逃逸分析的作用？', 'Java中逃逸分析的主要作用是？', 1, 3, '["A. 栈上分配", "B. 锁消除", "C. 标量替换", "D. 以上都对"]', 'D', '逃逸分析可以优化：栈上分配、锁消除、标量替换。', 'Java,JVM,逃逸分析', 1),
+(1, 'Java中如何进行性能调优？', 'Java性能调优的常见方法包括？', 2, 2, '["A. JVM参数调优", "B. 代码优化", "C. 数据库优化", "D. 以上都是"]', 'D', '性能调优方法：JVM参数调优、代码优化、数据库优化。', 'Java,性能调优,最佳实践', 1),
+(1, 'Java中常见的性能问题？', 'Java中常见的性能问题包括？', 2, 2, '["A. 内存泄漏", "B. 频繁GC", "C. 线程阻塞", "D. 以上都是"]', 'D', '常见性能问题：内存泄漏、频繁GC、线程阻塞。', 'Java,性能问题,排查', 1),
+(1, 'Java中如何排查CPU使用率高？', 'Java中排查CPU使用率高的方法是？', 1, 3, '["A. top命令找到高CPU进程", "B. jstack获取线程堆栈", "C. 分析热点方法", "D. 以上都是"]', 'D', '排查步骤：top找到高CPU进程；jstack获取线程堆栈。', 'Java,性能排查,CPU', 1),
+(1, 'Java中如何排查内存泄漏？', 'Java中排查内存泄漏的方法是？', 1, 3, '["A. jmap导出堆转储", "B. MAT分析对象引用", "C. 观察GC日志", "D. 以上都是"]', 'D', '排查步骤：jmap导出堆转储；MAT分析。', 'Java,性能排查,内存', 1),
+(1, 'Java中LongAdder比AtomicLong的优势？', 'Java中LongAdder比AtomicLong的优势是？', 1, 3, '["A. 高并发下性能更好", "B. 空间换时间", "C. 最终一致性", "D. 以上都对"]', 'D', 'LongAdder在高并发下性能更好，使用空间换时间。', 'Java,并发,原子类', 1),
+(1, 'Java中StampedLock的特点？', 'Java中StampedLock的主要特点是？', 1, 3, '["A. 乐观读", "B. 读写锁分离", "C. 不可重入", "D. 以上都对"]', 'D', 'StampedLock支持乐观读、读写锁分离，但不可重入。', 'Java,并发,锁', 1),
+(1, 'Java中Fork/Join框架的原理？', 'Java中Fork/Join框架的工作原理是？', 1, 3, '["A. 分治算法", "B. 工作窃取算法", "C. A和B", "D. 轮询调度"]', 'C', 'Fork/Join框架基于分治算法和工作窃取算法。', 'Java,并发,ForkJoin', 1),
+(1, 'Java中模块化系统是什么？', 'Java 9引入的模块化系统的主要目的是？', 2, 3, '["A. 更好的封装", "B. 更可靠的配置", "C. 更小的运行时", "D. 以上都是"]', 'D', '模块化系统目的：更好的封装、更可靠的配置、更小的运行时。', 'Java,模块化,JPMS', 1),
+(1, 'Java中Phaser的作用？', 'Java中Phaser的主要作用是？', 1, 3, '["A. 分阶段并发控制", "B. 动态注册线程", "C. 替代CountDownLatch和CyclicBarrier", "D. 以上都对"]', 'D', 'Phaser支持分阶段并发控制，可以动态注册/注销线程。', 'Java,并发,Phaser', 1),
+(1, 'Java中Exchanger的作用？', 'Java中Exchanger的主要作用是？', 1, 3, '["A. 线程间数据交换", "B. 线程同步", "C. 数据传输", "D. 线程通信"]', 'A', 'Exchanger用于两个线程之间交换数据。', 'Java,并发,Exchanger', 1),
+
+-- 3. MySQL题目 (30道)
+(3, 'MySQL中InnoDB和MyISAM的区别？', 'MySQL中InnoDB和MyISAM存储引擎的主要区别是？', 2, 2, '["A. InnoDB支持事务", "B. InnoDB支持行锁", "C. InnoDB支持外键", "D. 以上都对"]', 'D', 'InnoDB支持事务、行锁、外键、崩溃恢复。', 'MySQL,存储引擎,InnoDB', 1),
+(3, 'MySQL中索引的类型有哪些？', 'MySQL中常见的索引类型包括？', 2, 2, '["A. B+树索引", "B. 哈希索引", "C. 全文索引", "D. 以上都是"]', 'D', 'MySQL索引类型：B+树索引、哈希索引、全文索引、空间索引。', 'MySQL,索引,类型', 1),
+(3, 'MySQL中聚簇索引和非聚簇索引的区别？', 'MySQL中聚簇索引和非聚簇索引的区别是？', 1, 3, '["A. 聚簇索引叶子节点存储完整数据", "B. 非聚簇索引叶子节点存储主键值", "C. 一个表只能有一个聚簇索引", "D. 以上都对"]', 'D', '聚簇索引叶子节点存储完整行数据；非聚簇索引叶子节点存储主键值。', 'MySQL,索引,聚簇索引', 1),
+(3, 'MySQL中什么情况下索引会失效？', 'MySQL中索引失效的情况包括？', 2, 3, '["A. 使用函数", "B. 隐式类型转换", "C. LIKE以%开头", "D. 以上都是"]', 'D', '索引失效情况：使用函数、隐式类型转换、LIKE以%开头。', 'MySQL,索引,优化', 1),
+(3, 'MySQL中如何优化慢查询？', 'MySQL中优化慢查询的方法包括？', 2, 2, '["A. 使用EXPLAIN分析", "B. 添加合适的索引", "C. 优化SQL语句", "D. 以上都是"]', 'D', '优化方法：使用EXPLAIN分析、添加索引、优化SQL。', 'MySQL,优化,慢查询', 1),
+(3, 'MySQL中事务的隔离级别有哪些？', 'MySQL中事务的隔离级别包括？', 2, 2, '["A. 读未提交", "B. 读已提交", "C. 可重复读", "D. 以上都是"]', 'D', 'MySQL支持四种隔离级别：读未提交、读已提交、可重复读、串行化。', 'MySQL,事务,隔离级别', 1),
+(3, 'MySQL中MVCC的原理？', 'MySQL中MVCC的原理是？', 1, 3, '["A. 保存数据的历史版本", "B. 使用undo log实现", "C. 解决读写冲突", "D. 以上都对"]', 'D', 'MVCC通过保存数据的历史版本实现并发控制。', 'MySQL,事务,MVCC', 1),
+(3, 'MySQL中redo log和undo log的区别？', 'MySQL中redo log和undo log的区别是？', 1, 3, '["A. redo log保证持久性", "B. undo log保证原子性", "C. redo log用于崩溃恢复", "D. 以上都对"]', 'D', 'redo log保证持久性；undo log保证原子性。', 'MySQL,日志,redo,undo', 1),
+(3, 'MySQL中binlog的作用？', 'MySQL中binlog的主要作用是？', 2, 2, '["A. 主从复制", "B. 数据恢复", "C. 审计", "D. 以上都是"]', 'D', 'binlog作用：主从复制、数据恢复、审计。', 'MySQL,日志,binlog', 1),
+(3, 'MySQL中如何解决幻读？', 'MySQL中如何解决幻读问题？', 1, 3, '["A. 使用间隙锁", "B. 使用Next-Key Lock", "C. 使用串行化隔离级别", "D. 以上都对"]', 'D', 'MySQL通过Next-Key Lock解决幻读问题。', 'MySQL,事务,幻读', 1),
+(3, 'MySQL中主从复制的原理？', 'MySQL中主从复制的原理是？', 1, 3, '["A. 主库写入binlog", "B. 从库读取binlog", "C. 从库重放binlog", "D. 以上都对"]', 'D', '主从复制：主库写入binlog -> 从库读取并重放。', 'MySQL,主从复制,架构', 1),
+(3, 'MySQL中如何处理主从延迟？', 'MySQL中处理主从延迟的方法包括？', 2, 3, '["A. 优化网络", "B. 从库开启多线程复制", "C. 关键业务读主库", "D. 以上都是"]', 'D', '处理主从延迟：优化网络、多线程复制、关键业务读主库。', 'MySQL,主从复制,优化', 1),
+(3, 'MySQL中分库分表的策略？', 'MySQL中分库分表的常见策略包括？', 2, 3, '["A. 垂直分库", "B. 垂直分表", "C. 水平分库分表", "D. 以上都是"]', 'D', '分库分表策略：垂直分库、垂直分表、水平分库分表。', 'MySQL,分库分表,架构', 1),
+(3, 'MySQL中如何设计索引？', 'MySQL中设计索引的原则包括？', 2, 2, '["A. 选择区分度高的列", "B. 遵循最左前缀原则", "C. 控制索引数量", "D. 以上都是"]', 'D', '索引设计原则：选择区分度高的列、遵循最左前缀原则。', 'MySQL,索引,设计', 1),
+(3, 'MySQL中EXPLAIN的结果如何分析？', 'MySQL中EXPLAIN结果的重要字段包括？', 2, 3, '["A. type", "B. key", "C. rows", "D. 以上都是"]', 'D', 'EXPLAIN关键字段：type、key、rows、Extra。', 'MySQL,优化,EXPLAIN', 1),
+(3, 'MySQL中如何优化COUNT查询？', 'MySQL中优化COUNT查询的方法是？', 1, 2, '["A. 使用COUNT(*)", "B. 使用覆盖索引", "C. 维护计数表", "D. 以上都是"]', 'D', 'COUNT优化：使用COUNT(*)、使用覆盖索引。', 'MySQL,优化,COUNT', 1),
+(3, 'MySQL中如何优化LIMIT分页？', 'MySQL中优化LIMIT分页的方法是？', 1, 3, '["A. 使用覆盖索引", "B. 使用子查询优化", "C. 记录上次最大ID", "D. 以上都是"]', 'D', 'LIMIT优化：使用覆盖索引、子查询优化。', 'MySQL,优化,分页', 1),
+(3, 'MySQL中如何避免死锁？', 'MySQL中避免死锁的方法包括？', 2, 3, '["A. 按相同顺序访问资源", "B. 减小事务范围", "C. 使用乐观锁", "D. 以上都是"]', 'D', '避免死锁：按相同顺序访问资源、减小事务范围。', 'MySQL,锁,死锁', 1),
+(3, 'MySQL中如何处理大表？', 'MySQL中处理大表的方法包括？', 2, 2, '["A. 分库分表", "B. 归档历史数据", "C. 使用分区表", "D. 以上都是"]', 'D', '处理大表：分库分表、归档历史数据、使用分区表。', 'MySQL,优化,大表', 1),
+(3, 'MySQL中如何选择数据类型？', 'MySQL中选择数据类型的原则是？', 2, 2, '["A. 使用最小数据类型", "B. 使用简单类型", "C. 避免NULL", "D. 以上都是"]', 'D', '数据类型选择：使用最小数据类型、使用简单类型。', 'MySQL,数据类型,设计', 1),
+(3, 'MySQL中CHAR和VARCHAR的区别？', 'MySQL中CHAR和VARCHAR的区别是？', 1, 2, '["A. CHAR定长，VARCHAR变长", "B. CHAR最大255，VARCHAR最大65535", "C. CHAR效率高，VARCHAR省空间", "D. 以上都对"]', 'D', 'CHAR定长，VARCHAR变长。', 'MySQL,数据类型,CHAR,VARCHAR', 1),
+(3, 'MySQL中DATETIME和TIMESTAMP的区别？', 'MySQL中DATETIME和TIMESTAMP的区别是？', 1, 2, '["A. DATETIME范围更大", "B. TIMESTAMP受时区影响", "C. TIMESTAMP自动更新", "D. 以上都对"]', 'D', 'DATETIME范围更大；TIMESTAMP受时区影响。', 'MySQL,数据类型,时间', 1),
+(3, 'MySQL中如何优化JOIN？', 'MySQL中优化JOIN的方法包括？', 2, 3, '["A. 小表驱动大表", "B. 在关联字段建索引", "C. 避免JOIN太多表", "D. 以上都是"]', 'D', 'JOIN优化：小表驱动大表、在关联字段建索引。', 'MySQL,优化,JOIN', 1),
+(3, 'MySQL中如何优化子查询？', 'MySQL中优化子查询的方法是？', 1, 3, '["A. 改为JOIN", "B. 使用EXISTS代替IN", "C. 使用临时表", "D. 以上都是"]', 'D', '子查询优化：改为JOIN、使用EXISTS代替IN。', 'MySQL,优化,子查询', 1),
+(3, 'MySQL中如何实现分布式事务？', 'MySQL中实现分布式事务的方式是？', 1, 3, '["A. XA事务", "B. 两阶段提交", "C. TCC", "D. 以上都是"]', 'D', '分布式事务：XA事务、两阶段提交、TCC。', 'MySQL,分布式事务,架构', 1),
+(3, 'MySQL中如何实现读写分离？', 'MySQL中实现读写分离的方式是？', 1, 2, '["A. 应用层路由", "B. 中间件（ShardingSphere）", "C. MySQL Router", "D. 以上都是"]', 'D', '读写分离实现：应用层路由、中间件、MySQL Router。', 'MySQL,读写分离,架构', 1),
+(3, 'MySQL中如何实现高可用？', 'MySQL中实现高可用的方案包括？', 2, 2, '["A. MHA", "B. MGR", "C. Orchestrator", "D. 以上都是"]', 'D', 'MySQL高可用：MHA、MGR、Orchestrator。', 'MySQL,高可用,架构', 1),
+(3, 'MySQL中如何备份恢复？', 'MySQL中备份恢复的方式包括？', 2, 2, '["A. mysqldump", "B. xtrabackup", "C. binlog", "D. 以上都是"]', 'D', '备份方式：mysqldump、xtrabackup、binlog。', 'MySQL,备份,恢复', 1),
+(3, 'MySQL 8.0的新特性？', 'MySQL 8.0的新特性包括？', 2, 3, '["A. 窗口函数", "B. CTE", "C. 降序索引", "D. 以上都是"]', 'D', 'MySQL 8.0新特性：窗口函数、CTE、降序索引。', 'MySQL,新特性,MySQL8', 1),
+
+-- 4. Redis题目 (25道)
+(4, 'Redis中常用的数据类型有哪些？', 'Redis中常用的数据类型包括？', 2, 1, '["A. String", "B. List", "C. Hash", "D. 以上都是"]', 'D', 'Redis有5种基本数据类型：String、List、Hash、Set、ZSet。', 'Redis,数据类型,基础', 1),
+(4, 'Redis中String类型的应用场景？', 'Redis中String类型的常见应用场景包括？', 2, 2, '["A. 缓存", "B. 计数器", "C. 分布式锁", "D. 以上都是"]', 'D', 'String应用场景：缓存对象、计数器、分布式锁。', 'Redis,String,应用场景', 1),
+(4, 'Redis中List类型的应用场景？', 'Redis中List类型的常见应用场景包括？', 2, 2, '["A. 消息队列", "B. 最新列表", "C. 时间线", "D. 以上都是"]', 'D', 'List应用场景：消息队列、最新列表、时间线。', 'Redis,List,应用场景', 1),
+(4, 'Redis中Hash类型的应用场景？', 'Redis中Hash类型的常见应用场景包括？', 2, 2, '["A. 存储对象", "B. 购物车", "C. 计数器", "D. 以上都是"]', 'D', 'Hash应用场景：存储对象、购物车、计数器。', 'Redis,Hash,应用场景', 1),
+(4, 'Redis中Set类型的应用场景？', 'Redis中Set类型的常见应用场景包括？', 2, 2, '["A. 标签系统", "B. 共同好友", "C. 抽奖", "D. 以上都是"]', 'D', 'Set应用场景：标签系统、共同好友、抽奖。', 'Redis,Set,应用场景', 1),
+(4, 'Redis中ZSet类型的应用场景？', 'Redis中ZSet类型的常见应用场景包括？', 2, 2, '["A. 排行榜", "B. 延迟队列", "C. 范围查询", "D. 以上都是"]', 'D', 'ZSet应用场景：排行榜、延迟队列、范围查询。', 'Redis,ZSet,应用场景', 1),
+(4, 'Redis中如何实现分布式锁？', 'Redis中实现分布式锁的正确方式是？', 1, 3, '["A. SETNX", "B. SET key value NX PX", "C. Redisson", "D. B和C都对"]', 'D', '分布式锁实现：SET key value NX PX、Redisson框架。', 'Redis,分布式锁,并发', 1),
+(4, 'Redis中如何解决缓存穿透？', 'Redis中解决缓存穿透的方法是？', 1, 2, '["A. 缓存空值", "B. 布隆过滤器", "C. 参数校验", "D. 以上都是"]', 'D', '缓存穿透解决方案：缓存空值、布隆过滤器。', 'Redis,缓存,穿透', 1),
+(4, 'Redis中如何解决缓存击穿？', 'Redis中解决缓存击穿的方法是？', 1, 2, '["A. 设置热点数据永不过期", "B. 互斥锁", "C. 逻辑过期", "D. 以上都是"]', 'D', '缓存击穿解决方案：设置热点数据永不过期、互斥锁。', 'Redis,缓存,击穿', 1),
+(4, 'Redis中如何解决缓存雪崩？', 'Redis中解决缓存雪崩的方法是？', 1, 2, '["A. 随机过期时间", "B. 多级缓存", "C. 熔断降级", "D. 以上都是"]', 'D', '缓存雪崩解决方案：随机过期时间、多级缓存。', 'Redis,缓存,雪崩', 1),
+(4, 'Redis的持久化方式有哪些？', 'Redis的持久化方式包括？', 2, 2, '["A. RDB", "B. AOF", "C. 混合持久化", "D. 以上都是"]', 'D', 'Redis持久化：RDB、AOF、混合持久化。', 'Redis,持久化,RDB,AOF', 1),
+(4, 'Redis的主从复制原理？', 'Redis的主从复制原理是？', 1, 3, '["A. 全量同步", "B. 增量同步", "C. PSYNC", "D. 以上都对"]', 'D', '主从复制：首次全量同步、后续增量同步。', 'Redis,主从复制,架构', 1),
+(4, 'Redis哨兵的作用？', 'Redis哨兵的主要作用是？', 2, 2, '["A. 监控", "B. 故障转移", "C. 配置提供者", "D. 以上都是"]', 'D', '哨兵作用：监控、故障转移、配置提供者。', 'Redis,哨兵,高可用', 1),
+(4, 'Redis Cluster的原理？', 'Redis Cluster的原理是？', 1, 3, '["A. 数据分片", "B. 虚拟槽", "C. 去中心化", "D. 以上都对"]', 'D', 'Redis Cluster原理：数据分片、虚拟槽、去中心化。', 'Redis,集群,架构', 1),
+(4, 'Redis的内存淘汰策略？', 'Redis的内存淘汰策略包括？', 2, 2, '["A. LRU", "B. LFU", "C. TTL", "D. 以上都是"]', 'D', '内存淘汰策略：LRU、LFU、TTL等。', 'Redis,内存,淘汰策略', 1),
+(4, 'Redis的过期策略？', 'Redis的过期策略是？', 1, 2, '["A. 定期删除", "B. 惰性删除", "C. 定期+惰性", "D. 立即删除"]', 'C', 'Redis过期策略：定期删除+惰性删除。', 'Redis,过期,策略', 1),
+(4, 'Redis为什么快？', 'Redis为什么速度快？', 2, 2, '["A. 内存操作", "B. 单线程", "C. IO多路复用", "D. 以上都是"]', 'D', 'Redis快的原因：纯内存操作、单线程、IO多路复用。', 'Redis,性能,原理', 1),
+(4, 'Redis的管道作用？', 'Redis管道的主要作用是？', 1, 2, '["A. 减少网络往返", "B. 批量执行命令", "C. 提高吞吐量", "D. 以上都对"]', 'D', 'Pipeline作用：减少网络往返、批量执行命令。', 'Redis,Pipeline,优化', 1),
+(4, 'Redis的发布订阅模式？', 'Redis发布订阅的特点是？', 1, 2, '["A. 实时推送", "B. 非持久化", "C. 一对多", "D. 以上都对"]', 'D', 'Pub/Sub特点：实时推送、非持久化、一对多。', 'Redis,发布订阅,消息', 1),
+(4, 'Redis Stream的作用？', 'Redis Stream的主要作用是？', 1, 3, '["A. 消息队列", "B. 持久化", "C. 消费者组", "D. 以上都对"]', 'D', 'Stream用于消息队列，支持持久化、消费者组。', 'Redis,Stream,消息队列', 1),
+(4, 'Redis如何实现延迟队列？', 'Redis实现延迟队列的方式是？', 1, 3, '["A. ZSet", "B. 过期事件", "C. Stream", "D. A和C都对"]', 'D', '延迟队列实现：ZSet、Stream。', 'Redis,延迟队列,应用场景', 1),
+(4, 'Redis的Big Key问题？', 'Redis中Big Key的问题和解决方案？', 1, 3, '["A. 影响性能", "B. 导致阻塞", "C. 拆分大Key", "D. 以上都对"]', 'D', 'Big Key问题：影响性能、导致阻塞。解决方案：拆分大Key。', 'Redis,优化,BigKey', 1),
+(4, 'Redis的热点Key问题？', 'Redis中热点Key的问题和解决方案？', 1, 3, '["A. 单点压力", "B. 本地缓存", "C. 分片", "D. 以上都对"]', 'D', '热点Key问题：单点压力大。解决方案：本地缓存、分片。', 'Redis,优化,热点Key', 1),
+(4, 'Redis的内存优化方法？', 'Redis内存优化的方法包括？', 2, 2, '["A. 选择合适的数据结构", "B. 设置过期时间", "C. 使用压缩", "D. 以上都是"]', 'D', '内存优化：选择合适的数据结构、设置过期时间。', 'Redis,优化,内存', 1),
+(4, 'Redis如何保证数据一致性？', 'Redis与数据库数据一致性方案？', 1, 3, '["A. Cache Aside", "B. Write Through", "C. Write Behind", "D. 以上都是"]', 'D', '一致性方案：Cache Aside、Write Through、Write Behind。', 'Redis,一致性,架构', 1),
+
+-- 5. Spring题目 (25道)
+(5, 'Spring中IOC的作用？', 'Spring中IOC的主要作用是？', 1, 2, '["A. 解耦", "B. 管理Bean", "C. 依赖注入", "D. 以上都对"]', 'D', 'IOC作用：解耦、管理Bean、依赖注入。', 'Spring,IOC,基础', 1),
+(5, 'Spring中Bean的作用域？', 'Spring中Bean的作用域包括？', 2, 2, '["A. singleton", "B. prototype", "C. request/session", "D. 以上都是"]', 'D', 'Bean作用域：singleton、prototype、request、session。', 'Spring,Bean,作用域', 1),
+(5, 'Spring中@Autowired和@Resource的区别？', 'Spring中@Autowired和@Resource的区别是？', 1, 2, '["A. @Autowired按类型注入", "B. @Resource按名称注入", "C. @Autowired是Spring注解", "D. 以上都对"]', 'D', '@Autowired按类型注入；@Resource按名称注入。', 'Spring,注解,注入', 1),
+(5, 'Spring中Bean的生命周期？', 'Spring中Bean的生命周期包括哪些阶段？', 2, 3, '["A. 实例化", "B. 属性赋值", "C. 初始化", "D. 以上都是"]', 'D', 'Bean生命周期：实例化->属性赋值->初始化->使用->销毁。', 'Spring,Bean,生命周期', 1),
+(5, 'Spring中AOP的实现原理？', 'Spring中AOP的实现原理是？', 1, 3, '["A. JDK动态代理", "B. CGLIB代理", "C. AspectJ", "D. A和B都对"]', 'D', 'Spring AOP实现：JDK动态代理、CGLIB代理。', 'Spring,AOP,代理', 1),
+(5, 'Spring中事务的传播行为？', 'Spring中事务的传播行为包括？', 2, 3, '["A. REQUIRED", "B. REQUIRES_NEW", "C. NESTED", "D. 以上都是"]', 'D', '事务传播：REQUIRED、REQUIRES_NEW、NESTED等。', 'Spring,事务,传播', 1),
+(5, 'Spring中事务失效的场景？', 'Spring中事务失效的场景包括？', 2, 3, '["A. 方法非public", "B. 自调用", "C. 异常被捕获", "D. 以上都是"]', 'D', '事务失效：方法非public、自调用、异常被捕获。', 'Spring,事务,问题', 1),
+(5, 'Spring中循环依赖如何解决？', 'Spring中如何解决循环依赖？', 1, 3, '["A. 三级缓存", "B. 提前暴露半成品", "C. 只支持单例", "D. 以上都对"]', 'D', '循环依赖解决：三级缓存、提前暴露半成品Bean。', 'Spring,循环依赖,原理', 1),
+(5, 'Spring MVC的工作流程？', 'Spring MVC的工作流程是？', 2, 2, '["A. DispatcherServlet接收请求", "B. HandlerMapping找到Controller", "C. ViewResolver解析视图", "D. 以上都是"]', 'D', 'Spring MVC流程：DispatcherServlet->HandlerMapping->Controller。', 'Spring,MVC,流程', 1),
+(5, 'Spring Boot的自动配置原理？', 'Spring Boot自动配置的原理是？', 1, 3, '["A. @EnableAutoConfiguration", "B. spring.factories", "C. 条件注解", "D. 以上都对"]', 'D', '自动配置原理：@EnableAutoConfiguration、spring.factories。', 'SpringBoot,自动配置,原理', 1),
+(5, 'Spring Boot Starter的作用？', 'Spring Boot Starter的主要作用是？', 1, 2, '["A. 依赖管理", "B. 自动配置", "C. 简化开发", "D. 以上都对"]', 'D', 'Starter作用：依赖管理、自动配置、简化开发。', 'SpringBoot,Starter,原理', 1),
+(5, 'Spring Cloud的核心组件？', 'Spring Cloud的核心组件包括？', 2, 2, '["A. Eureka/Nacos", "B. Ribbon/Feign", "C. Hystrix/Sentinel", "D. 以上都是"]', 'D', 'Spring Cloud核心：注册中心、负载均衡、熔断器。', 'SpringCloud,组件,架构', 1),
+(5, 'Spring Cloud Gateway的作用？', 'Spring Cloud Gateway的主要作用是？', 2, 2, '["A. 路由转发", "B. 过滤器", "C. 限流熔断", "D. 以上都是"]', 'D', 'Gateway作用：路由转发、过滤器、限流熔断。', 'SpringCloud,Gateway,网关', 1),
+(5, 'Nacos的作用？', 'Nacos的主要作用是？', 2, 2, '["A. 注册中心", "B. 配置中心", "C. 服务发现", "D. 以上都是"]', 'D', 'Nacos作用：注册中心、配置中心、服务发现。', 'SpringCloud,Nacos,注册中心', 1),
+(5, 'Sentinel的作用？', 'Sentinel的主要作用是？', 2, 2, '["A. 限流", "B. 熔断", "C. 降级", "D. 以上都是"]', 'D', 'Sentinel作用：限流、熔断、降级。', 'SpringCloud,Sentinel,熔断', 1),
+(5, 'Spring Security的核心功能？', 'Spring Security的核心功能包括？', 2, 2, '["A. 认证", "B. 授权", "C. 攻击防护", "D. 以上都是"]', 'D', 'Spring Security功能：认证、授权、攻击防护。', 'Spring,Security,安全', 1),
+(5, 'Spring中如何处理异常？', 'Spring中处理异常的方式包括？', 2, 2, '["A. @ExceptionHandler", "B. @ControllerAdvice", "C. HandlerExceptionResolver", "D. 以上都是"]', 'D', '异常处理：@ExceptionHandler、@ControllerAdvice。', 'Spring,异常处理,最佳实践', 1),
+(5, 'Spring中如何实现异步处理？', 'Spring中实现异步处理的方式是？', 1, 2, '["A. @Async", "B. CompletableFuture", "C. 配置线程池", "D. 以上都对"]', 'D', '异步处理：@Async注解、CompletableFuture。', 'Spring,异步,最佳实践', 1),
+(5, 'Spring中如何实现定时任务？', 'Spring中实现定时任务的方式是？', 1, 2, '["A. @Scheduled", "B. Quartz", "C. XXL-Job", "D. 以上都对"]', 'D', '定时任务：@Scheduled、Quartz、XXL-Job。', 'Spring,定时任务,最佳实践', 1),
+(5, 'Spring中如何实现缓存？', 'Spring中实现缓存的方式是？', 1, 2, '["A. @Cacheable", "B. @CacheEvict", "C. Redis", "D. 以上都对"]', 'D', '缓存实现：@Cacheable、@CacheEvict、Redis。', 'Spring,缓存,最佳实践', 1),
+(5, 'Spring中如何实现事件机制？', 'Spring中事件机制的实现方式是？', 1, 2, '["A. ApplicationEvent", "B. ApplicationListener", "C. @EventListener", "D. 以上都对"]', 'D', '事件机制：ApplicationEvent、ApplicationListener。', 'Spring,事件,设计模式', 1),
+(5, 'Spring中如何实现多数据源？', 'Spring中实现多数据源的方式是？', 1, 3, '["A. 配置多个DataSource", "B. AbstractRoutingDataSource", "C. 动态切换", "D. 以上都对"]', 'D', '多数据源：配置多个DataSource、AbstractRoutingDataSource。', 'Spring,多数据源,架构', 1),
+(5, 'Spring中如何优化启动速度？', 'Spring优化启动速度的方法包括？', 2, 2, '["A. 延迟初始化", "B. 减少扫描范围", "C. 禁用自动配置", "D. 以上都是"]', 'D', '启动优化：延迟初始化、减少扫描范围。', 'Spring,优化,启动', 1),
+(5, 'Spring中如何实现软删除？', 'Spring中实现软删除的方式是？', 1, 2, '["A. MyBatis-Plus @TableLogic", "B. deleted字段", "C. 查询时过滤", "D. 以上都对"]', 'D', '软删除：MyBatis-Plus @TableLogic注解。', 'Spring,软删除,最佳实践', 1),
+(5, 'Spring Boot如何实现热部署？', 'Spring Boot实现热部署的方式是？', 1, 2, '["A. spring-boot-devtools", "B. JRebel", "C. IDEA热更新", "D. 以上都对"]', 'D', '热部署：spring-boot-devtools、JRebel。', 'SpringBoot,热部署,开发', 1),
+
+-- 6. 算法题目 (20道)
+(7, '两数之和的时间复杂度？', 'LeetCode两数之和问题最优解的时间复杂度是？', 1, 2, '["A. O(n²)", "B. O(n log n)", "C. O(n)", "D. O(log n)"]', 'C', '使用哈希表可以在O(n)时间复杂度内解决两数之和问题。', '算法,哈希表,时间复杂度', 1),
+(7, '反转链表的时间复杂度？', '反转单链表的时间复杂度和空间复杂度是？', 1, 1, '["A. O(n) O(1)", "B. O(n) O(n)", "C. O(1) O(1)", "D. O(n²) O(1)"]', 'A', '反转链表时间复杂度O(n)，空间复杂度O(1)。', '算法,链表,时间复杂度', 1),
+(7, '二分查找的条件？', '二分查找算法的前提条件是？', 1, 1, '["A. 数组有序", "B. 数组无序", "C. 链表结构", "D. 树结构"]', 'A', '二分查找要求数组必须是有序的。', '算法,二分查找,时间复杂度', 1),
+(7, '快速排序的平均时间复杂度？', '快速排序的平均时间复杂度是？', 1, 2, '["A. O(n)", "B. O(n log n)", "C. O(n²)", "D. O(log n)"]', 'B', '快速排序平均时间复杂度O(n log n)。', '算法,排序,时间复杂度', 1),
+(7, '归并排序的特点？', '归并排序的特点包括？', 2, 2, '["A. 稳定排序", "B. 时间复杂度O(n log n)", "C. 空间复杂度O(n)", "D. 以上都是"]', 'D', '归并排序是稳定排序，时间复杂度O(n log n)。', '算法,排序,归并排序', 1),
+(7, '堆排序的特点？', '堆排序的特点包括？', 2, 3, '["A. 不稳定排序", "B. 原地排序", "C. 时间复杂度O(n log n)", "D. 以上都是"]', 'D', '堆排序是不稳定排序，原地排序，时间复杂度O(n log n)。', '算法,排序,堆排序', 1),
+(7, '二叉树的前序遍历顺序？', '二叉树前序遍历的顺序是？', 1, 1, '["A. 根-左-右", "B. 左-根-右", "C. 左-右-根", "D. 右-根-左"]', 'A', '前序遍历顺序：根节点->左子树->右子树。', '算法,树,遍历', 1),
+(7, '二叉树的中序遍历顺序？', '二叉树中序遍历的顺序是？', 1, 1, '["A. 根-左-右", "B. 左-根-右", "C. 左-右-根", "D. 右-根-左"]', 'B', '中序遍历顺序：左子树->根节点->右子树。', '算法,树,遍历', 1),
+(7, '二叉搜索树的查找时间复杂度？', '平衡二叉搜索树查找的时间复杂度是？', 1, 2, '["A. O(1)", "B. O(log n)", "C. O(n)", "D. O(n log n)"]', 'B', '平衡BST查找时间复杂度O(log n)。', '算法,树,时间复杂度', 1),
+(7, 'B+树的特点？', 'B+树的特点包括？', 2, 3, '["A. 非叶子节点不存数据", "B. 叶子节点用指针连接", "C. 查询性能稳定", "D. 以上都是"]', 'D', 'B+树特点：非叶子节点只存索引、叶子节点用指针连接。', '算法,树,B+树', 1),
+(7, '红黑树的特点？', '红黑树的特点包括？', 2, 3, '["A. 自平衡", "B. 查找O(log n)", "C. Java TreeMap使用", "D. 以上都是"]', 'D', '红黑树是自平衡二叉搜索树，查找O(log n)。', '算法,树,红黑树', 1),
+(7, '哈希表解决冲突的方法？', '哈希表解决冲突的方法包括？', 2, 2, '["A. 链地址法", "B. 开放地址法", "C. 再哈希法", "D. 以上都是"]', 'D', '解决冲突方法：链地址法、开放地址法、再哈希法。', '算法,哈希表,冲突', 1),
+(7, 'LRU缓存的实现？', 'LRU缓存通常使用什么数据结构实现？', 1, 3, '["A. 数组", "B. 链表", "C. 哈希表+双向链表", "D. 栈"]', 'C', 'LRU缓存使用哈希表+双向链表实现。', '算法,缓存,LRU', 1),
+(7, '动态规划的特点？', '动态规划的特点包括？', 2, 3, '["A. 重叠子问题", "B. 最优子结构", "C. 状态转移方程", "D. 以上都是"]', 'D', '动态规划特点：重叠子问题、最优子结构、状态转移方程。', '算法,动态规划,原理', 1),
+(7, '贪心算法的特点？', '贪心算法的特点是？', 1, 2, '["A. 局部最优", "B. 不保证全局最优", "C. 简单高效", "D. 以上都是"]', 'D', '贪心算法每步选择局部最优，不保证全局最优。', '算法,贪心,原理', 1),
+(7, '回溯算法的应用？', '回溯算法适合解决的问题包括？', 2, 2, '["A. 全排列", "B. 子集", "C. N皇后", "D. 以上都是"]', 'D', '回溯算法适合：全排列、子集、N皇后等问题。', '算法,回溯,应用场景', 1),
+(7, 'BFS和DFS的区别？', '广度优先搜索和深度优先搜索的区别是？', 1, 2, '["A. BFS用队列，DFS用栈", "B. BFS找最短路径", "C. DFS用递归", "D. 以上都对"]', 'D', 'BFS用队列，适合找最短路径；DFS用栈/递归。', '算法,搜索,BFS,DFS', 1),
+(7, '拓扑排序的应用？', '拓扑排序适合解决什么问题？', 1, 2, '["A. 任务调度", "B. 依赖关系", "C. 课程安排", "D. 以上都是"]', 'D', '拓扑排序适合：任务调度、依赖关系、课程安排。', '算法,图,拓扑排序', 1),
+(7, '最短路径算法？', '常见的最短路径算法包括？', 2, 3, '["A. Dijkstra", "B. Bellman-Ford", "C. Floyd", "D. 以上都是"]', 'D', '最短路径算法：Dijkstra、Bellman-Ford、Floyd。', '算法,图,最短路径', 1),
+(7, '最小生成树算法？', '常见的最小生成树算法包括？', 2, 2, '["A. Prim", "B. Kruskal", "C. A和B都是", "D. Dijkstra"]', 'C', '最小生成树算法：Prim、Kruskal。', '算法,图,最小生成树', 1),
+
+-- 7. 计算机网络题目 (15道)
+(8, 'TCP三次握手的过程？', 'TCP三次握手的过程是？', 1, 2, '["A. SYN->SYN+ACK->ACK", "B. ACK->SYN->ACK", "C. SYN->ACK->FIN", "D. FIN->ACK->SYN"]', 'A', 'TCP三次握手：SYN->SYN+ACK->ACK。', '网络,TCP,三次握手', 1),
+(8, 'TCP四次挥手的过程？', 'TCP四次挥手的过程是？', 1, 2, '["A. FIN->ACK->FIN->ACK", "B. FIN->FIN->ACK->ACK", "C. ACK->FIN->ACK->FIN", "D. FIN->ACK->ACK->FIN"]', 'A', 'TCP四次挥手：FIN->ACK->FIN->ACK。', '网络,TCP,四次挥手', 1),
+(8, 'TCP和UDP的区别？', 'TCP和UDP的主要区别是？', 2, 2, '["A. TCP面向连接，UDP无连接", "B. TCP可靠，UDP不可靠", "C. TCP有序，UDP无序", "D. 以上都是"]', 'D', 'TCP面向连接、可靠、有序；UDP无连接、不可靠。', '网络,TCP,UDP', 1),
+(8, 'HTTP和HTTPS的区别？', 'HTTP和HTTPS的主要区别是？', 2, 2, '["A. HTTPS加密传输", "B. HTTPS需要证书", "C. HTTPS端口443", "D. 以上都是"]', 'D', 'HTTPS加密传输、需要证书、默认端口443。', '网络,HTTP,HTTPS', 1),
+(8, 'HTTP状态码的含义？', 'HTTP状态码404表示？', 1, 1, '["A. 服务器错误", "B. 资源未找到", "C. 权限不足", "D. 请求成功"]', 'B', 'HTTP 404表示资源未找到。', '网络,HTTP,状态码', 1),
+(8, 'GET和POST的区别？', 'HTTP中GET和POST的主要区别是？', 2, 2, '["A. GET参数在URL，POST在请求体", "B. GET有长度限制", "C. GET可缓存", "D. 以上都是"]', 'D', 'GET参数在URL、有长度限制、可缓存。', '网络,HTTP,GET,POST', 1),
+(8, 'Cookie和Session的区别？', 'Cookie和Session的主要区别是？', 2, 2, '["A. Cookie存储在客户端", "B. Session存储在服务端", "C. Session更安全", "D. 以上都是"]', 'D', 'Cookie存储在客户端，Session存储在服务端。', '网络,HTTP,Cookie,Session', 1),
+(8, '浏览器输入URL后的过程？', '浏览器输入URL后发生的过程包括？', 2, 2, '["A. DNS解析", "B. TCP连接", "C. 发送HTTP请求", "D. 以上都是"]', 'D', '过程：DNS解析->TCP连接->发送HTTP请求。', '网络,HTTP,DNS', 1),
+(8, 'OSI七层模型？', 'OSI七层模型从下到上是？', 1, 2, '["A. 物理层->数据链路层->网络层->传输层->会话层->表示层->应用层", "B. 应用层->表示层->会话层->传输层->网络层->数据链路层->物理层", "C. 物理层->网络层->传输层->会话层->表示层->应用层", "D. 以上都不对"]', 'A', 'OSI七层：物理层->数据链路层->网络层->传输层->会话层->表示层->应用层。', '网络,OSI,模型', 1),
+(8, 'TCP如何保证可靠传输？', 'TCP保证可靠传输的机制包括？', 2, 3, '["A. 序列号和确认应答", "B. 超时重传", "C. 流量控制", "D. 以上都是"]', 'D', 'TCP可靠传输：序列号、确认应答、超时重传、流量控制。', '网络,TCP,可靠传输', 1),
+(8, 'TCP滑动窗口的作用？', 'TCP滑动窗口的主要作用是？', 1, 3, '["A. 流量控制", "B. 提高传输效率", "C. 拥塞控制", "D. A和B都对"]', 'D', 'TCP滑动窗口用于流量控制和提高传输效率。', '网络,TCP,滑动窗口', 1),
+(8, 'DNS解析过程？', 'DNS域名解析的过程是？', 1, 2, '["A. 浏览器缓存->系统缓存->hosts文件->DNS服务器", "B. DNS服务器->hosts文件->系统缓存->浏览器缓存", "C. hosts文件->DNS服务器->系统缓存->浏览器缓存", "D. 以上都不对"]', 'A', 'DNS解析：浏览器缓存->系统缓存->hosts文件->DNS服务器。', '网络,DNS,解析', 1),
+(8, 'WebSocket的特点？', 'WebSocket的主要特点是？', 1, 2, '["A. 全双工通信", "B. 基于TCP", "C. 实时通信", "D. 以上都是"]', 'D', 'WebSocket支持全双工通信、基于TCP、实时通信。', '网络,WebSocket,通信', 1),
+(8, 'CDN的作用？', 'CDN的主要作用是？', 2, 2, '["A. 加速内容访问", "B. 负载均衡", "C. 减轻源站压力", "D. 以上都是"]', 'D', 'CDN作用：加速内容访问、负载均衡、减轻源站压力。', '网络,CDN,优化', 1),
+(8, '跨域问题的解决方案？', '解决跨域问题的方法包括？', 2, 2, '["A. CORS", "B. JSONP", "C. 代理服务器", "D. 以上都是"]', 'D', '跨域解决方案：CORS、JSONP、代理服务器。', '网络,跨域,CORS', 1);
+
+-- 题目分类表
+-- 注意：ID 1-6 必须与 data.sql 中题目的 category_id 保持一致
+INSERT IGNORE INTO `category` (`id`, `name`, `parent_id`, `sort`, `icon`, `description`) VALUES
+-- 原有分类（与题目数据匹配）
+(1, 'Java', 0, 1, 'java', 'Java后端开发'),
+(2, 'Python', 0, 2, 'python', 'Python开发与数据科学'),
+(3, 'MySQL', 0, 3, 'mysql', 'MySQL数据库'),
+(4, 'Redis', 0, 4, 'redis', 'Redis缓存'),
+(5, 'Spring', 0, 5, 'spring', 'Spring框架全家桶'),
+(6, '消息队列', 0, 6, 'mq', 'RabbitMQ/Kafka/RocketMQ'),
+
+-- 编程语言（新增）
+(10, 'C/C++', 0, 10, 'cpp', 'C/C++系统开发'),
+(11, 'Go', 0, 11, 'go', 'Go语言开发'),
+(12, 'JavaScript', 0, 12, 'js', 'JavaScript前端开发'),
+(13, 'PHP', 0, 13, 'php', 'PHP后端开发'),
+
+-- 计算机基础
+(20, '数据结构', 0, 20, 'ds', '数据结构与算法基础'),
+(21, '操作系统', 0, 21, 'os', '操作系统原理'),
+(22, '计算机网络', 0, 22, 'network', '计算机网络协议'),
+(23, '计算机组成', 0, 23, 'arch', '计算机组成原理'),
+(24, '编译原理', 0, 24, 'compiler', '编译器原理'),
+
+-- 数据库（新增）
+(30, 'MongoDB', 0, 30, 'mongodb', 'MongoDB文档数据库'),
+(31, 'PostgreSQL', 0, 31, 'pgsql', 'PostgreSQL数据库'),
+
+-- 后端框架（新增）
+(40, 'MyBatis', 0, 40, 'mybatis', 'MyBatis持久层框架'),
+(41, 'Dubbo', 0, 41, 'dubbo', 'Dubbo分布式框架'),
+(42, 'Netty', 0, 42, 'netty', 'Netty网络框架'),
+
+-- 中间件（新增）
+(50, 'Nginx', 0, 50, 'nginx', 'Nginx反向代理'),
+(51, 'Zookeeper', 0, 51, 'zk', 'Zookeeper分布式协调'),
+
+-- 微服务
+(60, '微服务', 0, 60, 'microservice', 'Spring Cloud微服务'),
+(61, 'Docker', 0, 61, 'docker', 'Docker容器技术'),
+(62, 'Kubernetes', 0, 62, 'k8s', 'K8s容器编排'),
+
+-- 前端技术
+(70, 'Vue', 0, 70, 'vue', 'Vue.js框架'),
+(71, 'React', 0, 71, 'react', 'React框架'),
+(72, 'Node.js', 0, 72, 'node', 'Node.js后端开发'),
+(73, 'TypeScript', 0, 73, 'ts', 'TypeScript类型系统'),
+
+-- 人工智能
+(80, '机器学习', 0, 80, 'ml', '机器学习算法'),
+(81, '深度学习', 0, 81, 'dl', '神经网络与深度学习'),
+(82, 'NLP', 0, 82, 'nlp', '自然语言处理'),
+(83, '计算机视觉', 0, 83, 'cv', '图像识别与处理'),
+
+-- 大数据
+(90, 'Hadoop', 0, 90, 'hadoop', 'Hadoop大数据平台'),
+(91, 'Spark', 0, 91, 'spark', 'Spark计算引擎'),
+(92, 'Flink', 0, 92, 'flink', 'Flink流处理'),
+(93, '数据仓库', 0, 93, 'dw', '数据仓库建设'),
+
+-- 安全
+(100, 'Web安全', 0, 100, 'security', 'Web安全攻防'),
+(101, '密码学', 0, 101, 'crypto', '密码学原理'),
+
+-- 测试运维
+(110, '软件测试', 0, 110, 'test', '软件测试方法'),
+(111, 'Linux', 0, 111, 'linux', 'Linux系统运维'),
+(112, 'Git', 0, 112, 'git', 'Git版本控制'),
+
+-- 学校课程
+(120, '高等数学', 0, 120, 'math', '高等数学'),
+(121, '线性代数', 0, 121, 'la', '线性代数'),
+(122, '概率论', 0, 122, 'prob', '概率论与数理统计'),
+(123, '离散数学', 0, 123, 'dm', '离散数学'),
+
+-- 求职面试
+(130, '算法面试', 0, 130, 'algo', 'LeetCode算法题'),
+(131, '系统设计', 0, 131, 'sysdesign', '系统设计面试'),
+(132, 'HR面试', 0, 132, 'hr', 'HR面试技巧'),
+(133, '行为面试', 0, 133, 'behavior', '行为面试问题');
+
+
+
+-- 清空现有题目数据（仅在第一次执行时需要）
+-- DELETE FROM `question`;
+
+-- 插入Java题目（ID 1-10），使用INSERT IGNORE避免重复插入
+INSERT IGNORE INTO `question` (`id`, `category_id`, `title`, `content`, `type`, `difficulty`, `options`, `answer`, `analysis`, `tags`, `status`) VALUES
+(1, 1, 'Java中哪个关键字用于定义类？', 'Java中哪个关键字用于定义类？', 1, 1, '["class","struct","define","object"]', 'A', 'class是Java中定义类的关键字。', 'Java,基础', 1),
+(2, 1, 'Java中main方法的正确签名是？', 'Java中main方法的正确签名是？', 1, 1, '["public void main(String[] args)","public static void main(String[] args)","static void main(String[] args)","public static int main(String[] args)"]', 'B', 'main方法必须是public static void，参数为String数组。', 'Java,基础', 1),
+(3, 1, 'Java中String是不可变的，这意味着？', 'Java中String是不可变的，这意味着？', 1, 1, '["String对象不能被创建","String对象的值不能被修改","String对象不能被引用","String对象不能被比较"]', 'B', 'String是不可变对象，一旦创建其值就不能被修改。', 'Java,基础', 1),
+(4, 1, 'Java中哪个集合不允许重复元素？', 'Java中哪个集合不允许重复元素？', 1, 1, '["ArrayList","LinkedList","HashSet","HashMap"]', 'C', 'HashSet是基于哈希表实现的Set集合，不允许存储重复元素。', 'Java,集合', 1),
+(5, 1, 'Java中final关键字可以修饰？', 'Java中final关键字可以修饰？', 1, 2, '["只有变量","只有方法","只有类","变量、方法和类"]', 'D', 'final可以修饰变量（常量）、方法（不可重写）和类（不可继承）。', 'Java,基础', 1),
+(6, 1, 'Java中接口和抽象类的区别是？', 'Java中接口和抽象类的区别是？', 1, 2, '["接口可以有构造方法","抽象类可以多继承","一个类可以实现多个接口","接口可以有成员变量"]', 'C', 'Java支持单继承多实现，一个类可以实现多个接口。', 'Java,面向对象', 1),
+(7, 1, 'Java中哪个关键字用于抛出异常？', 'Java中哪个关键字用于抛出异常？', 1, 2, '["catch","throw","throws","try"]', 'B', 'throw用于手动抛出异常对象，throws用于声明方法可能抛出的异常。', 'Java,异常', 1),
+(8, 1, 'Java中synchronized关键字可以修饰？', 'Java中synchronized关键字可以修饰？', 1, 2, '["只有方法","只有代码块","方法和代码块","只有变量"]', 'C', 'synchronized可以修饰方法和代码块，用于实现线程同步。', 'Java,多线程', 1),
+(9, 1, 'Java中volatile关键字的作用是？', 'Java中volatile关键字的作用是？', 1, 3, '["保证原子性","保证可见性","保证有序性","以上都是"]', 'B', 'volatile保证变量的可见性，但不保证原子性。', 'Java,多线程', 1),
+(10, 1, 'Java中HashMap的默认负载因子是？', 'Java中HashMap的默认负载因子是？', 1, 3, '["0.5","0.75","1.0","0.25"]', 'B', 'HashMap的默认负载因子是0.75，这是平衡时间和空间成本的结果。', 'Java,集合', 1),
+
+-- 插入Python题目（ID 11-20）
+(11, 2, 'Python中用于定义函数的关键字是？', 'Python中用于定义函数的关键字是？', 1, 1, '["function","def","func","define"]', 'B', 'Python使用def关键字定义函数。', 'Python,基础', 1),
+(12, 2, 'Python中列表和元组的主要区别是？', 'Python中列表和元组的主要区别是？', 1, 1, '["列表可变，元组不可变","列表不可变，元组可变","都是可变的","都是不可变的"]', 'A', '列表是可变序列，元组是不可变序列。', 'Python,基础', 1),
+(13, 2, 'Python中哪个不是基本数据类型？', 'Python中哪个不是基本数据类型？', 1, 1, '["int","str","list","char"]', 'D', 'Python没有char类型，单个字符也是str类型。', 'Python,基础', 1),
+(14, 2, 'Python中如何创建空字典？', 'Python中如何创建空字典？', 1, 1, '["{}","[]","()","set()"]', 'A', '{}创建空字典，[]创建空列表，()创建空元组。', 'Python,基础', 1),
+(15, 2, 'Python中列表推导式的语法是？', 'Python中列表推导式的语法是？', 1, 2, '["[x for x in iterable]","{x for x in iterable}","(x for x in iterable)","<x for x in iterable>"]', 'A', '列表推导式使用方括号[]，返回列表。', 'Python,高级', 1),
+(16, 2, 'Python中*args和**kwargs的作用是？', 'Python中*args和**kwargs的作用是？', 1, 2, '["定义变量","接收可变参数","定义常量","定义类"]', 'B', '*args接收可变位置参数，**kwargs接收可变关键字参数。', 'Python,函数', 1),
+(17, 2, 'Python中装饰器的作用是？', 'Python中装饰器的作用是？', 1, 2, '["装饰字符串","修改函数行为","创建对象","定义变量"]', 'B', '装饰器用于在不修改函数代码的情况下扩展函数功能。', 'Python,高级', 1),
+(18, 2, 'Python中GIL是什么？', 'Python中GIL是什么？', 1, 3, '["全局解释器锁","全局导入锁","全局迭代锁","全局索引锁"]', 'A', 'GIL是全局解释器锁，确保同一时刻只有一个线程执行Python字节码。', 'Python,多线程', 1),
+(19, 2, 'Python中生成器和列表的区别是？', 'Python中生成器和列表的区别是？', 1, 3, '["生成器占用更多内存","生成器是惰性求值","列表是惰性求值","没有区别"]', 'B', '生成器是惰性求值的，只在需要时生成值，节省内存。', 'Python,高级', 1),
+(20, 2, 'Python中with语句的作用是？', 'Python中with语句的作用是？', 1, 2, '["定义上下文","资源管理","异常处理","循环控制"]', 'B', 'with语句用于资源管理，确保资源正确释放。', 'Python,基础', 1),
+
+-- 插入MySQL题目（ID 21-30）
+(21, 3, 'MySQL中主键的特点是？', 'MySQL中主键的特点是？', 1, 1, '["可以为空","可以重复","唯一且非空","只能有一个字段"]', 'C', '主键必须唯一且非空，但可以由多个字段组成复合主键。', 'MySQL,基础', 1),
+(22, 3, 'MySQL中VARCHAR和CHAR的区别是？', 'MySQL中VARCHAR和CHAR的区别是？', 1, 1, '["VARCHAR固定长度","CHAR可变长度","VARCHAR可变长度","没有区别"]', 'C', 'VARCHAR是可变长度字符串，CHAR是固定长度字符串。', 'MySQL,基础', 1),
+(23, 3, 'MySQL中哪个存储引擎支持事务？', 'MySQL中哪个存储引擎支持事务？', 1, 1, '["MyISAM","InnoDB","MEMORY","ARCHIVE"]', 'B', 'InnoDB支持事务、行级锁和外键，MyISAM不支持事务。', 'MySQL,存储引擎', 1),
+(24, 3, 'MySQL中索引的作用是？', 'MySQL中索引的作用是？', 1, 1, '["增加存储空间","提高查询速度","降低查询速度","没有作用"]', 'B', '索引可以大大提高查询速度，但会增加存储空间和降低写入速度。', 'MySQL,索引', 1),
+(25, 3, 'MySQL中事务的ACID特性是指？', 'MySQL中事务的ACID特性是指？', 1, 2, '["原子性、一致性、隔离性、持久性","准确性、一致性、隔离性、持久性","原子性、连续性、隔离性、持久性","原子性、一致性、集成性、持久性"]', 'A', 'ACID指原子性、一致性、隔离性、持久性。', 'MySQL,事务', 1),
+(26, 3, 'MySQL中LEFT JOIN返回？', 'MySQL中LEFT JOIN返回？', 1, 2, '["左表所有记录","右表所有记录","两表匹配记录","两表所有记录"]', 'A', 'LEFT JOIN返回左表所有记录，右表没有匹配则为NULL。', 'MySQL,连接', 1),
+(27, 3, 'MySQL中EXPLAIN的作用是？', 'MySQL中EXPLAIN的作用是？', 1, 2, '["解释SQL语法","分析查询执行计划","解释表结构","解释索引"]', 'B', 'EXPLAIN用于分析SQL查询的执行计划。', 'MySQL,优化', 1),
+(28, 3, 'MySQL中如何避免SQL注入？', 'MySQL中如何避免SQL注入？', 1, 2, '["使用Statement","使用PreparedStatement","使用字符串拼接","使用文件读取"]', 'B', 'PreparedStatement使用参数化查询，可以有效防止SQL注入。', 'MySQL,安全', 1),
+(29, 3, 'MySQL中MVCC的作用是？', 'MySQL中MVCC的作用是？', 1, 3, '["提高写入性能","提高并发性能","提高查询速度","减少存储空间"]', 'B', 'MVCC多版本并发控制，提高数据库并发性能。', 'MySQL,高级', 1),
+(30, 3, 'MySQL中B+树索引的特点是？', 'MySQL中B+树索引的特点是？', 1, 3, '["非叶子节点存储数据","叶子节点不存储数据","叶子节点存储数据且有序","所有节点存储数据"]', 'C', 'B+树非叶子节点只存储键值，叶子节点存储数据且通过指针连接。', 'MySQL,索引', 1),
+
+-- 插入Redis题目（ID 31-40）
+(31, 4, 'Redis默认端口号是？', 'Redis默认端口号是？', 1, 1, '["3306","6379","8080","27017"]', 'B', 'Redis默认端口是6379。', 'Redis,基础', 1),
+(32, 4, 'Redis支持的数据类型不包括？', 'Redis支持的数据类型不包括？', 1, 1, '["String","List","Table","Set"]', 'C', 'Redis不支持Table类型，支持String、List、Set、Hash、ZSet等。', 'Redis,基础', 1),
+(33, 4, 'Redis中SET命令的作用是？', 'Redis中SET命令的作用是？', 1, 1, '["设置过期时间","存储字符串","删除键","获取值"]', 'B', 'SET命令用于存储字符串类型的值。', 'Redis,基础', 1),
+(34, 4, 'Redis持久化的方式有？', 'Redis持久化的方式有？', 1, 1, '["只有RDB","只有AOF","RDB和AOF","没有持久化"]', 'C', 'Redis支持RDB快照和AOF日志两种持久化方式。', 'Redis,持久化', 1),
+(35, 4, 'Redis中缓存穿透是指？', 'Redis中缓存穿透是指？', 1, 2, '["缓存和数据库都没有数据","缓存没有数据库有","缓存有数据库没有","缓存过期"]', 'A', '缓存穿透是指查询缓存和数据库都不存在的数据。', 'Redis,缓存', 1),
+(36, 4, 'Redis中缓存击穿是指？', 'Redis中缓存击穿是指？', 1, 2, '["大量key同时过期","热点key过期","缓存穿透","缓存雪崩"]', 'B', '缓存击穿是指热点key过期，大量请求直接访问数据库。', 'Redis,缓存', 1),
+(37, 4, 'Redis中缓存雪崩是指？', 'Redis中缓存雪崩是指？', 1, 2, '["单个key过期","大量key同时过期","缓存穿透","缓存击穿"]', 'B', '缓存雪崩是指大量key同时过期，导致请求直接访问数据库。', 'Redis,缓存', 1),
+(38, 4, 'Redis集群的实现方式是？', 'Redis集群的实现方式是？', 1, 2, '["主从复制","哨兵模式","Cluster集群","以上都是"]', 'D', 'Redis可以通过主从复制、哨兵模式和Cluster集群实现高可用。', 'Redis,集群', 1),
+(39, 4, 'Redis中分布式锁的实现方式是？', 'Redis中分布式锁的实现方式是？', 1, 3, '["SETNX","SET","GET","DEL"]', 'A', 'SETNX可以用于实现分布式锁，但建议使用SET命令带NX参数。', 'Redis,分布式', 1),
+(40, 4, 'Redis中跳表用于哪种数据类型？', 'Redis中跳表用于哪种数据类型？', 1, 3, '["String","List","Set","ZSet"]', 'D', 'Redis的ZSet（有序集合）使用跳表作为底层实现。', 'Redis,高级', 1),
+
+-- 插入Spring题目（ID 41-50）
+(41, 5, 'Spring框架的核心特性是？', 'Spring框架的核心特性是？', 1, 1, '["AOP","IOC","MVC","以上都是"]', 'D', 'Spring框架的核心特性包括IOC控制反转和AOP面向切面编程。', 'Spring,基础', 1),
+(42, 5, 'Spring中@Bean注解的作用是？', 'Spring中@Bean注解的作用是？', 1, 1, '["定义配置类","定义Bean","注入依赖","定义切面"]', 'B', '@Bean注解用于方法上，声明该方法返回一个由Spring管理的Bean。', 'Spring,基础', 1),
+(43, 5, 'Spring中@Autowired的作用是？', 'Spring中@Autowired的作用是？', 1, 1, '["定义Bean","自动装配","定义配置","定义切面"]', 'B', '@Autowired用于自动装配Bean的依赖。', 'Spring,基础', 1),
+(44, 5, 'Spring中@ComponentScan的作用是？', 'Spring中@ComponentScan的作用是？', 1, 1, '["定义Bean","扫描组件","注入依赖","定义配置"]', 'B', '@ComponentScan用于指定Spring扫描组件的包路径。', 'Spring,基础', 1),
+(45, 5, 'Spring AOP中通知类型不包括？', 'Spring AOP中通知类型不包括？', 1, 2, '["Before","After","Around","Inside"]', 'D', 'Spring AOP支持Before、After、Around、AfterReturning、AfterThrowing通知。', 'Spring,AOP', 1),
+(46, 5, 'Spring事务的传播行为默认是？', 'Spring事务的传播行为默认是？', 1, 2, '["REQUIRES_NEW","REQUIRED","SUPPORTS","MANDATORY"]', 'B', 'Spring事务默认传播行为是REQUIRED，如果存在事务则加入，否则新建。', 'Spring,事务', 1),
+(47, 5, 'Spring中@PathVariable的作用是？', 'Spring中@PathVariable的作用是？', 1, 2, '["获取请求参数","获取路径变量","获取请求头","获取Cookie"]', 'B', '@PathVariable用于获取URL路径中的变量值。', 'Spring,MVC', 1),
+(48, 5, 'Spring Boot自动配置的原理是？', 'Spring Boot自动配置的原理是？', 1, 2, '["@EnableAutoConfiguration","@SpringBootApplication","@ComponentScan","@Configuration"]', 'A', '@EnableAutoConfiguration根据类路径下的依赖自动配置Spring应用。', 'Spring Boot,基础', 1),
+(49, 5, 'Spring Cloud中服务注册发现的组件是？', 'Spring Cloud中服务注册发现的组件是？', 1, 3, '["Gateway","Nacos","Ribbon","Hystrix"]', 'B', 'Nacos可以作为服务注册中心和配置中心。', 'Spring Cloud,微服务', 1),
+(50, 5, 'Spring中循环依赖的解决方式是？', 'Spring中循环依赖的解决方式是？', 1, 3, '["三级缓存","二级缓存","一级缓存","无法解决"]', 'A', 'Spring使用三级缓存解决单例Bean的循环依赖问题。', 'Spring,高级', 1),
+
+-- 插入MQ题目（ID 51-60）
+(51, 6, '消息队列的主要作用是？', '消息队列的主要作用是？', 1, 1, '["数据存储","异步解耦","数据计算","数据展示"]', 'B', '消息队列主要用于异步处理、应用解耦和流量削峰。', 'MQ,基础', 1),
+(52, 6, 'RabbitMQ默认端口号是？', 'RabbitMQ默认端口号是？', 1, 1, '["5672","6379","3306","8080"]', 'A', 'RabbitMQ默认端口是5672，管理界面端口是15672。', 'RabbitMQ,基础', 1),
+(53, 6, 'Kafka中消息存储的位置是？', 'Kafka中消息存储的位置是？', 1, 1, '["内存","磁盘","数据库","缓存"]', 'B', 'Kafka将消息持久化存储在磁盘上，保证消息不丢失。', 'Kafka,基础', 1),
+(54, 6, '消息队列如何保证消息不丢失？', '消息队列如何保证消息不丢失？', 1, 1, '["持久化","确认机制","事务","以上都是"]', 'D', '消息队列通过持久化、确认机制和事务保证消息不丢失。', 'MQ,可靠性', 1),
+(55, 6, 'RabbitMQ中Exchange的类型不包括？', 'RabbitMQ中Exchange的类型不包括？', 1, 2, '["Direct","Topic","Fanout","Queue"]', 'D', 'Exchange类型包括Direct、Topic、Fanout、Headers，Queue不是Exchange类型。', 'RabbitMQ,高级', 1),
+(56, 6, 'Kafka中Consumer Group的作用是？', 'Kafka中Consumer Group的作用是？', 1, 2, '["提高写入性能","提高消费性能","提高存储性能","提高网络性能"]', 'B', 'Consumer Group允许多个消费者并行消费，提高消费性能。', 'Kafka,高级', 1),
+(57, 6, '消息队列如何保证消息顺序？', '消息队列如何保证消息顺序？', 1, 2, '["多队列","单队列单消费者","分区","以上都是"]', 'B', '单队列单消费者可以保证消息顺序，但会降低并发性能。', 'MQ,高级', 1),
+(58, 6, 'RocketMQ的事务消息原理是？', 'RocketMQ的事务消息原理是？', 1, 3, '["两阶段提交","三阶段提交","TCC","本地消息表"]', 'A', 'RocketMQ事务消息采用两阶段提交实现分布式事务。', 'RocketMQ,高级', 1),
+(59, 6, 'Kafka中ISR是指？', 'Kafka中ISR是指？', 1, 3, '["同步副本集合","异步副本集合","领导者副本","追随者副本"]', 'A', 'ISR是In-Sync Replicas，指与Leader保持同步的副本集合。', 'Kafka,高级', 1),
+(60, 6, '消息队列如何实现延迟消息？', '消息队列如何实现延迟消息？', 1, 3, '["定时任务","延迟队列","延迟发送","以上都是"]', 'B', '消息队列通过延迟队列或定时任务实现延迟消息。', 'MQ,高级', 1);
+
+-- 更新practice_record表中的question_id，将旧ID映射到新ID（仅需要执行一次）
+-- Java题目：3001-3010 -> 1-10
+-- UPDATE `practice_record` SET `question_id` = `question_id` - 3000 WHERE `question_id` BETWEEN 3001 AND 3010;
+-- Redis题目：4001-4010 -> 31-40
+-- UPDATE `practice_record` SET `question_id` = `question_id` - 3970 WHERE `question_id` BETWEEN 4001 AND 4010;
