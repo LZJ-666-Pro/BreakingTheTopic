@@ -1,6 +1,6 @@
 <view class="page">
-  <view class="header-bg">
-    <view class="glass-icon">
+  <view class="hero">
+    <view class="hero-icon">
       <text class="icon-emoji">📖</text>
     </view>
     <text class="main-title">破题</text>
@@ -9,40 +9,28 @@
 
   <view class="content">
     <view class="welcome-section">
-      <text class="welcome-emoji">👋</text>
-      <text class="welcome-title">欢迎回来</text>
-      <text class="welcome-desc">授权后即可使用完整服务</text>
+      <view class="welcome-row">
+        <text class="welcome-emoji">👋</text>
+        <text class="welcome-title">欢迎回来</text>
+      </view>
+      <text class="welcome-desc">一键登录，马上开始刷题</text>
     </view>
 
-    <view class="privacy-capsule">
-      <text class="capsule-icon">🔒</text>
-      <text class="capsule-tag">严格保密</text>
-      <text class="capsule-dot"></text>
-      <text class="capsule-tag">微信一键登录</text>
-    </view>
-
-    <button class="wechat-btn {{btnPressed ? 'btn-pressed' : ''}}" 
+    <button class="wechat-btn {{btnPressed ? 'btn-pressed' : ''}}"
             bindtap="handleLogin"
             bindtouchstart="onBtnStart"
             bindtouchend="onBtnEnd"
             disabled="{{loading}}">
-      <text class="btn-icon">💬</text>
-      <text class="btn-text">{{loading ? '获取授权信息...' : '微信用户一键登录'}}</text>
+      <view class="btn-icon"></view>
+      <text class="btn-text">{{loading ? '登录中...' : '微信一键登录'}}</text>
     </button>
 
     <view class="auxiliary-row">
-      <view class="aux-item" bindtap="handlePhoneLogin">
-        <text class="aux-icon">📱</text>
-        <text class="aux-text">手机号登录</text>
-      </view>
-      <view class="aux-item" bindtap="goToRegister">
-        <text class="aux-icon">📝</text>
-        <text class="aux-text">注册账号</text>
-      </view>
-      <view class="aux-item" bindtap="handleGuestLogin">
-        <text class="aux-icon">👤</text>
-        <text class="aux-text">游客体验</text>
-      </view>
+      <text class="aux-item" bindtap="handlePhoneLogin">手机号登录</text>
+      <text class="aux-dot">·</text>
+      <text class="aux-item" bindtap="goToRegister">注册账号</text>
+      <text class="aux-dot">·</text>
+      <text class="aux-item" bindtap="handleGuestLogin">游客体验</text>
     </view>
   </view>
 

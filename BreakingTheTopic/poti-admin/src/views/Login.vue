@@ -15,9 +15,9 @@
 
       <el-form :model="form" :rules="rules" ref="formRef" @submit.prevent="handleSubmit">
         <el-form-item prop="username">
-          <el-input 
-            v-model="form.username" 
-            placeholder="用户名" 
+          <el-input
+            v-model="form.username"
+            placeholder="用户名"
             size="large"
             :prefix-icon="User"
           />
@@ -85,11 +85,11 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button 
-            type="primary" 
-            size="large" 
-            :loading="loading" 
-            @click="handleSubmit" 
+          <el-button
+            type="primary"
+            size="large"
+            :loading="loading"
+            @click="handleSubmit"
             class="login-btn"
           >
             {{ loading ? (isLogin ? '登录中...' : '注册中...') : (isLogin ? '登录' : '注册') }}
@@ -245,13 +245,13 @@ const beforeAvatarUpload = (file) => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (!valid) {
       console.log('表单验证失败')
       return
     }
-    
+
     loading.value = true
     try {
       console.log('开始提交，模式：', isLogin.value ? '登录' : '注册')
@@ -274,13 +274,13 @@ const handleLogin = async () => {
     username: form.username,
     password: form.password
   })
-  
+
   if (rememberMe.value) {
     localStorage.setItem('admin_remember_username', form.username)
   } else {
     localStorage.removeItem('admin_remember_username')
   }
-  
+
   userStore.setToken(res.data.token)
   userStore.setUserInfo(res.data.user)
   ElMessage.success('登录成功')
@@ -293,16 +293,16 @@ const handleRegister = async () => {
     password: form.password,
     nickname: form.nickname
   }
-  
+
   if (form.email) registerData.email = form.email
   if (form.phone) registerData.phone = form.phone
   if (form.avatar) registerData.avatar = form.avatar
-  
+
   console.log('发送注册请求，完整数据：', registerData)
   console.log('form.avatar值：', form.avatar)
-  
+
   await api.post('/admin/register', registerData)
-  
+
   ElMessage.success('注册成功，请登录')
   isLogin.value = true
   formRef.value?.resetFields()
