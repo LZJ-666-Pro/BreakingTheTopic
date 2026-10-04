@@ -8,6 +8,7 @@ function request(options) {
       data: options.data || {},
       header: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${app.globalData.token}`,
         'X-User-Id': app.globalData.userId || 1,
         ...options.header
       },
