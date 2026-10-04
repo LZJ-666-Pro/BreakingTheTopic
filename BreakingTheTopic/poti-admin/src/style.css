@@ -1,3 +1,45 @@
+/* ===== 设计令牌（Design Tokens） ===== */
+:root {
+  /* 品牌色 */
+  --color-primary: #1E40AF;
+  --color-primary-hover: #1E3A8A;
+  --color-primary-active: #1E3A8A;
+  --color-accent: #0EA5E9;
+  /* 功能色 */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  /* 中性色 */
+  --color-bg: #F8FAFC;
+  --color-card: #FFFFFF;
+  --color-text: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-border: #E2E8F0;
+  --color-disabled: #94A3B8;
+  /* 圆角 */
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  /* 阴影 */
+  --shadow-light: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-medium: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* ===== Element Plus 主色对齐（按钮/链接/聚焦/分页/复选框等） ===== */
+:root {
+  --el-color-primary: #1E40AF;
+  --el-color-primary-light-3: #3B6FD4;
+  --el-color-primary-light-5: #6E97E2;
+  --el-color-primary-light-7: #A3BEEF;
+  --el-color-primary-light-8: #C0D3F5;
+  --el-color-primary-light-9: #E4ECFB;
+  --el-color-primary-dark-2: #1E3A8A;
+  --el-color-success: #10B981;
+  --el-color-warning: #F59E0B;
+  --el-color-danger: #EF4444;
+  --el-color-error: #EF4444;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,9 +48,10 @@
 
 html, body, #app {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Source Han Sans SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: var(--color-text);
 }
 
 ::-webkit-scrollbar {
@@ -35,25 +78,25 @@ html, body, #app {
 }
 
 .el-card {
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-light);
 }
 
 .el-button {
-  border-radius: 8px;
+  border-radius: var(--radius-btn);
 }
 
 .el-input__wrapper {
-  border-radius: 8px;
+  border-radius: var(--radius-input);
 }
 
 .el-dialog {
-  border-radius: 12px;
+  border-radius: var(--radius-card);
 }
 
 .el-dialog__header {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border);
   padding: 16px 20px;
 }
 
@@ -62,7 +105,7 @@ html, body, #app {
 }
 
 .el-dialog__footer {
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--color-border);
   padding: 12px 20px;
 }
 
@@ -73,16 +116,16 @@ html, body, #app {
 .el-table th.el-table__cell {
   background-color: #fafafa;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
 }
 
 .el-pagination {
   --el-pagination-button-bg-color: #fff;
-  --el-pagination-hover-color: #1e3c72;
+  --el-pagination-hover-color: var(--color-primary);
 }
 
 .el-pagination .el-pager li.is-active {
-  background-color: #1e3c72;
+  background-color: var(--color-primary);
   color: #fff;
 }
 
@@ -91,7 +134,7 @@ html, body, #app {
 }
 
 .el-message-box {
-  border-radius: 12px;
+  border-radius: var(--radius-card);
 }
 
 .el-dropdown-menu {

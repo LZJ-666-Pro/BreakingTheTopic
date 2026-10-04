@@ -3,13 +3,7 @@
     <el-container>
       <el-aside :width="isCollapse ? '64px' : '200px'" class="aside">
         <div class="logo">
-          <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <img class="logo-icon" src="../static/log.png" alt="破题 Logo" />
           <transition name="fade">
             <span v-if="!isCollapse" class="logo-text">破题管理</span>
           </transition>
@@ -170,7 +164,7 @@ const handleLogout = () => {
 }
 
 .aside {
-  background: #001529;
+  background: #0F172A;
   transition: width 0.2s;
   display: flex;
   flex-direction: column;
@@ -191,12 +185,9 @@ const handleLogout = () => {
   width: 32px;
   height: 32px;
   flex-shrink: 0;
-}
-
-.logo-icon svg {
-  width: 100%;
-  height: 100%;
-  color: #1890ff;
+  border-radius: 8px;
+  display: block;
+  object-fit: cover;
 }
 
 .logo-text {
@@ -234,7 +225,7 @@ const handleLogout = () => {
 }
 
 .sidebar-menu :deep(.el-menu-item.is-active) {
-  background-color: #1890ff;
+  background-color: var(--color-primary);
 }
 
 .sidebar-menu :deep(.el-menu-item.is-active::before) {
@@ -292,7 +283,7 @@ const handleLogout = () => {
 
 .header-action:hover {
   background-color: #f5f5f5;
-  color: #1890ff;
+  color: var(--color-primary);
 }
 
 .user-dropdown {
@@ -315,7 +306,7 @@ const handleLogout = () => {
 }
 
 .main {
-  background-color: #f0f2f5;
+  background-color: var(--color-bg);
   padding: 20px;
   min-height: calc(100vh - 56px);
 }

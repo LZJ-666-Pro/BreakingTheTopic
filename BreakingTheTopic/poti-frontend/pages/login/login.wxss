@@ -10,58 +10,80 @@ page {
   flex-direction: column;
 }
 
-/* ===== 顶部浅蓝圆角区 ===== */
+/* ===== 顶部品牌区 ===== */
 .hero {
-  background: linear-gradient(180deg, #d3e2f9 0%, #eaf2fd 100%);
-  border-radius: 0 0 48rpx 48rpx;
-  padding: 88rpx 40rpx 96rpx;
+  background: linear-gradient(180deg, #E0F2FE 0%, #F0F9FF 100%);
+  padding: 120rpx 40rpx 120rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.hero-icon {
-  width: 176rpx;
-  height: 176rpx;
-  background: #fff;
-  border-radius: 44rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 48rpx;
-  box-shadow: 0 16rpx 40rpx rgba(96, 140, 240, 0.22);
+.hero-logo {
+  width: 440rpx;
+  height: 220rpx;
+  margin-bottom: 40rpx;
+  mix-blend-mode: multiply;
+  animation: breathe 3s ease-in-out infinite;
 }
 
-.icon-emoji {
-  font-size: 88rpx;
-  line-height: 1;
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
 }
 
 .main-title {
-  font-size: 76rpx;
-  font-weight: 700;
-  color: #1d2129;
-  margin-bottom: 20rpx;
-  letter-spacing: 10rpx;
+  font-size: 56rpx;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 16rpx;
+  letter-spacing: 8rpx;
 }
 
 .sub-title {
   font-size: 28rpx;
-  color: #8fa0b8;
-  letter-spacing: 6rpx;
+  color: #64748B;
+  letter-spacing: 4rpx;
 }
 
-/* ===== 内容区 ===== */
+.value-pill {
+  margin-top: 24rpx;
+  padding: 10rpx 28rpx;
+  background: rgba(30, 64, 175, 0.06);
+  border-radius: 999rpx;
+}
+
+.value-pill-text {
+  font-size: 26rpx;
+  color: #1E40AF;
+}
+
+/* ===== 欢迎区（白色圆角面板覆盖） ===== */
 .content {
   flex: 1;
+  background: #fff;
+  border-radius: 48rpx 48rpx 0 0;
+  margin-top: -48rpx;
   padding: 80rpx 48rpx 0;
   display: flex;
   flex-direction: column;
+  animation: fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .welcome-section {
   text-align: center;
-  margin-bottom: 72rpx;
+  margin-bottom: 64rpx;
 }
 
 .welcome-row {
@@ -72,34 +94,34 @@ page {
 }
 
 .welcome-emoji {
-  font-size: 44rpx;
+  font-size: 36rpx;
   line-height: 1;
   margin-right: 12rpx;
 }
 
 .welcome-title {
-  font-size: 42rpx;
-  font-weight: 700;
-  color: #1d2129;
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #0F172A;
 }
 
 .welcome-desc {
   display: block;
   font-size: 28rpx;
-  color: #98a4b5;
+  color: #64748B;
 }
 
 /* ===== 微信登录按钮 ===== */
 .wechat-btn {
   width: 100%;
-  height: 104rpx;
-  background: #4a7cf0;
-  border-radius: 28rpx;
+  height: 96rpx;
+  background: #1E40AF;
+  border-radius: 24rpx;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 12rpx 28rpx rgba(74, 124, 240, 0.32);
+  box-shadow: 0 12rpx 28rpx rgba(30, 64, 175, 0.3);
   transition: all 0.2s ease;
   padding: 0;
 }
@@ -110,11 +132,11 @@ page {
 
 .wechat-btn.btn-pressed {
   transform: scale(0.97);
-  background: #3f6fe0;
+  background: #1E3A8A;
 }
 
 .wechat-btn[disabled] {
-  background: #4a7cf0;
+  background: #1E40AF;
   opacity: 0.7;
   color: #fff;
 }
@@ -123,7 +145,7 @@ page {
   width: 44rpx;
   height: 44rpx;
   margin-right: 14rpx;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2048%2048'%3E%3Cg%20fill='%23ffffff'%3E%3Cpath%20d='M19.5%205C10.4%205%203%2011.2%203%2018.9c0%204.4%202.5%208.3%206.4%2010.9l-1.6%204.9%205.7-2.9c1.9.5%203.5.7%205.5.7.5%200%201.1%200%201.7-.1-.4-1.3-.6-2.6-.6-3.9%200-7.7%207.2-13.8%2016-13.8.4%200%20.9%200%201.4.1C36.2%208.9%2028.5%205%2019.5%205z'/%3E%3Cpath%20d='M31%2017.5c-7.4%200-13.3%205-13.3%2011S23.6%2039.5%2031%2039.5c1.5%200%203-.2%204.5-.7l4.4%202.4-1.2-4c3.1-2.2%205.6-5.4%205.6-8.7%200-6-5.9-11-13.3-11z'%20stroke='%234a7cf0'%20stroke-width='2'/%3E%3C/g%3E%3Cg%20fill='%234a7cf0'%3E%3Ccircle%20cx='14.2'%20cy='16.4'%20r='2'/%3E%3Ccircle%20cx='25'%20cy='16.4'%20r='2'/%3E%3Ccircle%20cx='27.4'%20cy='28'%20r='1.7'/%3E%3Ccircle%20cx='35.8'%20cy='28'%20r='1.7'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2048%2048'%3E%3Cg%20fill='%23ffffff'%3E%3Cpath%20d='M19.5%205C10.4%205%203%2011.2%203%2018.9c0%204.4%202.5%208.3%206.4%2010.9l-1.6%204.9%205.7-2.9c1.9.5%203.5.7%205.5.7.5%200%201.1%200%201.7-.1-.4-1.3-.6-2.6-.6-3.9%200-7.7%207.2-13.8%2016-13.8.4%200%20.9%200%201.4.1C36.2%208.9%2028.5%205%2019.5%205z'/%3E%3Cpath%20d='M31%2017.5c-7.4%200-13.3%205-13.3%2011S23.6%2039.5%2031%2039.5c1.5%200%203-.2%204.5-.7l4.4%202.4-1.2-4c3.1-2.2%205.6-5.4%205.6-8.7%200-6-5.9-11-13.3-11z'%20stroke='%231E40AF'%20stroke-width='2'/%3E%3C/g%3E%3Cg%20fill='%231E40AF'%3E%3Ccircle%20cx='14.2'%20cy='16.4'%20r='2'/%3E%3Ccircle%20cx='25'%20cy='16.4'%20r='2'/%3E%3Ccircle%20cx='27.4'%20cy='28'%20r='1.7'/%3E%3Ccircle%20cx='35.8'%20cy='28'%20r='1.7'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -136,17 +158,34 @@ page {
   letter-spacing: 2rpx;
 }
 
+.btn-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  margin-top: 24rpx;
+}
+
+.btn-tip-icon {
+  font-size: 20rpx;
+}
+
+.btn-tip-text {
+  font-size: 22rpx;
+  color: #94A3B8;
+}
+
 /* ===== 辅助登录 ===== */
 .auxiliary-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 48rpx;
+  margin-top: 56rpx;
 }
 
 .aux-item {
   font-size: 28rpx;
-  color: #8a94a6;
+  color: #64748B;
   padding: 16rpx 8rpx;
   transition: opacity 0.2s;
 }
@@ -157,7 +196,7 @@ page {
 
 .aux-dot {
   font-size: 28rpx;
-  color: #c9d1dc;
+  color: #CBD5E1;
   margin: 0 12rpx;
 }
 
@@ -177,12 +216,12 @@ page {
 
 .agreement-text {
   font-size: 24rpx;
-  color: #b3bac4;
+  color: #94A3B8;
 }
 
 .agreement-link {
   font-size: 24rpx;
-  color: #7d8794;
+  color: #0EA5E9;
 }
 
 /* ===== Toast ===== */
@@ -191,12 +230,13 @@ page {
   bottom: 200rpx;
   left: 50%;
   transform: translateX(-50%) translateY(40rpx);
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(15, 23, 42, 0.78);
   padding: 20rpx 40rpx;
   border-radius: 40rpx;
   opacity: 0;
   transition: all 0.3s ease;
   z-index: 1000;
+  max-width: 80%;
 }
 
 .custom-toast.toast-show {

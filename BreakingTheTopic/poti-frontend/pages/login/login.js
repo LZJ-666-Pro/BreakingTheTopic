@@ -135,7 +135,7 @@ Page({
     app.globalData.userInfo = guestUserInfo
     app.globalData.guestMode = true
     
-    this.showToast('已进入游客模式')
+    this.showToast('游客模式数据仅保存在本地，升级账号后可同步')
     
     setTimeout(() => {
       wx.switchTab({

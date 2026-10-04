@@ -1,10 +1,11 @@
 <view class="page">
   <view class="hero">
-    <view class="hero-icon">
-      <text class="icon-emoji">📖</text>
-    </view>
+    <image class="hero-logo" src="/images/log.png" mode="aspectFit" />
     <text class="main-title">破题</text>
     <text class="sub-title">刷题 · 成长 · 即刻启程</text>
+    <view class="value-pill">
+      <text class="value-pill-text">每天30分钟，系统化提升正确率</text>
+    </view>
   </view>
 
   <view class="content">
@@ -24,6 +25,11 @@
       <view class="btn-icon"></view>
       <text class="btn-text">{{loading ? '登录中...' : '微信一键登录'}}</text>
     </button>
+
+    <view class="btn-tip">
+      <text class="btn-tip-icon">🔒</text>
+      <text class="btn-tip-text">微信官方授权，信息仅用于登录</text>
+    </view>
 
     <view class="auxiliary-row">
       <text class="aux-item" bindtap="handlePhoneLogin">手机号登录</text>
