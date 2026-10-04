@@ -52,7 +52,7 @@
             <span class="time">{{ formatDate(row.createTime) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="80" align="center">
+        <el-table-column label="操作" width="140" align="center">
           <template #default="{ row }">
             <el-button 
               type="primary" 
@@ -61,6 +61,14 @@
               @click="handleStatusChange(row)"
             >
               {{ row.status === 1 ? '禁用' : '启用' }}
+            </el-button>
+            <el-button 
+              type="danger" 
+              link 
+              size="small"
+              @click="handleDelete(row)"
+            >
+              删除
             </el-button>
           </template>
         </el-table-column>
@@ -153,6 +161,26 @@ const handleStatusChange = async (row) => {
       params: { status: newStatus }
     })
     ElMessage.success(`${action}成功`)
+    loadUsers()
+  } catch (error) {
+    if (error !== 'cancel') console.error(error)
+  }
+}
+
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除用户「${row.nickname || row.id}」吗？删除后该用户将无法登录，且数据不可恢复。`,
+      '删除确认',
+      {
+        type: 'warning',
+        confirmButtonText: '确定删除',
+        cancelButtonText: '取消',
+        confirmButtonClass: 'el-button--danger'
+      }
+    )
+    await api.delete(`/admin/user/${row.id}`)
+    ElMessage.success('删除成功')
     loadUsers()
   } catch (error) {
     if (error !== 'cancel') console.error(error)

@@ -38,4 +38,10 @@ public class UserController {
         boolean success = userService.updateStatus(id, status);
         return success ? R.success(null) : R.error("操作失败");
     }
+
+    @DeleteMapping("/{id}")
+    public R<Void> deleteUser(@PathVariable Long id) {
+        boolean success = userService.deleteUser(id);
+        return success ? R.success(null) : R.error("删除失败");
+    }
 }

@@ -9,4 +9,6 @@ public interface UserService extends IService<User> {
     Page<User> pageList(int page, int size, String nickname, Integer status);
 
     boolean updateStatus(Long id, Integer status);
+
+    boolean deleteUser(Long id);
 }

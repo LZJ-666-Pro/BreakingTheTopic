@@ -34,4 +34,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setStatus(status);
         return this.updateById(user);
     }
+
+    @Override
+    public boolean deleteUser(Long id) {
+        return this.removeById(id);
+    }
 }
