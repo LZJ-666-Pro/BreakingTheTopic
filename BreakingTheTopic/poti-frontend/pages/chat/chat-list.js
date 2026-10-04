@@ -1,5 +1,4 @@
 const app = getApp()
-const API_BASE = 'http://localhost:8200'
 const guestUtils = require('../../utils/guest.js')
 
 Page({
@@ -51,11 +50,14 @@ Page({
 
   loadConversations() {
     wx.request({
-      url: `${API_BASE}/chat/conversations`,
+      url: `${app.globalData.userUrl}/chat/conversations`,
       method: 'GET',
       data: { userId: app.globalData.userId || 1 },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`
+      },
       success: (res) => {
-        if (res.data.code === 200) {
+        if (res.data && res.data.code === 200) {
           const conversations = res.data.data || []
           let totalUnread = 0
           

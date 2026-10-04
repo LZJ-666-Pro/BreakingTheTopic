@@ -294,12 +294,16 @@ Page({
       return
     }
     const userId = wx.getStorageSync('userId') || 1
+    const app = getApp()
     wx.request({
-      url: 'http://localhost:8200/chat/conversations',
+      url: `${app.globalData.userUrl}/chat/conversations`,
       method: 'GET',
       data: { userId },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`
+      },
       success: (res) => {
-        if (res.data.code === 200) {
+        if (res.data && res.data.code === 200) {
           const conversations = res.data.data || []
           let totalUnread = 0
           conversations.forEach(conv => {
@@ -308,6 +312,9 @@ Page({
           })
           this.setData({ unreadCount: totalUnread })
         }
+      },
+      fail: (err) => {
+        console.error('加载未读消息数失败', err)
       }
     })
   },

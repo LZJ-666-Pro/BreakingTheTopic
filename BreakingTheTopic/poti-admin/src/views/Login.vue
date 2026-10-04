@@ -25,6 +25,7 @@
             placeholder="请输入用户名"
             size="large"
             :prefix-icon="User"
+            autocomplete="off"
           />
         </el-form-item>
 
@@ -36,6 +37,7 @@
             size="large"
             :prefix-icon="Lock"
             show-password
+            autocomplete="new-password"
           />
         </el-form-item>
 
@@ -57,7 +59,9 @@
                 title="点击刷新验证码"
                 @click="loadCaptcha"
               />
-              <el-icon class="captcha-refresh" :size="18" @click="loadCaptcha"><Refresh /></el-icon>
+              <svg class="captcha-refresh" viewBox="0 0 24 24" fill="none" @click="loadCaptcha">
+                <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </div>
           </div>
         </el-form-item>
@@ -70,6 +74,7 @@
             size="large"
             :prefix-icon="Lock"
             show-password
+            autocomplete="new-password"
           />
         </el-form-item>
         <el-form-item v-if="!isLogin" prop="nickname">
@@ -134,12 +139,6 @@
         <el-icon :size="14"><Lock /></el-icon>
         <span>为保障系统安全，请勿在公共设备上保存登录状态</span>
       </div>
-
-      <div class="switch-link">
-        <span @click="toggleMode">
-          {{ isLogin ? '没有账号？立即注册' : '已有账号？立即登录' }}
-        </span>
-      </div>
     </div>
 
     <!-- 卡外版权 -->
@@ -154,7 +153,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { User, Lock, UserFilled, Message, Phone, Plus, Key, Refresh } from '@element-plus/icons-vue'
+import { User, Lock, UserFilled, Message, Phone, Plus, Key } from '@element-plus/icons-vue'
 import { useUserStore } from '../stores/user'
 import api from '../utils/api'
 
@@ -258,21 +257,12 @@ const rules = {
 }
 
 onMounted(() => {
-  const savedUsername = localStorage.getItem('admin_remember_username')
-  if (savedUsername) {
-    form.username = savedUsername
-    rememberMe.value = true
-  }
   loadCaptcha()
 })
 
 const toggleMode = () => {
   isLogin.value = !isLogin.value
   formRef.value?.resetFields()
-  const savedUsername = localStorage.getItem('admin_remember_username')
-  if (savedUsername && isLogin.value) {
-    form.username = savedUsername
-  }
 }
 
 const handleForgot = () => {
@@ -335,12 +325,6 @@ const handleLogin = async () => {
       captchaCode: form.captchaCode
     })
 
-    if (rememberMe.value) {
-      localStorage.setItem('admin_remember_username', form.username)
-    } else {
-      localStorage.removeItem('admin_remember_username')
-    }
-
     userStore.setToken(res.data.token)
     userStore.setUserInfo(res.data.user)
     ElMessage.success('登录成功')
@@ -369,10 +353,6 @@ const handleRegister = async () => {
   ElMessage.success('注册成功，请登录')
   isLogin.value = true
   formRef.value?.resetFields()
-  const savedUsername = localStorage.getItem('admin_remember_username')
-  if (savedUsername) {
-    form.username = savedUsername
-  }
 }
 </script>
 
@@ -431,7 +411,7 @@ const handleRegister = async () => {
   width: 100%;
   max-width: 460px;
   background: var(--color-card);
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow: 0 20px 60px rgba(30, 64, 175, 0.12), 0 4px 16px rgba(15, 23, 42, 0.05);
   padding: 44px 40px 32px;
   position: relative;
@@ -448,7 +428,7 @@ const handleRegister = async () => {
 }
 
 .card-title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   color: var(--color-text);
   line-height: 1.3;
@@ -474,8 +454,8 @@ const handleRegister = async () => {
 
 /* 顶部标签样式 */
 .login-form :deep(.el-form-item__label) {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--color-text);
   line-height: 1;
   margin-bottom: 8px;
@@ -535,9 +515,12 @@ const handleRegister = async () => {
 }
 
 .captcha-refresh {
-  padding: 0 12px;
+  width: 18px;
+  height: 18px;
+  margin: 0 12px;
   color: var(--color-text-secondary);
   cursor: pointer;
+  flex-shrink: 0;
   transition: color 0.2s;
 }
 
@@ -566,11 +549,11 @@ const handleRegister = async () => {
 /* ===== 登录按钮 ===== */
 .login-btn {
   width: 100%;
-  height: 46px;
+  height: 48px;
   font-size: 16px;
   font-weight: 500;
   letter-spacing: 4px;
-  border-radius: var(--radius-btn);
+  border-radius: 10px;
   background-color: var(--color-primary);
   border: none;
 }
@@ -597,33 +580,21 @@ const handleRegister = async () => {
   flex-shrink: 0;
 }
 
-/* ===== 切换注册 ===== */
-.switch-link {
-  text-align: center;
-  margin-top: 16px;
-}
-
-.switch-link span {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.switch-link span:hover {
-  color: var(--color-primary);
-}
-
-/* ===== 卡外版权 ===== */
+/* ===== 卡外版权（固定页底） ===== */
 .login-footer {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  margin: 24px 0 0 0;
+  margin: 0;
   font-size: 12px;
   color: var(--color-disabled);
-  position: relative;
   z-index: 1;
+  pointer-events: none;
 }
 
 /* ===== 头像上传（注册） ===== */
