@@ -135,7 +135,7 @@ public class DiscussionServiceImpl extends ServiceImpl<DiscussionMapper, Discuss
             item.put("createTime", discussion.getCreateTime());
             
             try {
-                String url = "http://localhost:8300/question/" + discussion.getQuestionId();
+                String url = "http://localhost:8300/question/internal/" + discussion.getQuestionId();
                 @SuppressWarnings("unchecked")
                 Map<String, Object> response = restTemplate.getForObject(url, Map.class);
                 

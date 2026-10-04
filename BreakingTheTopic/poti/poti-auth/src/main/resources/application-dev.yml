@@ -34,8 +34,12 @@ wx:
   secret: 1a1df381bfb417d942beee26ef809b09
 
 jwt:
-  secret: poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz
+  secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
   expire: 86400000
+
+poti:
+  security:
+    internal-token: ${INTERNAL_TOKEN:poti-internal-secret-2024}
 
 management:
   endpoints:

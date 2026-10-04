@@ -1,6 +1,10 @@
 server:
   port: 8300
 
+jwt:
+  secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
+  expire: 86400000
+
 spring:
   application:
     name: poti-question

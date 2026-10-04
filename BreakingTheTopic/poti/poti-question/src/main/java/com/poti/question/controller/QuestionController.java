@@ -282,6 +282,7 @@ public class QuestionController {
             Map<String, Object> result = new HashMap<>();
             result.put("id", question.getId());
             result.put("title", question.getTitle());
+            result.put("type", question.getType());
             result.put("answer", question.getAnswer());
             result.put("analysis", question.getAnalysis());
             result.put("categoryId", question.getCategoryId());

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +32,9 @@ public class AuthController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Value("${poti.security.internal-token:}")
+    private String internalToken;
 
 /**
  * Handles the login request using WeChat's authentication flow
@@ -90,6 +94,9 @@ public class AuthController {
             try {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
+                if (StringUtils.hasText(internalToken)) {
+                    headers.set("X-Internal-Token", internalToken);
+                }
                 HttpEntity<Map<String, String>> entity = new HttpEntity<>(createRequest, headers);
                 
                 @SuppressWarnings("unchecked")
@@ -215,6 +222,9 @@ public class AuthController {
                 HttpHeaders headers = new HttpHeaders();
                 if (userId != null) {
                     headers.set("X-User-Id", userId.toString());
+                }
+                if (StringUtils.hasText(internalToken)) {
+                    headers.set("X-Internal-Token", internalToken);
                 }
                 HttpEntity<String> entity = new HttpEntity<>(headers);
                 

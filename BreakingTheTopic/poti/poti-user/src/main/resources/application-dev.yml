@@ -5,6 +5,10 @@ jwt:
   secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
   expire: 86400000
 
+poti:
+  security:
+    internal-token: ${INTERNAL_TOKEN:poti-internal-secret-2024}
+
 spring:
   application:
     name: poti-user

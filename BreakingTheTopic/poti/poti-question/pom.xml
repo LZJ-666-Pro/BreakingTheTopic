@@ -64,6 +64,13 @@
 			<version>1.0.0</version>
 		</dependency>
 
+		<!-- 统一鉴权模块 -->
+		<dependency>
+			<groupId>com.poti</groupId>
+			<artifactId>poti-common-security</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
 		<!-- OpenFeign -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

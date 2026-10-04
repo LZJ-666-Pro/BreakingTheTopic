@@ -1,1 +1,5 @@
+com\poti\common\security\PotiSecurityAutoConfiguration.class
+com\poti\common\security\SecurityProperties.class
 com\poti\common\security\JwtUtil.class
+com\poti\common\security\HeaderMapRequestWrapper.class
+com\poti\common\security\JwtAuthenticationFilter.class
