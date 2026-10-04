@@ -31,7 +31,8 @@
     "pages/forgot-password/forgot-password",
     "pages/feedback/feedback",
     "pages/contact/contact",
-    "pages/group/group"
+    "pages/group/group",
+    "pages/statistics/statistics"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -41,9 +42,9 @@
   },
   "tabBar": {
     "custom": true,
-    "color": "#7A7E83",
-    "selectedColor": "#3cc51f",
-    "borderStyle": "black",
+    "color": "#9CA3AF",
+    "selectedColor": "#2979FF",
+    "borderStyle": "white",
     "backgroundColor": "#ffffff",
     "list": [
       {
@@ -56,7 +57,11 @@
       },
       {
         "pagePath": "pages/practice/practice",
-        "text": "刷题"
+        "text": "练习"
+      },
+      {
+        "pagePath": "pages/statistics/statistics",
+        "text": "统计"
       },
       {
         "pagePath": "pages/user/user",

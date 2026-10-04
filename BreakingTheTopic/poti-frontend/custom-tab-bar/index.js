@@ -1,36 +1,38 @@
 Component({
   data: {
     selected: 0,
-    color: "#7A7E83",
-    selectedColor: "#07C160",
+    color: "#9CA3AF",
+    selectedColor: "#2979FF",
     list: [
       {
         pagePath: "/pages/index/index",
-        iconPath: "images/home.png",
-        selectedIconPath: "images/home-active.png",
-        text: "首页",
-        iconName: "home-o"
+        iconPath: "/images/1.png",
+        selectedIconPath: "/images/1-active.png",
+        text: "首页"
       },
       {
         pagePath: "/pages/question/question",
-        iconPath: "images/question.png",
-        selectedIconPath: "images/question-active.png",
-        text: "题库",
-        iconName: "question-o"
+        iconPath: "/images/2.png",
+        selectedIconPath: "/images/2-active.png",
+        text: "题库"
       },
       {
         pagePath: "/pages/practice/practice",
-        iconPath: "images/practice.png",
-        selectedIconPath: "images/practice-active.png",
-        text: "刷题",
-        iconName: "edit"
+        iconPath: "/images/3.png",
+        selectedIconPath: "/images/3-active.png",
+        text: "练习"
+      },
+      {
+        pagePath: "/pages/statistics/statistics",
+        iconPath: "/images/4.png",
+        selectedIconPath: "/images/4-active.png",
+        text: "统计"
       },
       {
         pagePath: "/pages/user/user",
-        iconPath: "images/user.png",
-        selectedIconPath: "images/user-active.png",
-        text: "我的",
-        iconName: "user-o"
+        iconPath: "/images/5.png",
+        selectedIconPath: "/images/5-active.png",
+        text: "我的"
       }
     ]
   },
