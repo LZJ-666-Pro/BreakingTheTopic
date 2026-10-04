@@ -60,6 +60,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/monitor",
             "/admin/login",
             "/admin/register",
+            "/admin/captcha",
             "/admin/upload/",
             "/admin/test"
     );

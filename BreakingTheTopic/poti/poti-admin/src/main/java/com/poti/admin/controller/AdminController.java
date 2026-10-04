@@ -3,6 +3,7 @@ package com.poti.admin.controller;
 import cn.hutool.crypto.digest.BCrypt;
 import com.poti.admin.entity.Admin;
 import com.poti.admin.service.AdminService;
+import com.poti.admin.service.CaptchaService;
 import com.poti.common.R;
 import com.poti.common.security.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,19 @@ public class AdminController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private CaptchaService captchaService;
+
+    @GetMapping("/captcha")
+    public R<Map<String, Object>> captcha() {
+        try {
+            return R.success(captchaService.generate());
+        } catch (Exception e) {
+            log.error("生成验证码失败", e);
+            return R.error("获取验证码失败");
+        }
+    }
+
     @PostMapping("/login")
     public R<Map<String, Object>> login(@RequestBody Map<String, String> request, HttpServletRequest httpRequest) {
         try {
@@ -39,7 +53,13 @@ public class AdminController {
             if (password == null || password.trim().isEmpty()) {
                 return R.error("密码不能为空");
             }
-            
+
+            String captchaKey = request.get("captchaKey");
+            String captchaCode = request.get("captchaCode");
+            if (!captchaService.validate(captchaKey, captchaCode)) {
+                return R.error("验证码错误或已过期");
+            }
+
             Admin admin = adminService.login(username, password);
             if (admin == null) {
                 log.warn("管理员登录失败，用户名或密码错误: {}", username);
