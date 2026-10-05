@@ -304,6 +304,7 @@ Page({
     todayCount: 0,
     wrongCount: 0,
     favoriteCount: 0,
+    unreadCount: 0,
     totalQuestions: 0,
     historyCount: 0,
     accuracy: 0,
@@ -314,32 +315,6 @@ Page({
     hasUnfinished: false,
     unfinishedCategory: '',
     unfinishedProgress: 0,
-    banners: [
-      {
-        id: 1,
-        title: '每日挑战',
-        desc: '完成今日10道题目，解锁专属成就',
-        btnText: '立即挑战',
-        type: 'challenge',
-        theme: 'fire'
-      },
-      {
-        id: 2,
-        title: '排行榜挑战',
-        desc: '与全国用户PK，争夺周榜冠军',
-        btnText: '查看排行',
-        type: 'rank',
-        theme: 'gold'
-      },
-      {
-        id: 3,
-        title: '错题攻坚',
-        desc: '攻克错题，查漏补缺更高效',
-        btnText: '开始复习',
-        type: 'wrongbook',
-        theme: 'growth'
-      }
-    ],
     categories: [],
     displayCategories: [],
     showAllCategories: false
@@ -361,6 +336,45 @@ Page({
     this.loadStats()
     this.checkUnfinished()
     this.checkTodayCheckIn()
+    this.loadUnreadCount()
+  },
+
+  loadUnreadCount() {
+    if (guestUtils.checkGuest()) {
+      this.setData({ unreadCount: 0 })
+      return
+    }
+    const userId = wx.getStorageSync('userId') || 1
+    const app = getApp()
+    wx.request({
+      url: `${app.globalData.userUrl}/chat/conversations`,
+      method: 'GET',
+      data: { userId },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`
+      },
+      success: (res) => {
+        if (res.data && res.data.code === 200) {
+          const conversations = res.data.data || []
+          let totalUnread = 0
+          conversations.forEach(conv => {
+            const isUser1 = conv.user1_id === userId
+            totalUnread += isUser1 ? conv.user1_unread : conv.user2_unread
+          })
+          this.setData({ unreadCount: totalUnread })
+        }
+      },
+      fail: (err) => {
+        console.error('加载未读消息数失败', err)
+      }
+    })
+  },
+
+  goToMessages() {
+    if (!guestUtils.requireLogin()) return
+    wx.navigateTo({
+      url: '/pages/chat/chat-list'
+    })
   },
 
   loadCategories() {

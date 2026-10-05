@@ -9,30 +9,33 @@
           <view class="name-row">
             <text class="profile-name">{{userInfo.nickname || '面试鸭8384'}}</text>
             <view class="level-badge">Lv1</view>
-            <view class="user-tag">普通用户</view>
           </view>
-          <text class="profile-id">ID: {{userInfo.id || userId}}</text>
+          <text class="user-tag">普通用户</text>
         </view>
         <view class="edit-btn" bindtap="editProfile">
-          <van-icon name="edit" size="18px" color="rgba(255,255,255,0.8)" />
+          <van-icon name="edit" size="20px" color="#5A6478" />
         </view>
       </view>
-      
+
       <view class="stats-card">
         <view class="stat-item" bindtap="goToHistory">
+          <image class="stat-icon" src="/images/ge1.png" mode="aspectFit" />
           <text class="stat-number">{{statistics.totalQuestionCount}}</text>
           <text class="stat-label">累计刷题</text>
         </view>
         <view class="stat-item" bindtap="goToCorrect">
-          <text class="stat-number correct">{{statistics.todayCount || 0}}</text>
+          <image class="stat-icon" src="/images/ge2.png" mode="aspectFit" />
+          <text class="stat-number">{{statistics.todayCount || 0}}</text>
           <text class="stat-label">今日刷题</text>
         </view>
         <view class="stat-item" bindtap="goToWrongbook">
-          <text class="stat-number wrong">{{statistics.wrongbookCount || 0}}</text>
+          <image class="stat-icon" src="/images/ge3.png" mode="aspectFit" />
+          <text class="stat-number">{{statistics.wrongbookCount || 0}}</text>
           <text class="stat-label">错题</text>
         </view>
         <view class="stat-item" bindtap="goToFavorite">
-          <text class="stat-number favorite">{{statistics.favoriteCount}}</text>
+          <image class="stat-icon" src="/images/ge4.png" mode="aspectFit" />
+          <text class="stat-number">{{statistics.favoriteCount}}</text>
           <text class="stat-label">收藏</text>
         </view>
       </view>

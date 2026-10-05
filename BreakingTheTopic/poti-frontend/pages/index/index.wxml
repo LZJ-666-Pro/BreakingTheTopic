@@ -6,14 +6,11 @@
     </view>
     <view class="header-right">
       <view class="header-action" bindtap="goToSearch">
-        <van-icon name="search" size="20px" color="#666" />
+        <image class="action-icon search" src="/images/s2.png" mode="aspectFit" />
       </view>
-      <view class="header-action" bindtap="goToWrongbook">
-        <van-icon name="warning-o" size="20px" color="#666" />
-        <view class="action-badge" wx:if="{{wrongCount > 0}}">{{wrongCount}}</view>
-      </view>
-      <view class="header-action" bindtap="goToFavorite">
-        <van-icon name="star-o" size="20px" color="#666" />
+      <view class="header-action" bindtap="goToMessages">
+        <image class="action-icon bell" src="/images/s1.png" mode="aspectFit" />
+        <view class="msg-dot" wx:if="{{unreadCount > 0}}"></view>
       </view>
     </view>
   </view>
@@ -28,34 +25,18 @@
       <van-icon name="arrow" size="16px" color="#CCC" />
     </view>
 
-    <swiper class="banner-swiper" indicator-dots autoplay circular indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#fff">
-      <swiper-item wx:for="{{banners}}" wx:key="id" bindtap="onBannerTap" data-type="{{item.type}}" data-id="{{item.id}}">
-        <view class="banner-card banner-{{item.theme}}">
-          <view class="banner-decor">
-            <view class="decor-circle decor-circle-1"></view>
-            <view class="decor-circle decor-circle-2"></view>
-            <view class="decor-circle decor-circle-3"></view>
-          </view>
-          <view class="banner-icon-wrap">
-            <text class="banner-icon" wx:if="{{item.theme === 'fire'}}">🔥</text>
-            <text class="banner-icon" wx:if="{{item.theme === 'gold'}}">🏆</text>
-            <text class="banner-icon" wx:if="{{item.theme === 'growth'}}">📚</text>
-          </view>
-          <view class="banner-content">
-            <view class="banner-info">
-              <text class="banner-title">{{item.title}}</text>
-              <text class="banner-desc">{{item.desc}}</text>
-            </view>
-            <view class="banner-action">
-              <view class="banner-btn banner-btn-{{item.theme}}">
-                <text>{{item.btnText}}</text>
-                <van-icon name="arrow" size="14px" />
-              </view>
-            </view>
-          </view>
+    <!-- 排行榜 Banner（静态，替代原轮播图） -->
+    <view class="hero-banner" bindtap="onBannerTap" data-type="rank">
+      <view class="hero-info">
+        <text class="hero-title">排行榜挑战</text>
+        <text class="hero-desc">与全国用户PK，争夺周榜冠军</text>
+        <view class="hero-btn">
+          <text>查看排行</text>
+          <view class="hero-chevron"></view>
         </view>
-      </swiper-item>
-    </swiper>
+      </view>
+      <image class="hero-img" src="/images/phb.png" mode="aspectFit" />
+    </view>
 
     <view class="stats-section">
       <view class="stats-item">

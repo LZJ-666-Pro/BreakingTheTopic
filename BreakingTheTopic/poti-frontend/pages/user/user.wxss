@@ -14,10 +14,10 @@ page {
 }
 
 .profile-section {
-  background: #fff;
+  background: linear-gradient(180deg, #D9E6F8 0%, #ECF3FB 100%);
   border-radius: 32rpx;
   padding: 32rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4rpx 20rpx rgba(93, 130, 180, 0.12);
 }
 
 .profile-top {
@@ -70,16 +70,10 @@ page {
 }
 
 .user-tag {
-  padding: 4rpx 16rpx;
-  background: #F5F5F5;
-  border-radius: 20rpx;
-  font-size: 22rpx;
-  color: #999;
-}
-
-.profile-id {
+  display: block;
+  margin-top: 6rpx;
   font-size: 24rpx;
-  color: #999;
+  color: #8A94A6;
 }
 
 .edit-btn {
@@ -88,16 +82,16 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(7, 193, 96, 0.1);
   border-radius: 50%;
 }
 
 .stats-card {
   display: flex;
-  background: linear-gradient(135deg, #F8F9FA 0%, #F0F2F5 100%);
+  background: #fff;
   border-radius: 20rpx;
-  padding: 28rpx 16rpx;
+  padding: 28rpx 0;
   margin-top: 28rpx;
+  box-shadow: 0 4rpx 16rpx rgba(93, 130, 180, 0.1);
 }
 
 .stat-item {
@@ -107,28 +101,27 @@ page {
   align-items: center;
 }
 
+.stat-item + .stat-item {
+  border-left: 1rpx solid #EEF1F5;
+}
+
+.stat-icon {
+  width: 44rpx;
+  height: 44rpx;
+  margin-bottom: 12rpx;
+}
+
 .stat-number {
-  font-size: 40rpx;
+  font-size: 34rpx;
   font-weight: 700;
   color: #333;
   margin-bottom: 8rpx;
-}
-
-.stat-number.correct {
-  color: #07C160;
-}
-
-.stat-number.wrong {
-  color: #FA5151;
-}
-
-.stat-number.favorite {
-  color: #FF9500;
+  line-height: 1;
 }
 
 .stat-label {
   font-size: 24rpx;
-  color: #999;
+  color: #8A94A6;
 }
 
 .content {
