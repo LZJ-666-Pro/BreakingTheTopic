@@ -1,5 +1,5 @@
 const app = getApp()
-const API_BASE = 'http://localhost:8200'
+const API_BASE = 'http://10.98.45.3:8200'
 const guestUtils = require('../../utils/guest.js')
 
 Page({
