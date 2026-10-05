@@ -1,5 +1,4 @@
 const app = getApp()
-const API_BASE = 'http://10.98.45.3:8200'
 const guestUtils = require('../../utils/guest.js')
 
 Page({
@@ -74,9 +73,13 @@ Page({
 
   loadMessages() {
     wx.request({
-      url: `${API_BASE}/chat/conversations`,
+      url: `${app.globalData.userUrl}/chat/conversations`,
       method: 'GET',
       data: { userId: this.data.userId },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
       success: (res) => {
         if (res.data.code === 200) {
           const conversations = res.data.data || []
@@ -93,13 +96,17 @@ Page({
 
   getMessages(conversationId) {
     wx.request({
-      url: `${API_BASE}/chat/messages`,
+      url: `${app.globalData.userUrl}/chat/messages`,
       method: 'GET',
       data: {
         userId: this.data.userId,
         conversationId: conversationId,
         page: 1,
         size: 100
+      },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
       },
       success: (res) => {
         if (res.data.code === 200) {
@@ -131,10 +138,12 @@ Page({
     const content = this.data.inputMessage.trim()
     
     wx.request({
-      url: `${API_BASE}/chat/send`,
+      url: `${app.globalData.userUrl}/chat/send`,
       method: 'POST',
       header: {
-        'content-type': 'application/x-www-form-urlencoded'
+        'content-type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
       },
       data: {
         senderId: this.data.userId,
@@ -183,11 +192,15 @@ Page({
 
   uploadFile(filePath, type) {
     wx.uploadFile({
-      url: `${API_BASE}/chat/upload`,
+      url: `${app.globalData.userUrl}/chat/upload`,
       filePath: filePath,
       name: 'file',
       formData: {
         type: type
+      },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
       },
       success: (res) => {
         const data = JSON.parse(res.data)
@@ -216,10 +229,12 @@ Page({
 
   sendImageMessage(mediaUrl) {
     wx.request({
-      url: `${API_BASE}/chat/send`,
+      url: `${app.globalData.userUrl}/chat/send`,
       method: 'POST',
       header: {
-        'content-type': 'application/x-www-form-urlencoded'
+        'content-type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
       },
       data: {
         senderId: this.data.userId,
@@ -261,10 +276,12 @@ Page({
 
   sendVoiceMessage(mediaUrl) {
     wx.request({
-      url: `${API_BASE}/chat/send`,
+      url: `${app.globalData.userUrl}/chat/send`,
       method: 'POST',
       header: {
-        'content-type': 'application/x-www-form-urlencoded'
+        'content-type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
       },
       data: {
         senderId: this.data.userId,
@@ -307,8 +324,12 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.request({
-            url: `${API_BASE}/chat/message/${messageId}?userId=${this.data.userId}`,
+            url: `${app.globalData.userUrl}/chat/message/${messageId}?userId=${this.data.userId}`,
             method: 'DELETE',
+            header: {
+              'Authorization': `Bearer ${app.globalData.token}`,
+              'X-User-Id': app.globalData.userId || 1
+            },
             success: (res) => {
               if (res.data.code === 200) {
                 wx.showToast({
