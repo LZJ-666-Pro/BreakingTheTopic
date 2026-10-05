@@ -62,6 +62,6 @@
       <text class="empty-text">暂无相关题库</text>
     </view>
     
-    <view style="height: 120rpx;"></view>
+    <view style="height: calc(120rpx + env(safe-area-inset-bottom));"></view>
   </scroll-view>
 </view>
