@@ -43,12 +43,14 @@ Page({
       return
     }
     
+    // 头像地址兼容历史数据：老数据存的是 localhost，真机无法访问，统一替换为配置的服务地址
+    const fixAvatarUrl = (url) => (url || '').replace('http://localhost:8200', app.globalData.userUrl)
     this.setData({
       userId: app.globalData.userId || 1,
       friendId: parseInt(options.friendId),
       friendName: options.friendName || '好友',
-      friendAvatar: options.friendAvatar || '',
-      userAvatar: app.globalData.userInfo?.avatarUrl || ''
+      friendAvatar: fixAvatarUrl(decodeURIComponent(options.friendAvatar || '')),
+      userAvatar: fixAvatarUrl(app.globalData.userInfo?.avatarUrl)
     })
     
     wx.setNavigationBarTitle({
