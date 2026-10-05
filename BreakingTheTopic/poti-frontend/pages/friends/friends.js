@@ -1,5 +1,4 @@
 const app = getApp()
-const API_BASE = 'http://10.98.45.3:8200'
 const guestUtils = require('../../utils/guest.js')
 
 Page({
@@ -72,10 +71,13 @@ Page({
     }
 
     wx.request({
-      url: `${API_BASE}/user/search`,
+      url: `${app.globalData.userUrl}/user/search`,
       method: 'GET',
       data: { keyword },
-      header: { 'X-User-Id': app.globalData.userId || 1 },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
       success: (res) => {
         if (res.data.code === 200) {
           const results = res.data.data || []
@@ -111,10 +113,12 @@ Page({
     if (!selectedUser) return
 
     wx.request({
-      url: `${API_BASE}/friendship/request`,
+      url: `${app.globalData.userUrl}/friendship/request`,
       method: 'POST',
       header: {
-        'content-type': 'application/x-www-form-urlencoded'
+        'content-type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
       },
       data: {
         userId: app.globalData.userId || 1,
@@ -150,9 +154,13 @@ Page({
   loadFriendList() {
     console.log('加载好友列表')
     wx.request({
-      url: `${API_BASE}/friendship/list`,
+      url: `${app.globalData.userUrl}/friendship/list`,
       method: 'GET',
       data: { userId: app.globalData.userId || 1 },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
       success: (res) => {
         console.log('好友列表响应:', res.data)
         if (res.data.code === 200) {
@@ -160,9 +168,13 @@ Page({
           console.log('好友列表数据:', friendList)
           
           wx.request({
-            url: `${API_BASE}/chat/conversations`,
+            url: `${app.globalData.userUrl}/chat/conversations`,
             method: 'GET',
             data: { userId: app.globalData.userId || 1 },
+            header: {
+              'Authorization': `Bearer ${app.globalData.token}`,
+              'X-User-Id': app.globalData.userId || 1
+            },
             success: (convRes) => {
               if (convRes.data.code === 200) {
                 const conversations = convRes.data.data || []
@@ -214,9 +226,13 @@ Page({
 
   loadPendingRequests() {
     wx.request({
-      url: `${API_BASE}/friendship/pending`,
+      url: `${app.globalData.userUrl}/friendship/pending`,
       method: 'GET',
       data: { userId: app.globalData.userId || 1 },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
       success: (res) => {
         if (res.data.code === 200) {
           this.setData({ pendingRequests: res.data.data || [] })
@@ -227,9 +243,13 @@ Page({
 
   loadSentRequests() {
     wx.request({
-      url: `${API_BASE}/friendship/sent`,
+      url: `${app.globalData.userUrl}/friendship/sent`,
       method: 'GET',
       data: { userId: app.globalData.userId || 1 },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
       success: (res) => {
         if (res.data.code === 200) {
           this.setData({ sentRequests: res.data.data || [] })
@@ -243,10 +263,12 @@ Page({
     console.log('接受好友申请，requestId:', requestId)
     
     wx.request({
-      url: `${API_BASE}/friendship/accept`,
+      url: `${app.globalData.userUrl}/friendship/accept`,
       method: 'POST',
       header: {
-        'content-type': 'application/x-www-form-urlencoded'
+        'content-type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
       },
       data: {
         requestId,
@@ -272,10 +294,12 @@ Page({
   rejectRequest(e) {
     const requestId = e.currentTarget.dataset.id
     wx.request({
-      url: `${API_BASE}/friendship/reject`,
+      url: `${app.globalData.userUrl}/friendship/reject`,
       method: 'POST',
       header: {
-        'content-type': 'application/x-www-form-urlencoded'
+        'content-type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
       },
       data: {
         requestId,
@@ -303,10 +327,12 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.request({
-            url: `${API_BASE}/friendship/delete`,
+            url: `${app.globalData.userUrl}/friendship/delete`,
             method: 'DELETE',
             header: {
-              'content-type': 'application/x-www-form-urlencoded'
+              'content-type': 'application/x-www-form-urlencoded',
+              'Authorization': `Bearer ${app.globalData.token}`,
+              'X-User-Id': app.globalData.userId || 1
             },
             data: {
               userId: app.globalData.userId || 1,
@@ -345,8 +371,12 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.request({
-            url: `${API_BASE}/chat/conversation/${friend.conversationId}?userId=${app.globalData.userId || 1}`,
+            url: `${app.globalData.userUrl}/chat/conversation/${friend.conversationId}?userId=${app.globalData.userId || 1}`,
             method: 'DELETE',
+            header: {
+              'Authorization': `Bearer ${app.globalData.token}`,
+              'X-User-Id': app.globalData.userId || 1
+            },
             success: (res) => {
               if (res.data.code === 200) {
                 wx.showToast({
@@ -384,8 +414,12 @@ Page({
     this.setData({ showInviteDialog: true })
     
     wx.request({
-      url: `${API_BASE}/friendship/invite-code?userId=${app.globalData.userId || 1}`,
+      url: `${app.globalData.userUrl}/friendship/invite-code?userId=${app.globalData.userId || 1}`,
       method: 'GET',
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
       success: (res) => {
         if (res.data.code === 200) {
           this.setData({ inviteCode: res.data.data })
@@ -425,8 +459,12 @@ Page({
     this.setData({ showRecommendDialog: true })
     
     wx.request({
-      url: `${API_BASE}/friendship/recommendations?userId=${app.globalData.userId || 1}&limit=20`,
+      url: `${app.globalData.userUrl}/friendship/recommendations?userId=${app.globalData.userId || 1}&limit=20`,
       method: 'GET',
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
       success: (res) => {
         if (res.data.code === 200) {
           this.setData({ recommendations: res.data.data || [] })
@@ -487,8 +525,12 @@ Page({
     }
     
     wx.request({
-      url: `${API_BASE}/friendship/add-by-code?userId=${app.globalData.userId || 1}&inviteCode=${inviteCode}`,
+      url: `${app.globalData.userUrl}/friendship/add-by-code?userId=${app.globalData.userId || 1}&inviteCode=${inviteCode}`,
       method: 'POST',
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
       success: (res) => {
         if (res.data.code === 200) {
           wx.showToast({
