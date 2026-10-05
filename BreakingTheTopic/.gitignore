@@ -1,0 +1,25 @@
+# ===== 构建产物 / 依赖目录 =====
+# Maven（含本次编译使用的本地仓库与 target）
+.m2-repo/
+target/
+*.class
+
+# Node
+node_modules/
+dist/
+
+# ===== IDE / 系统文件 =====
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ===== 日志 =====
+*.log
+
+# ===== 运行数据 =====
+uploads/
+avatars/
+logs/
+*.pid

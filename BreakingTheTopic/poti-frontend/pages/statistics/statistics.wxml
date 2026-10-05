@@ -1,0 +1,193 @@
+<view class="page">
+  <!-- 顶部总览 -->
+  <view class="overview-card">
+    <view class="overview-title-row">
+      <text class="overview-title">学习总览</text>
+      <view class="streak-pill">
+        <text class="streak-flame">🔥</text>
+        <text class="streak-text" wx:if="{{streakDays > 0}}">连续 {{streakDays}} 天</text>
+        <text class="streak-text" wx:else>开始连击</text>
+      </view>
+    </view>
+    <view class="overview-grid">
+      <view class="overview-item">
+        <text class="overview-number">{{statistics.totalQuestionCount}}</text>
+        <text class="overview-label">累计刷题</text>
+      </view>
+      <view class="overview-divider"></view>
+      <view class="overview-item">
+        <text class="overview-number">{{statistics.todayCount}}</text>
+        <text class="overview-label">今日刷题</text>
+      </view>
+      <view class="overview-divider"></view>
+      <view class="overview-item">
+        <text class="overview-number">{{accuracy}}<text class="overview-unit">%</text></text>
+        <text class="overview-label">正确率</text>
+      </view>
+      <view class="overview-divider"></view>
+      <view class="overview-item">
+        <text class="overview-number">{{streakDays}}</text>
+        <text class="overview-label">连续天数</text>
+      </view>
+    </view>
+    <view class="overview-hint" wx:if="{{statistics.totalQuestionCount > 0}}">
+      <text wx:if="{{statistics.todayCount > 0}}">今日已刷 {{statistics.todayCount}} 题，继续保持！</text>
+      <text wx:else>今天还没开始刷题，先来 5 道热热身吧</text>
+    </view>
+    <view class="overview-hint" wx:else>登录后同步刷题数据，开启你的学习之旅</view>
+  </view>
+
+  <!-- 答题分布 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">答题分布</text>
+      <text class="card-sub" wx:if="{{statistics.totalQuestionCount > 0}}">共答 {{statistics.totalQuestionCount}} 题</text>
+    </view>
+    <block wx:if="{{statistics.totalQuestionCount > 0}}">
+      <view class="dist-body">
+        <view class="ring-wrap">
+          <view class="ring" style="{{ringStyle}}">
+            <view class="ring-inner">
+              <text class="ring-num">{{accuracy}}%</text>
+              <text class="ring-label">正确率</text>
+            </view>
+          </view>
+        </view>
+        <view class="dist-list">
+          <view class="dist-row-item">
+            <view class="dist-dot correct"></view>
+            <text class="dist-label">答对</text>
+            <text class="dist-value correct">{{statistics.correctCount}}</text>
+            <text class="dist-pct">{{correctPct}}%</text>
+          </view>
+          <view class="dist-row-item">
+            <view class="dist-dot wrong"></view>
+            <text class="dist-label">答错</text>
+            <text class="dist-value wrong">{{statistics.wrongCount}}</text>
+            <text class="dist-pct">{{wrongPct}}%</text>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view class="empty-state" wx:else>
+      <text class="empty-emoji">📝</text>
+      <text class="empty-title">还没有答题记录</text>
+      <text class="empty-desc">从第一题开始，见证你的进步</text>
+      <view class="empty-btn" bindtap="goPractice">去刷题</view>
+    </view>
+  </view>
+
+  <!-- 刷题日历 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">刷题日历</text>
+      <view class="month-switch">
+        <view class="month-arrow" bindtap="prevMonth">
+          <text class="arrow-icon left"></text>
+        </view>
+        <text class="month-label">{{monthLabel}}</text>
+        <view class="month-arrow {{canGoNextMonth ? '' : 'disabled'}}" bindtap="nextMonth">
+          <text class="arrow-icon right"></text>
+        </view>
+      </view>
+    </view>
+    <view class="cal-summary">
+      <text>本月刷题 <text class="highlight">{{monthPracticeDays}}</text> 天 · 共 <text class="highlight">{{monthPracticeTotal}}</text> 题</text>
+    </view>
+    <view class="cal-week">
+      <text class="cal-week-item" wx:for="{{weekLabels}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="cal-grid">
+      <view class="cal-cell {{item.empty ? 'empty' : ''}}" wx:for="{{calendarDays}}" wx:key="index">
+        <block wx:if="{{!item.empty}}">
+          <view class="cal-day level-{{item.level}} {{item.today ? 'today' : ''}}">
+            <text class="cal-day-num {{item.level > 0 ? 'on' : ''}}">{{item.day}}</text>
+            <text class="cal-day-count" wx:if="{{item.count > 0}}">{{item.count}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+    <view class="cal-legend">
+      <text class="legend-text">少</text>
+      <view class="legend-block level-1"></view>
+      <view class="legend-block level-2"></view>
+      <view class="legend-block level-3"></view>
+      <view class="legend-block level-4"></view>
+      <text class="legend-text">多</text>
+    </view>
+  </view>
+
+  <!-- 错题分析 -->
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">错题分析</text>
+      <text class="card-link" bindtap="goWrongbook">错题本 ›</text>
+    </view>
+    <block wx:if="{{wrongStats.totalWrong > 0}}">
+      <view class="mastery-row">
+        <view class="mastery-item">
+          <text class="mastery-num total">{{wrongStats.totalWrong}}</text>
+          <text class="mastery-label">总错题</text>
+        </view>
+        <view class="mastery-item">
+          <text class="mastery-num not-mastered">{{wrongStats.notMastered}}</text>
+          <text class="mastery-label">未掌握</text>
+        </view>
+        <view class="mastery-item">
+          <text class="mastery-num mastered">{{wrongStats.mastered}}</text>
+          <text class="mastery-label">已掌握</text>
+        </view>
+      </view>
+      <view class="mastery-bar-wrap">
+        <view class="mastery-bar">
+          <view class="mastery-bar-inner" style="width: {{masteredRate}}%"></view>
+        </view>
+        <view class="mastery-chip">已掌握 {{masteredRate}}%</view>
+      </view>
+
+      <view class="category-section" wx:if="{{wrongCategories.length > 0}}">
+        <text class="section-subtitle">错题分类分布</text>
+        <view class="category-item" wx:for="{{wrongCategories}}" wx:key="categoryName">
+          <text class="category-name">{{item.categoryName}}</text>
+          <view class="category-bar-bg">
+            <view class="category-bar" style="width: {{item.widthPct}}%"></view>
+          </view>
+          <text class="category-count">{{item.count}}题·{{item.pct}}%</text>
+        </view>
+      </view>
+    </block>
+    <view class="empty-state" wx:else>
+      <text class="empty-emoji">🎉</text>
+      <text class="empty-title">错题本是空的</text>
+      <text class="empty-desc">没有需要复习的错题，继续保持</text>
+      <view class="empty-btn" bindtap="goPractice">继续刷题</view>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-grid">
+    <view class="quick-item" bindtap="goWrongbook">
+      <image class="quick-icon" src="/images/ge3.png" mode="aspectFit" />
+      <text class="quick-name">错题本</text>
+      <text class="quick-desc" wx:if="{{wrongStats.totalWrong > 0}}">{{wrongStats.totalWrong}} 题待复习</text>
+      <text class="quick-desc" wx:else>暂无错题</text>
+    </view>
+    <view class="quick-item" bindtap="goFavorite">
+      <image class="quick-icon" src="/images/ge4.png" mode="aspectFit" />
+      <text class="quick-name">我的收藏</text>
+      <text class="quick-desc" wx:if="{{statistics.favoriteCount > 0}}">{{statistics.favoriteCount}} 个收藏</text>
+      <text class="quick-desc" wx:else>暂无收藏</text>
+    </view>
+    <view class="quick-item" bindtap="goHistory">
+      <image class="quick-icon" src="/images/ge1.png" mode="aspectFit" />
+      <text class="quick-name">刷题记录</text>
+      <text class="quick-desc">查看答题足迹</text>
+    </view>
+  </view>
+
+  <view class="footer-hint">
+    <text>每天进步一点点 · 坚持带来大改变</text>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

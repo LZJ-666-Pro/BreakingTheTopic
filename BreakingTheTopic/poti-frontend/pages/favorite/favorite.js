@@ -53,6 +53,7 @@ Page({
       url: `${app.globalData.favoriteUrl}/favorite/list`,
       method: 'GET',
       header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
         'X-User-Id': app.globalData.userId || 1
       },
       success: (res) => {
@@ -136,6 +137,7 @@ Page({
             url: `${app.globalData.favoriteUrl}/favorite/remove/${questionId}`,
             method: 'DELETE',
             header: {
+              'Authorization': `Bearer ${app.globalData.token}`,
               'X-User-Id': app.globalData.userId || 1
             },
             success: (res) => {
