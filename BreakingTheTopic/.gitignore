@@ -23,3 +23,10 @@ uploads/
 avatars/
 logs/
 *.pid
+
+# ===== 本地临时 / 个人文件 =====
+__pycache__/
+_*
+~$*
+*.docx
+query
