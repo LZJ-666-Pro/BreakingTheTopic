@@ -519,13 +519,16 @@ public class InterviewServiceImpl extends ServiceImpl<InterviewRecordMapper, Int
         if (correctAnswer != null && !correctAnswer.trim().isEmpty()) {
             String normalizedUserAnswer = userAnswer.trim().toUpperCase();
             String normalizedCorrectAnswer = correctAnswer.trim().toUpperCase();
-            
+            boolean hasAnalysis = referenceAnswer != null && !referenceAnswer.trim().isEmpty();
+
             if (normalizedUserAnswer.equals(normalizedCorrectAnswer)) {
                 score = 10;
-                comment = "回答正确！";
+                comment = "回答正确！" + (hasAnalysis ? "解析：" + referenceAnswer : "");
             } else {
                 score = 0;
-                comment = "回答错误，正确答案是：" + correctAnswer;
+                // 点评给出正确选项的完整内容与解析，而不是只给选项字母
+                comment = "回答错误，正确答案是：" + correctAnswer
+                        + (hasAnalysis ? "。解析：" + referenceAnswer : "");
             }
         } else if (referenceAnswer != null && !referenceAnswer.isEmpty()) {
             String[] keywords = referenceAnswer.split("[，。、；：,.;:\\s]+");
