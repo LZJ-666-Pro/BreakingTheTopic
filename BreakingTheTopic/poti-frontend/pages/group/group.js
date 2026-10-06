@@ -3,7 +3,8 @@ const app = getApp()
 Page({
   data: {
     groups: [],
-    wechatHelper: ''
+    wechatHelper: '',
+    isEmpty: true
   },
 
   onLoad() {
@@ -31,9 +32,11 @@ Page({
             }
           }
           
+          const wechatHelper = config.contact_wechat || ''
           this.setData({
             groups,
-            wechatHelper: config.contact_wechat || ''
+            wechatHelper,
+            isEmpty: groups.length === 0 && !wechatHelper
           })
         }
       }
@@ -64,6 +67,12 @@ Page({
       success: () => {
         wx.showToast({ title: '已复制', icon: 'success' })
       }
+    })
+  },
+
+  goFeedback() {
+    wx.navigateTo({
+      url: '/pages/feedback/feedback'
     })
   }
 })

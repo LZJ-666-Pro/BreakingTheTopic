@@ -24,7 +24,10 @@ Page({
     wx.request({
       url: `${app.globalData.userUrl}/feedback/list`,
       method: 'GET',
-      header: { 'X-User-Id': userId },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': userId
+      },
       success: (res) => {
         if (res.data.code === 200) {
           this.setData({ feedbackList: res.data.data || [] })
@@ -66,6 +69,7 @@ Page({
       method: 'POST',
       header: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${app.globalData.token}`,
         'X-User-Id': userId || ''
       },
       data: {
@@ -104,7 +108,10 @@ Page({
           wx.request({
             url: `${app.globalData.userUrl}/feedback/delete/${id}`,
             method: 'DELETE',
-            header: { 'X-User-Id': app.globalData.userId },
+            header: {
+              'Authorization': `Bearer ${app.globalData.token}`,
+              'X-User-Id': app.globalData.userId
+            },
             success: (res) => {
               if (res.data.code === 200) {
                 wx.showToast({ title: '删除成功', icon: 'success' })

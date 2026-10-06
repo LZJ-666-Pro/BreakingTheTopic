@@ -1,15 +1,23 @@
 <view class="page">
   <view class="header">
     <text class="header-title">联系我们</text>
-    <text class="header-desc">我们随时为您服务</text>
+    <text class="header-desc">这是个人开发的项目，开发者会认真看到每一条消息</text>
   </view>
 
-  <view class="section">
+  <!-- 空状态：联系方式还没配置 -->
+  <view class="section empty-box" wx:if="{{isAllEmpty}}">
+    <view class="empty-icon">📮</view>
+    <view class="empty-title">联系方式还没配置</view>
+    <view class="empty-desc">遇到问题或有建议，可以直接去意见反馈留言，开发者会尽快处理</view>
+    <view class="empty-btn" bindtap="goFeedback">去提意见反馈</view>
+  </view>
+
+  <view class="section" wx:if="{{!isAllEmpty}}">
     <view class="section-title">联系方式</view>
     <view class="contact-list">
       <view class="contact-item" bindtap="copyText" data-text="{{contactInfo.wechat}}" wx:if="{{contactInfo.wechat}}">
         <view class="contact-left">
-          <text class="contact-label">官方微信</text>
+          <text class="contact-label">开发者微信</text>
           <text class="contact-value">{{contactInfo.wechat}}</text>
         </view>
         <text class="contact-copy">复制</text>
@@ -17,7 +25,7 @@
 
       <view class="contact-item" bindtap="copyText" data-text="{{contactInfo.qq}}" wx:if="{{contactInfo.qq}}">
         <view class="contact-left">
-          <text class="contact-label">QQ群</text>
+          <text class="contact-label">交流 QQ 群</text>
           <text class="contact-value">{{contactInfo.qq}}</text>
         </view>
         <text class="contact-copy">复制</text>
@@ -25,16 +33,8 @@
 
       <view class="contact-item" bindtap="copyText" data-text="{{contactInfo.email}}" wx:if="{{contactInfo.email}}">
         <view class="contact-left">
-          <text class="contact-label">官方邮箱</text>
+          <text class="contact-label">联系邮箱</text>
           <text class="contact-value">{{contactInfo.email}}</text>
-        </view>
-        <text class="contact-copy">复制</text>
-      </view>
-
-      <view class="contact-item" bindtap="copyText" data-text="{{contactInfo.weibo}}" wx:if="{{contactInfo.weibo}}">
-        <view class="contact-left">
-          <text class="contact-label">官方微博</text>
-          <text class="contact-value">{{contactInfo.weibo}}</text>
         </view>
         <text class="contact-copy">复制</text>
       </view>
@@ -42,10 +42,10 @@
   </view>
 
   <view class="section" wx:if="{{contactInfo.workTime}}">
-    <view class="section-title">工作时间</view>
+    <view class="section-title">回复时间</view>
     <view class="work-box">
       <text class="work-time">{{contactInfo.workTime}}</text>
-      <text class="work-tip">非工作时间留言，我们会在工作日尽快回复</text>
+      <text class="work-tip">其他时间留言，看到后会尽快回复</text>
     </view>
   </view>
 </view>

@@ -28,6 +28,43 @@
   padding: 24rpx 32rpx;
 }
 
+/* 空状态 */
+.empty-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 80rpx 48rpx;
+}
+
+.empty-icon {
+  font-size: 72rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #999;
+  line-height: 1.7;
+}
+
+.empty-btn {
+  margin-top: 32rpx;
+  padding: 18rpx 48rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #fff;
+  background: #2979FF;
+}
+
 .section-title {
   font-size: 26rpx;
   font-weight: 500;

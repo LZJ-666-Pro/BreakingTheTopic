@@ -13,14 +13,15 @@ CREATE TABLE IF NOT EXISTS `system_config` (
     UNIQUE KEY `uk_config_key` (`config_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统配置表';
 
--- 初始化联系方式配置
+-- 初始化联系方式配置（个人项目：值留空即前端自动隐藏对应条目）
+-- 有真实联系方式后，把对应的值填上再执行，或直接 UPDATE：
+--   UPDATE system_config SET config_value='你的微信号' WHERE config_key='contact_wechat';
 INSERT INTO `system_config` (`config_key`, `config_value`, `config_desc`) VALUES
-('contact_wechat', 'poti_helper', '官方微信'),
-('contact_email', 'support@poti.com', '官方邮箱'),
-('contact_qq', '123456789', 'QQ群'),
-('contact_weibo', '@面试鸭官方', '官方微博'),
-('contact_work_time', '工作日 9:00-18:00', '工作时间'),
-('group_qq_1', '面试鸭官方群:123456789', 'QQ群1'),
-('group_qq_2', 'Java面试群:234567890', 'QQ群2'),
-('group_qq_3', '前端面试群:345678901', 'QQ群3'),
-('group_qq_4', '校招求职群:456789012', 'QQ群4');
+('contact_wechat', '', '开发者微信'),
+('contact_email', '', '联系邮箱'),
+('contact_qq', '', '交流QQ群'),
+('contact_work_time', '', '回复时间'),
+('group_qq_1', '', 'QQ群1（格式：群名称:群号）'),
+('group_qq_2', '', 'QQ群2（格式：群名称:群号）'),
+('group_qq_3', '', 'QQ群3（格式：群名称:群号）'),
+('group_qq_4', '', 'QQ群4（格式：群名称:群号）');

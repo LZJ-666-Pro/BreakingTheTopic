@@ -110,7 +110,7 @@
           <text class="service-name">加交流群</text>
         </view>
         <view class="service-right">
-          <text class="service-tip">获取最新资讯</text>
+          <text class="service-tip">一起刷题打卡</text>
           <van-icon name="arrow" size="14px" color="#C0C0C0" />
         </view>
       </view>

@@ -8,7 +8,8 @@ Page({
       qq: '',
       weibo: '',
       workTime: ''
-    }
+    },
+    isAllEmpty: false
   },
 
   onLoad() {
@@ -22,17 +23,25 @@ Page({
       success: (res) => {
         if (res.data.code === 200 && res.data.data) {
           const config = res.data.data
-          this.setData({
-            contactInfo: {
-              wechat: config.contact_wechat || '',
-              email: config.contact_email || '',
-              qq: config.contact_qq || '',
-              weibo: config.contact_weibo || '',
-              workTime: config.contact_work_time || ''
-            }
-          })
+          const contactInfo = {
+            wechat: config.contact_wechat || '',
+            email: config.contact_email || '',
+            qq: config.contact_qq || '',
+            weibo: config.contact_weibo || '',
+            workTime: config.contact_work_time || ''
+          }
+          // 全部为空时展示空状态引导
+          const isAllEmpty = !contactInfo.wechat && !contactInfo.qq &&
+            !contactInfo.email && !contactInfo.weibo
+          this.setData({ contactInfo, isAllEmpty })
         }
       }
+    })
+  },
+
+  goFeedback() {
+    wx.navigateTo({
+      url: '/pages/feedback/feedback'
     })
   },
 
