@@ -15,10 +15,6 @@ function parseDayOfMonth(value) {
   return 0
 }
 
-function dkey(y, m, d) {
-  return y + '-' + m + '-' + d
-}
-
 Page({
   data: {
     // 总览统计
@@ -106,7 +102,7 @@ Page({
     this.setData({ loading: true })
     this.loadStatistics()
     this.loadCalendar()
-    this.loadStreakMonths()
+    this.loadCheckinStreak()
     this.loadWrongStats()
   },
 
@@ -176,52 +172,29 @@ Page({
     })
   },
 
-  // 合并某月日历数据进连击映射
-  mergeCalendarDays(year, month, list) {
-    if (!this._streakMap) this._streakMap = {}
-    list.forEach(item => {
-      const day = parseDayOfMonth(item.date)
-      if (day > 0) {
-        const k = dkey(year, month, day)
-        this._streakMap[k] = (this._streakMap[k] || 0) + (Number(item.count) || 0)
+  // 连续天数与首页签到共用同一数据源（check_in 表），签到后切到本页即实时同步
+  loadCheckinStreak() {
+    const app = getApp()
+    const token = app.globalData.token || wx.getStorageSync('token')
+    const userId = wx.getStorageSync('userId')
+    if (!token || !userId) {
+      this.setData({ streakDays: 0 })
+      return
+    }
+    wx.request({
+      url: `${app.globalData.baseUrl}/checkin/status?userId=${userId}`,
+      method: 'GET',
+      header: { 'Authorization': `Bearer ${token}` },
+      success: (res) => {
+        if (res.statusCode === 401 || (res.data && res.data.code === 401)) {
+          app._handleUnauthorized()
+          return
+        }
+        if (res.data && res.data.code === 200 && res.data.data) {
+          this.setData({ streakDays: Number(res.data.data.streakDays) || 0 })
+        }
       }
     })
-  },
-
-  // 连续学习天数：从今天（今天没刷则从昨天）往前数，遇到没刷题的日期为止
-  computeStreak() {
-    const map = this._streakMap || {}
-    let streak = 0
-    const cursor = new Date()
-    const todayCount = map[dkey(cursor.getFullYear(), cursor.getMonth() + 1, cursor.getDate())] || 0
-    if (!todayCount) {
-      cursor.setDate(cursor.getDate() - 1)
-    }
-    for (let i = 0; i < 366; i++) {
-      const k = dkey(cursor.getFullYear(), cursor.getMonth() + 1, cursor.getDate())
-      if ((map[k] || 0) > 0) {
-        streak++
-        cursor.setDate(cursor.getDate() - 1)
-      } else {
-        break
-      }
-    }
-    this.setData({ streakDays: streak })
-  },
-
-  // 连击需要前几个月的数据，取今天往前两个月的日历
-  loadStreakMonths() {
-    const now = new Date()
-    for (let i = 1; i <= 2; i++) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-      const y = d.getFullYear()
-      const m = d.getMonth() + 1
-      userApi.getCalendar(y, m).then(res => {
-        const list = (res && res.data && res.data.list) || []
-        this.mergeCalendarDays(y, m, list)
-        this.computeStreak()
-      }).catch(() => {})
-    }
   },
 
   loadCalendar() {
