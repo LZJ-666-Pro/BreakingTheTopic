@@ -1,0 +1,86 @@
+<view class="page" wx:if="{{camp}}">
+  <!-- 进度头部 -->
+  <view class="hero">
+    <view class="hero-top">
+      <view class="hero-emoji" style="background: {{camp.tint}}">{{camp.emoji}}</view>
+      <view class="hero-info">
+        <view class="hero-title">{{camp.title}}</view>
+        <view class="hero-sub">已完成 {{camp.progressDays}}/{{camp.totalDays}} 天 · {{camp.percent}}%</view>
+      </view>
+      <view class="hero-badge {{camp.finished ? 'finished' : ''}}">{{camp.finished ? '已结营' : '进行中'}}</view>
+    </view>
+    <view class="progress-bar">
+      <view class="progress-inner" style="width: {{camp.percent}}%"></view>
+    </view>
+    <view class="dots">
+      <view class="dot {{item.done ? 'done' : ''}} {{item.current ? 'current' : ''}}"
+            wx:for="{{camp.dots}}" wx:key="day">
+        {{item.done ? '✓' : item.day}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 结营总结 -->
+  <view class="card graduate" wx:if="{{camp.finished}}">
+    <view class="graduate-icon">🎉</view>
+    <view class="graduate-title">恭喜结营！</view>
+    <view class="graduate-desc">你在「{{camp.title}}」坚持完成了 {{camp.totalDays}} 天系统训练，全部任务打卡完毕。继续保持刷题和模拟面试的节奏，Offer 就在前方！</view>
+    <view class="graduate-stats">
+      <view class="g-item">
+        <text class="g-value">{{camp.totalDays}}</text>
+        <text class="g-label">训练天数</text>
+      </view>
+      <view class="g-divider"></view>
+      <view class="g-item">
+        <text class="g-value">{{camp.progressDays}}</text>
+        <text class="g-label">累计打卡</text>
+      </view>
+      <view class="g-divider"></view>
+      <view class="g-item">
+        <text class="g-value">100%</text>
+        <text class="g-label">完成率</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日任务 -->
+  <view class="card" wx:if="{{!camp.finished}}">
+    <view class="card-header-row">
+      <text class="card-title">今日任务 · 第{{camp.currentDay}}天</text>
+      <text class="card-extra">{{camp.todayTopic}}</text>
+    </view>
+
+    <view class="task-item" wx:for="{{camp.tasks}}" wx:key="type">
+      <view class="task-icon">{{item.icon}}</view>
+      <view class="task-info">
+        <view class="task-name">{{item.name}}</view>
+        <view class="task-desc">{{item.desc}}</view>
+      </view>
+      <view class="task-btn" data-type="{{item.linkType}}" bindtap="goTask">去完成</view>
+    </view>
+
+    <view class="checkin-btn {{camp.todayChecked ? 'disabled' : ''}}" bindtap="checkin">
+      {{camp.todayChecked ? '今日已打卡 ✓ 明天继续' : '完成今日任务，立即打卡'}}
+    </view>
+    <view class="checkin-tip">完成上方任务后点击打卡，记录今天的训练进度</view>
+  </view>
+
+  <!-- 打卡记录 -->
+  <view class="card" wx:if="{{camp.checkins.length > 0}}">
+    <view class="card-title">打卡记录</view>
+    <view class="record-item" wx:for="{{camp.checkins}}" wx:key="dayNum">
+      <text class="record-day">{{item.recordText}}</text>
+      <text class="record-status">已打卡 ✓</text>
+    </view>
+  </view>
+
+  <!-- 大纲入口 -->
+  <view class="card outline-link" bindtap="goOutline">
+    <text class="outline-left">📋 查看训练大纲</text>
+    <text class="outline-arrow">›</text>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>
+
+<view wx:elif="{{loading}}" class="loading-page">加载中...</view>

@@ -1,0 +1,64 @@
+<view class="page">
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <view class="search-box">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索训练营" placeholder-class="search-placeholder"
+             value="{{keyword}}" bindinput="onSearchInput" confirm-type="search" />
+    </view>
+  </view>
+
+  <!-- Hero Banner -->
+  <image class="hero-banner" src="/images/ms.png" mode="widthFix" bindtap="goHeroTarget"></image>
+
+  <!-- 我的训练营入口（有进行中的营才显示） -->
+  <view class="my-camp-bar" wx:if="{{myCamp}}" bindtap="goMyCamp">
+    <text class="my-camp-emoji">{{myCamp.emoji}}</text>
+    <view class="my-camp-info">
+      <view class="my-camp-name">{{myCamp.title}}</view>
+      <view class="my-camp-progress">已训练 {{myCamp.progressText}} · 今天继续加油</view>
+    </view>
+    <view class="my-camp-btn">继续训练 ›</view>
+  </view>
+
+  <!-- 热门训练营 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">热门训练营</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-tip">加载中...</view>
+
+    <view wx:elif="{{showCamps.length === 0}}" class="empty-tip">
+      <text class="empty-icon">🔍</text>
+      <text>没有找到匹配的训练营</text>
+    </view>
+
+    <block wx:else>
+      <view class="camp-card" wx:for="{{showCamps}}" wx:key="id"
+            data-campid="{{item.id}}" bindtap="goDetail">
+        <view class="camp-icon" style="background: {{item.tint}};">{{item.emoji}}</view>
+        <view class="camp-info">
+          <view class="camp-title-row">
+            <text class="camp-title">{{item.title}}</text>
+            <text class="camp-badge finished" wx:if="{{item.finished}}">已结营</text>
+            <text class="camp-badge joining" wx:elif="{{item.joined}}">已加入</text>
+          </view>
+          <view class="camp-meta">
+            <text class="meta-item">⏱ {{item.totalDays}}天 · {{item.tag}}</text>
+          </view>
+          <view class="camp-meta">
+            <text class="meta-item">👥 已有{{item.joinText}}人加入</text>
+            <text class="meta-item progress" wx:if="{{item.joined}}">已完成 {{item.progressText}}</text>
+          </view>
+        </view>
+        <view class="camp-btn {{item.joined ? 'joined' : ''}}"
+              data-campid="{{item.id}}" data-joined="{{item.joined}}" catchtap="onCampAction">
+          {{item.finished ? '查看总结' : (item.joined ? '继续打卡' : '查看详情')}}
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

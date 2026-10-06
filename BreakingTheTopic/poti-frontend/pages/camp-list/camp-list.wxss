@@ -1,0 +1,212 @@
+.page {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+/* 搜索框 */
+.search-bar {
+  padding: 20rpx 24rpx 8rpx;
+  background: #fff;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  background: #F3F5F9;
+  border-radius: 36rpx;
+  padding: 16rpx 24rpx;
+}
+
+.search-icon {
+  font-size: 26rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #1B2B4B;
+}
+
+.search-placeholder {
+  color: #A8B0BF;
+}
+
+/* Hero Banner（610x243 原图） */
+.hero-banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 16rpx;
+}
+
+/* 我的训练营快捷入口 */
+.my-camp-bar {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin: 20rpx 24rpx 0;
+  padding: 24rpx 28rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 24rpx -12rpx rgba(27, 43, 75, 0.10);
+}
+
+.my-camp-emoji {
+  font-size: 48rpx;
+}
+
+.my-camp-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.my-camp-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1B2B4B;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.my-camp-progress {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #8A94A6;
+}
+
+.my-camp-btn {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #2979FF;
+}
+
+/* 训练营区块 */
+.section {
+  padding: 32rpx 24rpx 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1B2B4B;
+}
+
+.loading-tip,
+.empty-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+  padding: 80rpx 0;
+  font-size: 26rpx;
+  color: #8A94A6;
+}
+
+.empty-icon {
+  font-size: 56rpx;
+}
+
+/* 训练营卡片 */
+.camp-card {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 8rpx 24rpx -12rpx rgba(27, 43, 75, 0.10);
+}
+
+.camp-icon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  flex-shrink: 0;
+}
+
+.camp-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.camp-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.camp-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1B2B4B;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.camp-badge {
+  flex-shrink: 0;
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+}
+
+.camp-badge.joining {
+  color: #2979FF;
+  background: #EAF2FF;
+}
+
+.camp-badge.finished {
+  color: #07C160;
+  background: #EAF9F0;
+}
+
+.camp-meta {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 10rpx;
+}
+
+.meta-item {
+  font-size: 23rpx;
+  color: #8A94A6;
+}
+
+.meta-item.progress {
+  color: #2979FF;
+  font-weight: 600;
+}
+
+.camp-btn {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #4F8BFF, #2979FF);
+  padding: 14rpx 24rpx;
+  border-radius: 28rpx;
+}
+
+.camp-btn.joined {
+  background: #EAF2FF;
+  color: #2979FF;
+}
+
+.bottom-space {
+  height: 40rpx;
+}

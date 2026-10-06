@@ -258,7 +258,9 @@ Page({
   },
 
   goToTrain() {
-    wx.showToast({ title: '功能开发中', icon: 'none' })
+    wx.navigateTo({
+      url: '/pages/camp-list/camp-list'
+    })
   },
 
   goToInterview() {

@@ -35,7 +35,10 @@
     "pages/feedback/feedback",
     "pages/contact/contact",
     "pages/group/group",
-    "pages/statistics/statistics"
+    "pages/statistics/statistics",
+    "pages/camp-list/camp-list",
+    "pages/camp-detail/camp-detail",
+    "pages/camp-home/camp-home"
   ],
   "window": {
     "backgroundTextStyle": "light",

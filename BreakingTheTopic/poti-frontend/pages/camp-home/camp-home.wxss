@@ -1,0 +1,330 @@
+.page {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+/* 进度头部 */
+.hero {
+  background: #fff;
+  padding: 36rpx 32rpx;
+}
+
+.hero-top {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.hero-emoji {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  flex-shrink: 0;
+}
+
+.hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1B2B4B;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero-sub {
+  margin-top: 8rpx;
+  font-size: 25rpx;
+  color: #8A94A6;
+}
+
+.hero-badge {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #2979FF;
+  background: #EAF2FF;
+  padding: 8rpx 20rpx;
+  border-radius: 22rpx;
+}
+
+.hero-badge.finished {
+  color: #07C160;
+  background: #EAF9F0;
+}
+
+/* 进度条 + 圆点 */
+.progress-bar {
+  margin-top: 28rpx;
+  height: 16rpx;
+  border-radius: 8rpx;
+  background: #F0F2F6;
+  overflow: hidden;
+}
+
+.progress-inner {
+  height: 100%;
+  border-radius: 8rpx;
+  background: linear-gradient(90deg, #4F8BFF, #2979FF);
+  transition: width 0.4s ease;
+}
+
+.dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+  margin-top: 28rpx;
+}
+
+.dot {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: #F3F5F9;
+  color: #A8B0BF;
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot.done {
+  background: #2979FF;
+  color: #fff;
+  font-weight: 700;
+}
+
+.dot.current {
+  background: #EAF2FF;
+  color: #2979FF;
+  border: 2rpx solid #2979FF;
+  font-weight: 700;
+}
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin: 20rpx 24rpx 0;
+  box-shadow: 0 8rpx 24rpx -12rpx rgba(27, 43, 75, 0.10);
+}
+
+.card-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1B2B4B;
+}
+
+.card-extra {
+  font-size: 23rpx;
+  color: #8A94A6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 今日任务 */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F3F5F9;
+}
+
+.task-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  background: #F6F7F9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  flex-shrink: 0;
+}
+
+.task-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1B2B4B;
+}
+
+.task-desc {
+  margin-top: 6rpx;
+  font-size: 23rpx;
+  color: #8A94A6;
+  line-height: 1.5;
+}
+
+.task-btn {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #2979FF;
+  background: #EAF2FF;
+  padding: 12rpx 24rpx;
+  border-radius: 28rpx;
+}
+
+/* 打卡按钮 */
+.checkin-btn {
+  margin-top: 28rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #4F8BFF, #2979FF);
+  border-radius: 44rpx;
+  box-shadow: 0 12rpx 24rpx -12rpx rgba(41, 121, 255, 0.55);
+}
+
+.checkin-btn.disabled {
+  background: #EAF9F0;
+  color: #07C160;
+  box-shadow: none;
+}
+
+.checkin-tip {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #A8B0BF;
+}
+
+/* 打卡记录 */
+.record-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F3F5F9;
+}
+
+.record-item:last-child {
+  border-bottom: none;
+}
+
+.record-day {
+  font-size: 26rpx;
+  color: #5A6478;
+}
+
+.record-status {
+  font-size: 23rpx;
+  color: #07C160;
+}
+
+/* 大纲入口 */
+.outline-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.outline-left {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1B2B4B;
+}
+
+.outline-arrow {
+  font-size: 34rpx;
+  color: #C0C7D2;
+}
+
+/* 结营 */
+.graduate {
+  text-align: center;
+}
+
+.graduate-icon {
+  font-size: 72rpx;
+}
+
+.graduate-title {
+  margin-top: 12rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1B2B4B;
+}
+
+.graduate-desc {
+  margin-top: 14rpx;
+  font-size: 25rpx;
+  color: #8A94A6;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.graduate-stats {
+  display: flex;
+  align-items: center;
+  margin-top: 28rpx;
+  background: #F6F7F9;
+  border-radius: 20rpx;
+  padding: 24rpx 0;
+}
+
+.g-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.g-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1B2B4B;
+}
+
+.g-label {
+  font-size: 22rpx;
+  color: #8A94A6;
+}
+
+.g-divider {
+  width: 1rpx;
+  height: 48rpx;
+  background: #E4E8EF;
+}
+
+/* 其他 */
+.loading-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: #8A94A6;
+}
+
+.bottom-space {
+  height: 40rpx;
+}
