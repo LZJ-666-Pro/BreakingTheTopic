@@ -145,6 +145,37 @@ page {
   color: #2979FF;
 }
 
+/* 今日/累计切换 */
+.dist-tabs {
+  display: flex;
+  background: #F2F4F8;
+  border-radius: 999rpx;
+  padding: 4rpx;
+}
+
+.dist-tab {
+  font-size: 22rpx;
+  color: #8A94A6;
+  padding: 8rpx 26rpx;
+  border-radius: 999rpx;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.dist-tab.active {
+  background: #FFFFFF;
+  color: #2979FF;
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(41, 121, 255, 0.12);
+}
+
+.dist-today-hint {
+  text-align: center;
+  font-size: 22rpx;
+  color: #9AA3AF;
+  padding-top: 16rpx;
+}
+
 /* 答题分布：环形图 + 数字 */
 .dist-body {
   display: flex;
@@ -612,14 +643,7 @@ page {
   margin-top: 6rpx;
 }
 
-/* 底部引导文案 */
-.footer-hint {
-  text-align: center;
-  padding: 32rpx 0 8rpx;
-  font-size: 22rpx;
-  color: #B4BAC5;
-}
-
+/* 底部留白 */
 .bottom-space {
   height: calc(120rpx + env(safe-area-inset-bottom));
 }

@@ -80,6 +80,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         statistics.put("correctCount", 0);
         statistics.put("wrongCount", 0);
         statistics.put("todayCount", 0);
+        statistics.put("todayCorrectCount", 0);
+        statistics.put("todayWrongCount", 0);
         statistics.put("favoriteCount", 0);
         statistics.put("wrongbookCount", 0);
         
@@ -100,6 +102,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 }
                 if (practiceData.get("todayCount") != null) {
                     statistics.put("todayCount", practiceData.get("todayCount"));
+                }
+                if (practiceData.get("todayCorrectCount") != null) {
+                    statistics.put("todayCorrectCount", practiceData.get("todayCorrectCount"));
+                }
+                if (practiceData.get("todayWrongCount") != null) {
+                    statistics.put("todayWrongCount", practiceData.get("todayWrongCount"));
                 }
                 if (practiceData.get("lastPracticeTime") != null) {
                     statistics.put("lastPracticeTime", practiceData.get("lastPracticeTime"));

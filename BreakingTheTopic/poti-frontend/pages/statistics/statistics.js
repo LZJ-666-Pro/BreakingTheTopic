@@ -30,10 +30,12 @@ Page({
     accuracy: 0,
     streakDays: 0,
 
-    // 答题分布环形图
-    correctPct: 0,
-    wrongPct: 0,
-    ringStyle: 'background: conic-gradient(#EEF1F6 0% 100%)',
+    // 答题分布环形图：today=今日 / total=累计
+    distTab: 'total',
+    distData: {
+      today: { total: 0, correct: 0, wrong: 0, accuracy: 0, correctPct: 0, wrongPct: 0, ringStyle: 'background: conic-gradient(#EEF1F6 0% 100%)' },
+      total: { total: 0, correct: 0, wrong: 0, accuracy: 0, correctPct: 0, wrongPct: 0, ringStyle: 'background: conic-gradient(#EEF1F6 0% 100%)' }
+    },
 
     // 日历
     calendarYear: 0,
@@ -84,9 +86,11 @@ Page({
         },
         accuracy: 0,
         streakDays: 0,
-        correctPct: 0,
-        wrongPct: 0,
-        ringStyle: 'background: conic-gradient(#EEF1F6 0% 100%)',
+        distTab: 'total',
+        distData: {
+          today: { total: 0, correct: 0, wrong: 0, accuracy: 0, correctPct: 0, wrongPct: 0, ringStyle: 'background: conic-gradient(#EEF1F6 0% 100%)' },
+          total: { total: 0, correct: 0, wrong: 0, accuracy: 0, correctPct: 0, wrongPct: 0, ringStyle: 'background: conic-gradient(#EEF1F6 0% 100%)' }
+        },
         wrongStats: { totalWrong: 0, mastered: 0, notMastered: 0, byCategory: [] },
         wrongCategories: [],
         masteredRate: 0
@@ -111,33 +115,48 @@ Page({
       const stats = res && res.data ? res.data : {}
       const total = Number(stats.totalQuestionCount) || 0
       const correct = Number(stats.correctCount) || 0
-      const accuracy = total > 0 ? Math.round(correct * 100 / total) : 0
-      const correctPct = accuracy
-      const wrongPct = total > 0 ? 100 - accuracy : 0
-      // 环形图：答对绿色 + 答错红色；无数据时灰色
-      const ringStyle = total > 0
-        ? 'background: conic-gradient(#07C160 0% ' + correctPct + '%, #FA5151 ' + correctPct + '% 100%)'
-        : 'background: conic-gradient(#EEF1F6 0% 100%)'
+      const todayTotal = Number(stats.todayCount) || 0
       this.setData({
         statistics: {
           totalQuestionCount: total,
           correctCount: correct,
           wrongCount: Number(stats.wrongCount) || 0,
-          todayCount: Number(stats.todayCount) || 0,
+          todayCount: todayTotal,
           favoriteCount: Number(stats.favoriteCount) || 0,
           wrongbookCount: Number(stats.wrongbookCount) || 0,
           lastPracticeTime: stats.lastPracticeTime || null
         },
-        accuracy,
-        correctPct,
-        wrongPct,
-        ringStyle,
+        distData: {
+          total: this.buildDist(total, correct, Number(stats.wrongCount) || 0),
+          today: this.buildDist(todayTotal, Number(stats.todayCorrectCount) || 0, Number(stats.todayWrongCount) || 0)
+        },
+        accuracy: total > 0 ? Math.round(correct * 100 / total) : 0,
         loading: false
       })
     }).catch(err => {
       console.error('加载统计数据失败', err)
       this.setData({ loading: false })
     })
+  },
+
+  // 构建一组分布视图数据（答对绿 + 答错红，无数据灰色）
+  buildDist(total, correct, wrong) {
+    const accuracy = total > 0 ? Math.round(correct * 100 / total) : 0
+    return {
+      total,
+      correct,
+      wrong,
+      accuracy,
+      correctPct: accuracy,
+      wrongPct: total > 0 ? 100 - accuracy : 0,
+      ringStyle: total > 0
+        ? 'background: conic-gradient(#07C160 0% ' + accuracy + '%, #FA5151 ' + accuracy + '% 100%)'
+        : 'background: conic-gradient(#EEF1F6 0% 100%)'
+    }
+  },
+
+  switchDistTab(e) {
+    this.setData({ distTab: e.currentTarget.dataset.tab })
   },
 
   loadWrongStats() {

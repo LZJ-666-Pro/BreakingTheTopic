@@ -41,14 +41,17 @@
   <view class="card">
     <view class="card-header">
       <text class="card-title">答题分布</text>
-      <text class="card-sub" wx:if="{{statistics.totalQuestionCount > 0}}">共答 {{statistics.totalQuestionCount}} 题</text>
+      <view class="dist-tabs">
+        <view class="dist-tab {{distTab === 'today' ? 'active' : ''}}" data-tab="today" bindtap="switchDistTab">今日</view>
+        <view class="dist-tab {{distTab === 'total' ? 'active' : ''}}" data-tab="total" bindtap="switchDistTab">累计</view>
+      </view>
     </view>
-    <block wx:if="{{statistics.totalQuestionCount > 0}}">
+    <block wx:if="{{distData.total.total > 0}}">
       <view class="dist-body">
         <view class="ring-wrap">
-          <view class="ring" style="{{ringStyle}}">
+          <view class="ring" style="{{distData[distTab].ringStyle}}">
             <view class="ring-inner">
-              <text class="ring-num">{{accuracy}}%</text>
+              <text class="ring-num">{{distData[distTab].accuracy}}%</text>
               <text class="ring-label">正确率</text>
             </view>
           </view>
@@ -57,16 +60,19 @@
           <view class="dist-row-item">
             <view class="dist-dot correct"></view>
             <text class="dist-label">答对</text>
-            <text class="dist-value correct">{{statistics.correctCount}}</text>
-            <text class="dist-pct">{{correctPct}}%</text>
+            <text class="dist-value correct">{{distData[distTab].correct}}</text>
+            <text class="dist-pct">{{distData[distTab].correctPct}}%</text>
           </view>
           <view class="dist-row-item">
             <view class="dist-dot wrong"></view>
             <text class="dist-label">答错</text>
-            <text class="dist-value wrong">{{statistics.wrongCount}}</text>
-            <text class="dist-pct">{{wrongPct}}%</text>
+            <text class="dist-value wrong">{{distData[distTab].wrong}}</text>
+            <text class="dist-pct">{{distData[distTab].wrongPct}}%</text>
           </view>
         </view>
+      </view>
+      <view class="dist-today-hint" wx:if="{{distTab === 'today' && distData.today.total === 0}}">
+        <text>今天还没有答题，来几道题开启今日分布吧</text>
       </view>
     </block>
     <view class="empty-state" wx:else>
@@ -183,10 +189,6 @@
       <text class="quick-name">刷题记录</text>
       <text class="quick-desc">查看答题足迹</text>
     </view>
-  </view>
-
-  <view class="footer-hint">
-    <text>每天进步一点点 · 坚持带来大改变</text>
   </view>
 
   <view class="bottom-space"></view>

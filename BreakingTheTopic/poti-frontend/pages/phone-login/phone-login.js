@@ -186,11 +186,11 @@ Page({
         password: password
       },
       success: (res) => {
-        if (res.data.code === 200) {
+        if (res.data.code === 200 && res.data.data && res.data.data.token) {
           this.handleLoginSuccess(res.data.data)
         } else {
           wx.showToast({
-            title: res.data.msg || '登录失败',
+            title: res.data.msg || '登录失败，请重试',
             icon: 'none'
           })
         }
@@ -221,11 +221,11 @@ Page({
         verifyCode: verifyCode.trim()
       },
       success: (res) => {
-        if (res.data.code === 200) {
+        if (res.data.code === 200 && res.data.data && res.data.data.token) {
           this.handleLoginSuccess(res.data.data)
         } else {
           wx.showToast({
-            title: res.data.msg || '登录失败',
+            title: res.data.msg || '登录失败，请重试',
             icon: 'none'
           })
         }
@@ -243,6 +243,13 @@ Page({
   },
 
   handleLoginSuccess(data) {
+    if (!data || !data.token) {
+      wx.showToast({
+        title: '登录响应异常，请重试',
+        icon: 'none'
+      })
+      return
+    }
     const { token, userId, nickname, phone, email, uniqueId, avatarUrl } = data
     
     wx.setStorageSync('token', token)

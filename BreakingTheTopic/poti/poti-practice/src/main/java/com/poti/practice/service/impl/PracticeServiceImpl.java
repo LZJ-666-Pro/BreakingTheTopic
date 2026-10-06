@@ -129,14 +129,24 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeMapper, Practice> i
         int wrongCount = totalCount - correctCount;
 
         LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        int todayCount = (int) practices.stream()
-            .filter(p -> p.getPracticeTime() != null && p.getPracticeTime().isAfter(todayStart))
-            .count();
+        int todayCount = 0;
+        int todayCorrectCount = 0;
+        for (Practice p : practices) {
+            if (p.getPracticeTime() != null && p.getPracticeTime().isAfter(todayStart)) {
+                todayCount++;
+                if (Boolean.TRUE.equals(p.getIsCorrect())) {
+                    todayCorrectCount++;
+                }
+            }
+        }
+        int todayWrongCount = todayCount - todayCorrectCount;
 
         statistics.put("totalQuestionCount", totalCount);
         statistics.put("correctCount", correctCount);
         statistics.put("wrongCount", wrongCount);
         statistics.put("todayCount", todayCount);
+        statistics.put("todayCorrectCount", todayCorrectCount);
+        statistics.put("todayWrongCount", todayWrongCount);
 
         if (!practices.isEmpty()) {
             practices.sort((a, b) -> {

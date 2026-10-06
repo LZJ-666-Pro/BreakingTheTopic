@@ -68,7 +68,7 @@ Page({
       method: 'POST',
       data: { code },
       success: (res) => {
-        if (res.data.code === 200) {
+        if (res.data.code === 200 && res.data.data && res.data.data.token) {
           const data = res.data.data
           const { token, userId, nickname, avatarUrl } = data
 
@@ -94,7 +94,7 @@ Page({
             wx.switchTab({ url: '/pages/index/index' })
           }, 1500)
         } else {
-          this.showToast(res.data.msg || '登录失败')
+          this.showToast(res.data.msg || '登录失败，请重试')
         }
       },
       fail: () => {
