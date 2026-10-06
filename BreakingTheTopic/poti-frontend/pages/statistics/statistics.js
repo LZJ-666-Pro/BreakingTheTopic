@@ -228,9 +228,7 @@ Page({
         }
       })
       this._countByDay = countByDay
-      this.mergeCalendarDays(year, month, list)
       this.buildCalendar()
-      this.computeStreak()
     }).catch(err => {
       console.error('加载刷题日历失败', err)
       this._countByDay = {}
