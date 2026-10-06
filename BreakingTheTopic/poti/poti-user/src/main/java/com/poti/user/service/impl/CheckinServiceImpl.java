@@ -128,7 +128,8 @@ public class CheckinServiceImpl extends ServiceImpl<CheckInMapper, CheckIn> impl
             LocalDate lastCheckInDate = lastCheckIn.getCheckinDate();
             long daysSinceLastCheckIn = java.time.temporal.ChronoUnit.DAYS.between(lastCheckInDate, today);
             
-            if (daysSinceLastCheckIn > 7) {
+            if (daysSinceLastCheckIn > 1) {
+                // 断一天即归零：上次签到不是今天或昨天，连续中断
                 return 0;
             }
             
