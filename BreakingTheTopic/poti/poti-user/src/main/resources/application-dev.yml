@@ -81,7 +81,7 @@ avatar:
   upload:
     path: ./uploads/avatars/
   url:
-    prefix: ${AVATAR_URL_PREFIX:http://10.98.45.3:8200/avatars/}
+    prefix: ${AVATAR_URL_PREFIX:http://10.183.155.3:8200/avatars/}
 
 wx:
   appid: ${WX_APPID:wx920f3d57f4121af7}

@@ -340,20 +340,28 @@ Page({
   },
 
   loadUnreadCount() {
-    if (guestUtils.checkGuest()) {
+    const app = getApp()
+    const token = app.globalData.token || wx.getStorageSync('token')
+    const userId = wx.getStorageSync('userId')
+    // 未登录且非游客模式：无有效凭据，不发请求
+    if (!token || !userId) {
       this.setData({ unreadCount: 0 })
       return
     }
-    const userId = wx.getStorageSync('userId') || 1
-    const app = getApp()
     wx.request({
       url: `${app.globalData.userUrl}/chat/conversations`,
       method: 'GET',
       data: { userId },
       header: {
-        'Authorization': `Bearer ${app.globalData.token}`
+        'Authorization': `Bearer ${token}`
       },
       success: (res) => {
+        if (res.statusCode === 401 || (res.data && res.data.code === 401)) {
+          // 令牌过期/失效，走全局处理清空凭据并提示重新登录
+          app._handleUnauthorized()
+          this.setData({ unreadCount: 0 })
+          return
+        }
         if (res.data && res.data.code === 200) {
           const conversations = res.data.data || []
           let totalUnread = 0
