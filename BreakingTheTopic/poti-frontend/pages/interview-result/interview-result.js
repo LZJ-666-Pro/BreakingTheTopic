@@ -3,6 +3,7 @@ const app = getApp()
 Page({
   data: {
     interviewId: null,
+    isEmpty: false,
     result: {
       score: 0,
       totalQuestions: 0,
@@ -33,8 +34,10 @@ Page({
           const data = res.data.data
           const spendSeconds = data.spendSeconds || 0
           this.setData({
+            // 未完成（无题目记录）的面试显示空状态引导，而不是一屏 0
+            isEmpty: !(data.totalQuestions > 0),
             result: {
-              score: data.score || 0,
+              score: Math.round(Number(data.score) || 0),
               totalQuestions: data.totalQuestions || 0,
               correctCount: data.correctCount || 0,
               spendSeconds: spendSeconds,

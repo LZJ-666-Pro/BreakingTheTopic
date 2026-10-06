@@ -1,46 +1,84 @@
 <view class="page">
-  <view class="header">
-    <view class="header-left">
-      <text class="header-title">模拟面试</text>
-      <text class="header-sub">选择方向，开始练习</text>
-    </view>
-    <view class="header-right" bindtap="viewHistory">
-      <text class="history-text">历史</text>
-    </view>
+  <view class="nav-row">
+    <text class="nav-link" bindtap="viewHistory">历史</text>
   </view>
 
   <view class="stats-card">
     <view class="stat-item">
-      <text class="stat-num">{{statistics.totalInterviews || 0}}</text>
       <text class="stat-name">面试次数</text>
+      <view class="stat-num-row">
+        <text class="stat-num">{{statistics.totalInterviews || 0}}</text>
+      </view>
     </view>
     <view class="stat-divider"></view>
     <view class="stat-item">
-      <text class="stat-num">{{statistics.totalQuestions || 0}}</text>
       <text class="stat-name">答题数量</text>
+      <view class="stat-num-row">
+        <text class="stat-num">{{statistics.totalQuestions || 0}}</text>
+        <text class="stat-unit">次</text>
+      </view>
     </view>
     <view class="stat-divider"></view>
     <view class="stat-item">
-      <text class="stat-num">{{statistics.accuracy || 0}}%</text>
-      <text class="stat-name">正确率</text>
-    </view>
-  </view>
-
-  <view class="section">
-    <view class="section-header">
-      <text class="section-title">选择面试方向</text>
-    </view>
-    
-    <view class="type-grid">
-      <view class="type-card" wx:for="{{interviewTypes}}" wx:key="type" 
-            bindtap="startInterview" data-type="{{item.type}}">
-        <text class="type-emoji">{{item.emoji || '📝'}}</text>
-        <text class="type-title">{{item.title}}</text>
+      <text class="stat-name">平均正确率</text>
+      <view class="stat-num-row">
+        <text class="stat-num">{{statistics.accuracy || 0}}%</text>
       </view>
     </view>
   </view>
 
-  <view class="tips-card">
-    <text class="tips-text">每场面试随机抽取10道题目，每题限时2分钟作答</text>
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input class="search-input"
+           placeholder="搜索面试方向，如 Java、Redis..."
+           placeholder-class="search-placeholder"
+           value="{{searchText}}"
+           bindinput="onSearchInput"
+           confirm-type="search" />
   </view>
+
+  <view class="hot-section" wx:if="{{!searchText && hotTypes.length > 0}}">
+    <text class="hot-title">热门推荐</text>
+    <scroll-view scroll-x class="hot-scroll" enable-flex>
+      <view class="hot-row">
+        <view class="hot-chip {{selectedType === item.type ? 'active' : ''}}"
+              wx:for="{{hotTypes}}" wx:key="type"
+              bindtap="onSelectType" data-type="{{item.type}}">{{item.title}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="groups">
+    <view class="group" wx:for="{{groups}}" wx:key="key" wx:for-item="group">
+      <view class="group-header" bindtap="onToggleGroup" data-key="{{group.key}}">
+        <text class="group-name">{{group.name}}</text>
+        <text class="group-desc">{{group.desc}}</text>
+        <text class="group-arrow {{expandedMap[group.key] ? 'open' : ''}}">›</text>
+      </view>
+
+      <view class="group-grid" wx:if="{{expandedMap[group.key] && group.list.length > 0}}">
+        <view class="type-card {{selectedType === item.type ? 'selected' : ''}}"
+              wx:for="{{group.list}}" wx:key="type"
+              bindtap="onSelectType" data-type="{{item.type}}">
+          <view class="check-badge" wx:if="{{selectedType === item.type}}">✓</view>
+          <view class="type-icon" style="background:{{item.tint}};"><text>{{item.emoji}}</text></view>
+          <text class="type-title">{{item.title}}</text>
+        </view>
+      </view>
+      <view class="group-empty" wx:if="{{expandedMap[group.key] && group.list.length === 0}}">该分组下暂无匹配方向</view>
+    </view>
+
+    <view class="search-empty" wx:if="{{searchEmpty}}">
+      <text class="search-empty-icon">🔍</text>
+      <text>没有找到「{{searchText}}」相关的面试方向</text>
+    </view>
+  </view>
+
+  <view class="footer-bar">
+    <view class="btn-start {{selectedType ? '' : 'disabled'}}" bindtap="startInterview">
+      <text>开始模拟面试</text>
+      <text class="btn-arrow">→</text>
+    </view>
+  </view>
+  <view class="footer-placeholder"></view>
 </view>

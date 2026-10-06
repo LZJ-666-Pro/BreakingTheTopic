@@ -1,25 +1,29 @@
 <view class="page">
-  <view class="header">
-    <view class="header-left">
-      <text class="question-num">第 {{currentOrder}}/{{totalQuestions}} 题</text>
+  <view class="page-head">
+    <text class="page-title">模拟面试</text>
+    <view class="head-row">
+      <text class="question-num">第 <text class="num-hl">{{currentOrder}}</text>/{{totalQuestions}} 题</text>
+      <view class="timer {{isWarning ? 'warning' : ''}}">
+        <text class="timer-icon">⏱</text>
+        <text class="timer-text">{{timerText}}</text>
+      </view>
     </view>
-    <view class="timer {{isWarning ? 'warning' : ''}}">
-      <text class="timer-icon">⏱</text>
-      <text class="timer-text">{{timerText}}</text>
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{progress}}%;"></view>
     </view>
-  </view>
-
-  <view class="progress-bar">
-    <view class="progress-fill" style="width: {{progress}}%;"></view>
   </view>
 
   <view class="content">
     <view class="question-card">
-      <view class="question-content">{{currentQuestion.content}}</view>
+      <view class="question-row">
+        <view class="q-icon"><text>📄</text></view>
+        <view class="question-content">{{currentQuestion.content}}</view>
+      </view>
     </view>
 
     <view class="answer-section">
       <view class="answer-header">
+        <text class="answer-icon">✏️</text>
         <text class="answer-title">你的回答</text>
       </view>
 
@@ -28,17 +32,18 @@
           <text>文字输入</text>
         </view>
         <view class="tab {{answerMode === 'voice' ? 'active' : ''}}" bindtap="switchMode" data-mode="voice">
+          <text class="tab-mic">🎤</text>
           <text>语音回答</text>
         </view>
       </view>
 
       <view class="answer-content" wx:if="{{answerMode === 'text'}}">
-        <textarea class="answer-input" 
-                  placeholder="请输入你的答案..." 
+        <textarea class="answer-input"
+                  placeholder="请输入你的答案..."
+                  placeholder-class="answer-placeholder"
                   value="{{userAnswer}}"
                   bindinput="onAnswerInput"
-                  maxlength="1000"
-                  auto-height />
+                  maxlength="1000" />
         <view class="char-count">{{userAnswer.length}}/1000</view>
       </view>
 
@@ -53,7 +58,7 @@
   </view>
 
   <view class="action-bar">
-    <view class="btn-skip" bindtap="skipQuestion">跳过此题</view>
+    <view class="btn-skip" bindtap="skipQuestion">过此题</view>
     <view class="btn-submit {{canSubmit ? '' : 'disabled'}}" bindtap="submitAnswer">
       {{isLastQuestion ? '完成面试' : '提交答案'}}
     </view>

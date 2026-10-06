@@ -3,6 +3,15 @@
     <text class="header-title">面试结果</text>
   </view>
 
+  <view class="empty-wrap" wx:if="{{isEmpty}}">
+    <view class="empty-card">
+      <view class="empty-icon"><text>📋</text></view>
+      <view class="empty-title">这场面试未完成</view>
+      <view class="empty-desc">中途退出没有产生答题记录，不会计入成绩。重新开始一场面试试试吧！</view>
+    </view>
+  </view>
+
+  <block wx:else>
   <view class="result-card">
     <view class="score-section">
       <text class="score-value">{{result.score}}</text>
@@ -72,6 +81,7 @@
       </view>
     </view>
   </view>
+  </block>
 
   <view class="action-bar">
     <view class="btn-back" bindtap="goBack">返回首页</view>

@@ -16,6 +16,49 @@
   color: #1a1a1a;
 }
 
+.empty-wrap {
+  padding: 40rpx 24rpx;
+}
+
+.empty-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 80rpx 48rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 8rpx 24rpx -10rpx rgba(27, 43, 75, 0.10);
+}
+
+.empty-icon {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 40rpx;
+  background: #F6F7F9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28rpx;
+}
+
+.empty-icon text {
+  font-size: 64rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1B2B4B;
+  margin-bottom: 14rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #8A94A6;
+  line-height: 1.7;
+}
+
 .result-card {
   background: #fff;
   padding: 48rpx 32rpx;
