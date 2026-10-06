@@ -26,7 +26,7 @@ Page({
     wx.request({
       url: `${app.globalData.interviewUrl}/interview/detail/${this.data.interviewId}`,
       method: 'GET',
-      header: { 'X-User-Id': app.globalData.userId || 1 },
+      header: { 'Authorization': `Bearer ${app.globalData.token}`, 'X-User-Id': app.globalData.userId },
       success: (res) => {
         wx.hideLoading()
         if (res.data.code === 200) {

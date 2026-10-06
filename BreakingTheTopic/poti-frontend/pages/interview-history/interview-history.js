@@ -46,7 +46,8 @@ Page({
         pageSize: this.data.pageSize
       },
       header: {
-        'X-User-Id': app.globalData.userId || 1
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId
       },
       success: (res) => {
         if (res.data.code === 200) {
@@ -106,7 +107,8 @@ Page({
             url: `${app.globalData.interviewUrl}/interview/${id}`,
             method: 'DELETE',
             header: {
-              'X-User-Id': app.globalData.userId || 1
+              'Authorization': `Bearer ${app.globalData.token}`,
+              'X-User-Id': app.globalData.userId
             },
             success: (res) => {
               if (res.data.code === 200) {
@@ -134,7 +136,8 @@ Page({
             url: `${app.globalData.interviewUrl}/interview/clear`,
             method: 'DELETE',
             header: {
-              'X-User-Id': app.globalData.userId || 1
+              'Authorization': `Bearer ${app.globalData.token}`,
+              'X-User-Id': app.globalData.userId
             },
             success: (res) => {
               if (res.data.code === 200) {

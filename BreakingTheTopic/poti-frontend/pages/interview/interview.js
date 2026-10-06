@@ -53,6 +53,9 @@ Page({
     wx.request({
       url: `${app.globalData.interviewUrl}/interview/types`,
       method: 'GET',
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`
+      },
       success: (res) => {
         if (res.data.code === 200 && res.data.data && res.data.data.length > 0) {
           this.setData({
@@ -73,7 +76,8 @@ Page({
       url: `${app.globalData.interviewUrl}/interview/statistics`,
       method: 'GET',
       header: {
-        'X-User-Id': app.globalData.userId || 1
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId
       },
       success: (res) => {
         if (res.data.code === 200) {

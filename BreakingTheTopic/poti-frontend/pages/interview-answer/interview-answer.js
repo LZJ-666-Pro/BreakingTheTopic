@@ -64,7 +64,8 @@ Page({
         spendSeconds: spendSeconds
       },
       header: {
-        'X-User-Id': app.globalData.userId || 1,
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId,
         'content-type': 'application/json'
       }
     })
@@ -80,7 +81,7 @@ Page({
       url: `${app.globalData.interviewUrl}/interview/start`,
       method: 'GET',
       data: { type: this.data.type },
-      header: { 'X-User-Id': app.globalData.userId || 1 },
+      header: { 'Authorization': `Bearer ${app.globalData.token}`, 'X-User-Id': app.globalData.userId },
       success: (res) => {
         wx.hideLoading()
         if (res.data.code === 200) {
@@ -113,7 +114,7 @@ Page({
         interviewId: this.data.interviewId,
         orderNum: orderNum
       },
-      header: { 'X-User-Id': app.globalData.userId || 1 },
+      header: { 'Authorization': `Bearer ${app.globalData.token}`, 'X-User-Id': app.globalData.userId },
       success: (res) => {
         if (res.data.code === 200) {
           const data = res.data.data
@@ -206,6 +207,9 @@ Page({
       url: `${app.globalData.baseUrl}/upload/audio`,
       filePath: tempFilePath,
       name: 'file',
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`
+      },
       success: (res) => {
         const data = JSON.parse(res.data)
         if (data.code === 200) {
@@ -242,7 +246,8 @@ Page({
         answerTimeSeconds: answerTime
       },
       header: {
-        'X-User-Id': app.globalData.userId || 1,
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId,
         'content-type': 'application/json'
       },
       success: (res) => {
@@ -291,7 +296,8 @@ Page({
         spendSeconds: spendSeconds
       },
       header: {
-        'X-User-Id': app.globalData.userId || 1,
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId,
         'content-type': 'application/json'
       },
       success: (res) => {
