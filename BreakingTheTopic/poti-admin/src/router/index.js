@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '../stores/user'
+import { startProgress, doneProgress } from '../utils/pageProgress'
 
 const routes = [
   {
@@ -71,14 +72,23 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  startProgress()
   document.title = to.meta.title ? `${to.meta.title} - 破题管理后台` : '破题管理后台'
-  
+
   const userStore = useUserStore()
   if (to.path !== '/login' && !userStore.token) {
     next('/login')
   } else {
     next()
   }
+})
+
+router.afterEach(() => {
+  doneProgress()
+})
+
+router.onError(() => {
+  doneProgress()
 })
 
 export default router

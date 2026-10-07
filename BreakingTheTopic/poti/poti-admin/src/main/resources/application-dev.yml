@@ -139,7 +139,7 @@ upload:
 
 ai:
   provider: ${AI_PROVIDER:zhipu}
-  api-key: ${AI_API_KEY:37dcefbb79ac4311895829544de4fb4d.Zp7iMJWtuAaiCXX2}
+  api-key: ${AI_API_KEY:2794361da43a4a71ac28781fe1916910.TTvqqqy9O8Jha82e}
   base-url: ${AI_BASE_URL:https://open.bigmodel.cn/api/paas/v4}
   model: ${AI_MODEL:glm-4-flash}
   max-tokens: 4000

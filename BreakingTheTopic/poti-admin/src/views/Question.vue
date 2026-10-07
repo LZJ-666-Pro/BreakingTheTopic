@@ -33,7 +33,7 @@
 
     <el-card class="content-card" shadow="never">
       <div class="search-bar">
-        <el-select v-model="searchForm.categoryId" placeholder="选择分类" clearable style="width: 140px">
+        <el-select v-model="searchForm.categoryId" placeholder="选择分类" clearable filterable style="width: 140px">
           <el-option v-for="cat in categories" :key="cat.id" :label="cat.name" :value="cat.id" />
         </el-select>
         <el-select v-model="searchForm.difficulty" placeholder="选择难度" clearable style="width: 120px">
@@ -117,7 +117,7 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="分类" prop="categoryId">
-              <el-select v-model="form.categoryId" placeholder="选择分类" style="width: 100%">
+              <el-select v-model="form.categoryId" placeholder="选择分类" filterable style="width: 100%">
                 <el-option v-for="cat in categories" :key="cat.id" :label="cat.name" :value="cat.id" />
               </el-select>
             </el-form-item>
@@ -179,7 +179,7 @@
     <el-dialog v-model="aiDialogVisible" title="AI生成题目" width="600px" destroy-on-close>
       <el-form :model="aiForm" :rules="aiRules" ref="aiFormRef" label-width="100px">
         <el-form-item label="题目分类" prop="categoryId">
-          <el-select v-model="aiForm.categoryId" placeholder="选择分类" style="width: 100%">
+          <el-select v-model="aiForm.categoryId" placeholder="输入关键字搜索分类" filterable style="width: 100%">
             <el-option v-for="cat in categories" :key="cat.id" :label="cat.name" :value="cat.id" />
           </el-select>
         </el-form-item>
