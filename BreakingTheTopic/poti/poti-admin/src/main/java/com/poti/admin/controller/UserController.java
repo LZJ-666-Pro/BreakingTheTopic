@@ -1,11 +1,14 @@
 package com.poti.admin.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.poti.admin.dto.UserResetDataRequest;
 import com.poti.admin.entity.User;
 import com.poti.admin.service.UserService;
 import com.poti.common.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/user")
@@ -37,6 +40,15 @@ public class UserController {
     public R<Void> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
         boolean success = userService.updateStatus(id, status);
         return success ? R.success(null) : R.error("操作失败");
+    }
+
+    @PostMapping("/{id}/reset-data")
+    public R<Map<String, Integer>> resetData(@PathVariable Long id, @RequestBody UserResetDataRequest request) {
+        try {
+            return R.success(userService.resetData(id, request));
+        } catch (IllegalArgumentException e) {
+            return R.error(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

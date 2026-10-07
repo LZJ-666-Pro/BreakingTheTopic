@@ -52,19 +52,27 @@
             <span class="time">{{ formatDate(row.createTime) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="140" align="center">
+        <el-table-column label="操作" width="210" align="center">
           <template #default="{ row }">
-            <el-button 
-              type="primary" 
-              link 
+            <el-button
+              type="primary"
+              link
               size="small"
               @click="handleStatusChange(row)"
             >
               {{ row.status === 1 ? '禁用' : '启用' }}
             </el-button>
-            <el-button 
-              type="danger" 
-              link 
+            <el-button
+              type="warning"
+              link
+              size="small"
+              @click="handleResetData(row)"
+            >
+              重置数据
+            </el-button>
+            <el-button
+              type="danger"
+              link
               size="small"
               @click="handleDelete(row)"
             >
@@ -87,6 +95,58 @@
         />
       </div>
     </el-card>
+
+    <!-- 重置用户数据弹窗 -->
+    <el-dialog
+      v-model="resetDialog.visible"
+      title="重置用户数据"
+      width="480px"
+      :close-on-click-modal="false"
+    >
+      <div class="reset-target" v-if="resetDialog.user">
+        目标用户：<b>{{ resetDialog.user.nickname || resetDialog.user.id }}</b>
+        <span class="reset-target-id">ID: {{ resetDialog.user.id }}</span>
+      </div>
+      <div class="reset-tip">
+        勾选的数据将被<b>物理删除且不可恢复</b>；勾选「刷题记录」或「签到记录」会同步将学习统计（累计/今日/连续天数/积分）归零。
+      </div>
+      <el-checkbox-group v-model="resetDialog.checks">
+        <div class="reset-item">
+          <el-checkbox label="practice">刷题记录（练习明细 + 学习统计归零）</el-checkbox>
+        </div>
+        <div class="reset-item">
+          <el-checkbox label="wrongbook">错题本</el-checkbox>
+        </div>
+        <div class="reset-item">
+          <el-checkbox label="favorite">收藏</el-checkbox>
+        </div>
+        <div class="reset-item">
+          <el-checkbox label="checkin">签到记录（含连续天数归零）</el-checkbox>
+        </div>
+        <div class="reset-item">
+          <el-checkbox label="discussion">讨论记录（评论与点赞）</el-checkbox>
+        </div>
+      </el-checkbox-group>
+      <div class="reset-confirm">
+        <div class="reset-confirm-label">请输入该用户昵称以确认操作：</div>
+        <el-input
+          v-model="resetDialog.confirmText"
+          :placeholder="resetDialog.user?.nickname || String(resetDialog.user?.id || '')"
+          clearable
+        />
+      </div>
+      <template #footer>
+        <el-button @click="resetDialog.visible = false">取消</el-button>
+        <el-button
+          type="danger"
+          :loading="resetDialog.loading"
+          :disabled="!resetDialog.checks.length"
+          @click="confirmReset"
+        >
+          确认重置
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -187,6 +247,62 @@ const handleDelete = async (row) => {
   }
 }
 
+// ===== 重置用户数据 =====
+const resetDialog = reactive({
+  visible: false,
+  user: null,
+  checks: [],
+  confirmText: '',
+  loading: false
+})
+
+const handleResetData = (row) => {
+  resetDialog.user = row
+  resetDialog.checks = []
+  resetDialog.confirmText = ''
+  resetDialog.visible = true
+}
+
+const confirmReset = async () => {
+  const user = resetDialog.user
+  if (!user) return
+  const expected = String(user.nickname || user.id)
+  if ((resetDialog.confirmText || '').trim() !== expected) {
+    ElMessage.warning(`请输入用户昵称「${expected}」以确认`)
+    return
+  }
+  if (!resetDialog.checks.length) {
+    ElMessage.warning('请至少勾选一个要重置的数据维度')
+    return
+  }
+  resetDialog.loading = true
+  try {
+    const body = {}
+    resetDialog.checks.forEach(k => { body[k] = true })
+    const res = await api.post(`/admin/user/${user.id}/reset-data`, body)
+    const data = res.data || {}
+    const lines = []
+    if (data.practice !== undefined) lines.push(`刷题记录：已删除 ${data.practice} 条`)
+    if (data.wrongbook !== undefined) lines.push(`错题本：已删除 ${data.wrongbook} 条`)
+    if (data.favorite !== undefined) lines.push(`收藏：已删除 ${data.favorite} 条`)
+    if (data.checkin !== undefined) lines.push(`签到记录：已删除 ${data.checkin} 条`)
+    if (data.discussion !== undefined) lines.push(`讨论评论：已删除 ${data.discussion} 条`)
+    if (data.discussionLike !== undefined) lines.push(`讨论点赞：已删除 ${data.discussionLike} 条`)
+    if (data.stats !== undefined) lines.push('学习统计：已归零')
+    resetDialog.visible = false
+    ElMessageBox.alert(lines.join('<br/>'), '重置完成', {
+      confirmButtonText: '知道了',
+      dangerouslyUseHTMLString: true,
+      type: 'success'
+    })
+  } catch (error) {
+    // 业务错误已由 api 响应拦截器统一提示，401 会自动跳登录
+    console.error(error)
+  } finally {
+    resetDialog.loading = false
+  }
+}
+
 onMounted(() => {
   loadUsers()
 })
@@ -265,5 +381,43 @@ onMounted(() => {
   justify-content: flex-end;
   margin-top: 16px;
   padding-top: 16px;
+}
+
+/* 重置数据弹窗 */
+.reset-target {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.reset-target-id {
+  color: #999;
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.reset-tip {
+  font-size: 12px;
+  color: #e6a23c;
+  line-height: 1.6;
+  background: #fdf6ec;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+}
+
+.reset-item {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.reset-confirm {
+  margin-top: 16px;
+}
+
+.reset-confirm-label {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 8px;
 }
 </style>
