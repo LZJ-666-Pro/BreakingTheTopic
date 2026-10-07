@@ -125,15 +125,21 @@ Page({
   // 任务跳转：复用现有刷题 / 模拟面试 / 错题本模块
   goTask(e) {
     const type = e.currentTarget.dataset.type
+    let task
     if (type === 'question') {
-      wx.switchTab({ url: '/pages/question/question' })
+      task = () => wx.switchTab({ url: '/pages/question/question' })
     } else if (type === 'practice') {
-      wx.switchTab({ url: '/pages/practice/practice' })
+      task = () => wx.switchTab({ url: '/pages/practice/practice' })
     } else if (type === 'interview') {
-      wx.navigateTo({ url: '/pages/interview/interview' })
+      task = () => wx.navigateTo({ url: '/pages/interview/interview' })
     } else if (type === 'wrongbook') {
-      wx.navigateTo({ url: '/pages/wrongbook/wrongbook' })
+      task = () => wx.navigateTo({ url: '/pages/wrongbook/wrongbook' })
     }
+    if (!task) {
+      wx.showToast({ title: '任务入口暂未开放', icon: 'none' })
+      return
+    }
+    task()
   },
 
   goOutline() {

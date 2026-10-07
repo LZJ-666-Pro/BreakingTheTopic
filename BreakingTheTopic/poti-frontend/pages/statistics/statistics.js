@@ -30,6 +30,10 @@ Page({
     accuracy: 0,
     streakDays: 0,
 
+    // 学习总览：today=今日 / total=累计（连续天数只在累计视图展示）
+    ovTab: 'total',
+    ovTodayAccuracy: 0,
+
     // 答题分布环形图：today=今日 / total=累计
     distTab: 'total',
     distData: {
@@ -80,12 +84,15 @@ Page({
           correctCount: 0,
           wrongCount: 0,
           todayCount: 0,
+          todayCorrectCount: 0,
+          todayWrongCount: 0,
           favoriteCount: 0,
           wrongbookCount: 0,
           lastPracticeTime: null
         },
         accuracy: 0,
         streakDays: 0,
+        ovTodayAccuracy: 0,
         distTab: 'total',
         distData: {
           today: { total: 0, correct: 0, wrong: 0, accuracy: 0, correctPct: 0, wrongPct: 0, ringStyle: 'background: conic-gradient(#EEF1F6 0% 100%)' },
@@ -116,16 +123,20 @@ Page({
       const total = Number(stats.totalQuestionCount) || 0
       const correct = Number(stats.correctCount) || 0
       const todayTotal = Number(stats.todayCount) || 0
+      const todayCorrect = Number(stats.todayCorrectCount) || 0
       this.setData({
         statistics: {
           totalQuestionCount: total,
           correctCount: correct,
           wrongCount: Number(stats.wrongCount) || 0,
           todayCount: todayTotal,
+          todayCorrectCount: todayCorrect,
+          todayWrongCount: Number(stats.todayWrongCount) || 0,
           favoriteCount: Number(stats.favoriteCount) || 0,
           wrongbookCount: Number(stats.wrongbookCount) || 0,
           lastPracticeTime: stats.lastPracticeTime || null
         },
+        ovTodayAccuracy: todayTotal > 0 ? Math.round(todayCorrect * 100 / todayTotal) : 0,
         distData: {
           total: this.buildDist(total, correct, Number(stats.wrongCount) || 0),
           today: this.buildDist(todayTotal, Number(stats.todayCorrectCount) || 0, Number(stats.todayWrongCount) || 0)
@@ -157,6 +168,11 @@ Page({
 
   switchDistTab(e) {
     this.setData({ distTab: e.currentTarget.dataset.tab })
+  },
+
+  // 学习总览 今日/累计 切换
+  switchOvTab(e) {
+    this.setData({ ovTab: e.currentTarget.dataset.tab })
   },
 
   loadWrongStats() {

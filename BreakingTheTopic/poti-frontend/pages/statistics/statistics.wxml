@@ -3,21 +3,43 @@
   <view class="overview-card">
     <view class="overview-title-row">
       <text class="overview-title">学习总览</text>
-      <view class="streak-pill">
-        <text class="streak-flame">🔥</text>
-        <text class="streak-text" wx:if="{{streakDays > 0}}">连续 {{streakDays}} 天</text>
-        <text class="streak-text" wx:else>开始连击</text>
+      <view class="dist-tabs ov-tabs">
+        <view class="dist-tab {{ovTab === 'today' ? 'active' : ''}}" data-tab="today" bindtap="switchOvTab">今日</view>
+        <view class="dist-tab {{ovTab === 'total' ? 'active' : ''}}" data-tab="total" bindtap="switchOvTab">累计</view>
       </view>
     </view>
-    <view class="overview-grid">
+    <!-- 今日视图：不含连续天数 -->
+    <view class="overview-grid" wx:if="{{ovTab === 'today'}}">
+      <view class="overview-item">
+        <text class="overview-number">{{statistics.todayCount}}</text>
+        <text class="overview-label">今日刷题</text>
+      </view>
+      <view class="overview-divider"></view>
+      <view class="overview-item">
+        <text class="overview-number">{{statistics.todayCorrectCount}}</text>
+        <text class="overview-label">今日答对</text>
+      </view>
+      <view class="overview-divider"></view>
+      <view class="overview-item">
+        <text class="overview-number">{{statistics.todayWrongCount}}</text>
+        <text class="overview-label">今日答错</text>
+      </view>
+      <view class="overview-divider"></view>
+      <view class="overview-item">
+        <text class="overview-number">{{ovTodayAccuracy}}<text class="overview-unit">%</text></text>
+        <text class="overview-label">今日正确率</text>
+      </view>
+    </view>
+    <!-- 累计视图：含连续天数 -->
+    <view class="overview-grid" wx:else>
       <view class="overview-item">
         <text class="overview-number">{{statistics.totalQuestionCount}}</text>
         <text class="overview-label">累计刷题</text>
       </view>
       <view class="overview-divider"></view>
       <view class="overview-item">
-        <text class="overview-number">{{statistics.todayCount}}</text>
-        <text class="overview-label">今日刷题</text>
+        <text class="overview-number">{{statistics.correctCount}}</text>
+        <text class="overview-label">累计答对</text>
       </view>
       <view class="overview-divider"></view>
       <view class="overview-item">
@@ -30,9 +52,12 @@
         <text class="overview-label">连续天数</text>
       </view>
     </view>
-    <view class="overview-hint" wx:if="{{statistics.totalQuestionCount > 0}}">
+    <view class="overview-hint" wx:if="{{ovTab === 'today'}}">
       <text wx:if="{{statistics.todayCount > 0}}">今日已刷 {{statistics.todayCount}} 题，继续保持！</text>
       <text wx:else>今天还没开始刷题，先来 5 道热热身吧</text>
+    </view>
+    <view class="overview-hint" wx:elif="{{statistics.totalQuestionCount > 0}}">
+      <text>已累计刷题 {{statistics.totalQuestionCount}} 题，坚持就是胜利！</text>
     </view>
     <view class="overview-hint" wx:else>登录后同步刷题数据，开启你的学习之旅</view>
   </view>

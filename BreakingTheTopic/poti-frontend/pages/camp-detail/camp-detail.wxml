@@ -7,7 +7,8 @@
     <view class="hero-chips">
       <text class="hero-chip">⏱ {{camp.totalDays}}天</text>
       <text class="hero-chip">{{camp.tag}}</text>
-      <text class="hero-chip">👥 已有{{camp.joinText}}人加入</text>
+      <text class="hero-chip" wx:if="{{camp.joinCount > 0}}">👥 已有{{camp.joinText}}人加入</text>
+      <text class="hero-chip" wx:else>👥 虚位以待，等你来打卡</text>
     </view>
   </view>
 

@@ -46,23 +46,18 @@ page {
   color: #fff;
 }
 
-.streak-pill {
-  display: flex;
-  align-items: center;
+/* 总览卡今日/累计切换（渐变底适配） */
+.ov-tabs {
   background: rgba(255, 255, 255, 0.22);
-  border-radius: 999rpx;
-  padding: 8rpx 20rpx;
 }
 
-.streak-flame {
-  font-size: 24rpx;
-  margin-right: 8rpx;
+.ov-tabs .dist-tab {
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.streak-text {
-  font-size: 24rpx;
-  color: #fff;
-  font-weight: 500;
+.ov-tabs .dist-tab.active {
+  background: #FFFFFF;
+  color: #2979FF;
 }
 
 .overview-grid {

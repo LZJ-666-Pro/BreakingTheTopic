@@ -48,7 +48,8 @@
             <text class="meta-item">⏱ {{item.totalDays}}天 · {{item.tag}}</text>
           </view>
           <view class="camp-meta">
-            <text class="meta-item">👥 已有{{item.joinText}}人加入</text>
+            <text class="meta-item" wx:if="{{item.joinCount > 0}}">👥 已有{{item.joinText}}人加入</text>
+            <text class="meta-item" wx:else>👥 虚位以待，等你来打卡</text>
             <text class="meta-item progress" wx:if="{{item.joined}}">已完成 {{item.progressText}}</text>
           </view>
         </view>

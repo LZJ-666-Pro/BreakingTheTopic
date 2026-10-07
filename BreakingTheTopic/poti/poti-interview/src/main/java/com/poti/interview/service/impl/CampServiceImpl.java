@@ -42,7 +42,6 @@ public class CampServiceImpl implements CampService {
         String accent;    // 主题色
         int totalDays;
         String tag;       // 适合人群标签
-        int baseJoin;     // 展示用报名基数
         String subject;   // 刷题/面试科目名
         String intro;
         String[] audience;
@@ -50,7 +49,7 @@ public class CampServiceImpl implements CampService {
         String[] topics;  // 每日主题（即大纲）
 
         CampDef(String id, String title, String subtitle, String emoji, String tint, String accent,
-                int totalDays, String tag, int baseJoin, String subject, String intro,
+                int totalDays, String tag, String subject, String intro,
                 String[] audience, String[] highlights, String[] topics) {
             this.id = id;
             this.title = title;
@@ -60,7 +59,6 @@ public class CampServiceImpl implements CampService {
             this.accent = accent;
             this.totalDays = totalDays;
             this.tag = tag;
-            this.baseJoin = baseJoin;
             this.subject = subject;
             this.intro = intro;
             this.audience = audience;
@@ -74,7 +72,7 @@ public class CampServiceImpl implements CampService {
     static {
         CAMPS.add(new CampDef(
                 "java-backend", "Java 后端面试特训营", "从基础到进阶，直通大厂后端岗",
-                "🏆", "#FFF3E6", "#FF9500", 21, "适合1-3年经验", 328, "Java",
+                "🏆", "#FFF3E6", "#FF9500", 21, "适合1-3年经验", "Java",
                 "以 Java 后端校招/社招面试大纲为主线，21 天系统过完 Java 基础、并发、JVM、Spring、MySQL、Redis 与分布式高频考点，每天学习 + 刷题 + 面试三件套，循序渐进拿下 Offer。",
                 new String[]{"准备校招/实习的后端方向同学", "工作 1-3 年想跳槽进阶的后端工程师", "基础不牢、知识零散需要体系化梳理的开发者"},
                 new String[]{"21 天完整面试知识路线图", "每天 5 道高频真题配套练习", "阶段复盘 + 结营综合模拟面试"},
@@ -90,7 +88,7 @@ public class CampServiceImpl implements CampService {
 
         CAMPS.add(new CampDef(
                 "algo-sprint", "算法与数据结构冲刺营", "14 天刷穿高频算法题",
-                "🧮", "#F3EEFF", "#7B61FF", 14, "适合校招/全体", 256, "算法",
+                "🧮", "#F3EEFF", "#7B61FF", 14, "适合校招/全体", "算法",
                 "按「数组→链表→树→动态规划」的路线 14 天刷穿高频算法题，每天一个专题 + 配套刷题 + 阶段复盘，帮你建立解题模板，告别拿到题没思路。",
                 new String[]{"备战秋招/春招笔试面试的同学", "算法基础薄弱、刷题没方向的同学", "想系统整理解题模板的求职者"},
                 new String[]{"14 天高频算法专题路线", "每天 5 道经典题型配套练习", "递归/DP 等解题模板总结"},
@@ -103,7 +101,7 @@ public class CampServiceImpl implements CampService {
 
         CAMPS.add(new CampDef(
                 "cs-basic", "计算机基础综合营", "网络 + 操作系统 + 设计模式一站式补齐",
-                "📖", "#E8F4FF", "#10AEFF", 14, "适合校招/转行", 189, "计算机网络",
+                "📖", "#E8F4FF", "#10AEFF", 14, "适合校招/转行", "计算机网络",
                 "计算机基础是面试的「必修课」。本营 14 天串讲计算机网络、操作系统与设计模式三大板块高频考点，配合真题练习，快速补齐基础短板。",
                 new String[]{"计算机基础薄弱的校招同学", "非科班转行想补基础的开发者", "简历项目多但基础题总丢分的同学"},
                 new String[]{"网络/OS/设计模式三大板块全覆盖", "高频面试题逐日串讲", "真题练习 + 错题复盘闭环"},
@@ -116,7 +114,7 @@ public class CampServiceImpl implements CampService {
 
         CAMPS.add(new CampDef(
                 "spring-mysql", "Spring+MySQL+Redis 实战营", "框架与中间件面试一网打尽",
-                "🐬", "#EAF9F0", "#07C160", 14, "适合1-3年经验", 143, "Spring",
+                "🐬", "#EAF9F0", "#07C160", 14, "适合1-3年经验", "Spring",
                 "聚焦面试中被问最多的三大件：Spring、MySQL、Redis。14 天从原理到实战，覆盖事务、索引调优、缓存三大问题、分布式锁等高频考点，让八股文变成真本事。",
                 new String[]{"天天被 Spring/Redis 八股文问倒的同学", "想深入理解框架原理的后端工程师", "准备社招面试的 1-3 年经验开发者"},
                 new String[]{"Spring 事务/IOC/AOP 原理精讲", "MySQL 索引与 SQL 调优实战", "Redis 缓存三大问题与分布式锁"},
@@ -149,7 +147,7 @@ public class CampServiceImpl implements CampService {
         List<Map<String, Object>> result = new ArrayList<>();
         for (CampDef camp : CAMPS) {
             result.add(toCampMap(camp,
-                    realCounts.getOrDefault(camp.id, 0L) + camp.baseJoin,
+                    realCounts.getOrDefault(camp.id, 0L),
                     myMembers.get(camp.id), myProgress.getOrDefault(camp.id, 0L), false));
         }
         return result;
@@ -161,12 +159,11 @@ public class CampServiceImpl implements CampService {
         if (camp == null) {
             return null;
         }
-        long realCount = campMemberMapper.selectCount(
-                new LambdaQueryWrapper<CampMember>().eq(CampMember::getCampId, campId));
+        long realCount = countCampMembers(campId);
         CampMember member = findMembers(userId).get(campId);
         long progress = member != null ? findProgress(userId).getOrDefault(campId, 0L) : 0L;
 
-        Map<String, Object> result = toCampMap(camp, realCount + camp.baseJoin, member, progress, false);
+        Map<String, Object> result = toCampMap(camp, realCount, member, progress, false);
 
         // 训练大纲
         List<Map<String, Object>> outline = new ArrayList<>();
@@ -227,7 +224,7 @@ public class CampServiceImpl implements CampService {
             if (member == null) {
                 continue;
             }
-            result.add(toCampMap(camp, camp.baseJoin, member, progress.getOrDefault(camp.id, 0L), true));
+            result.add(toCampMap(camp, countCampMembers(camp.id), member, progress.getOrDefault(camp.id, 0L), true));
         }
         return result;
     }
@@ -264,7 +261,7 @@ public class CampServiceImpl implements CampService {
         }
         Collections.reverse(checkinList);
 
-        Map<String, Object> result = toCampMap(camp, camp.baseJoin, member, progress, true);
+        Map<String, Object> result = toCampMap(camp, countCampMembers(campId), member, progress, true);
         result.put("finished", finished);
         result.put("todayChecked", todayChecked);
         result.put("currentDay", currentDay);
@@ -322,6 +319,12 @@ public class CampServiceImpl implements CampService {
     }
 
     // ==================== 私有工具 ====================
+
+    /** 营真实报名人数（camp_member 表计数，无静态基数） */
+    private long countCampMembers(String campId) {
+        return campMemberMapper.selectCount(
+                new LambdaQueryWrapper<CampMember>().eq(CampMember::getCampId, campId));
+    }
 
     private Map<String, CampMember> findMembers(Long userId) {
         List<CampMember> members = campMemberMapper.selectList(
