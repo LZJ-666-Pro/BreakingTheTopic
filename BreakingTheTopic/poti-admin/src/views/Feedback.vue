@@ -160,7 +160,10 @@ const loadFeedbackList = async () => {
       params.status = filterStatus.value
     }
     
-    const res = await axios.get(`${userUrl}/feedback/page`, { params })
+    const res = await axios.get(`${userUrl}/feedback/page`, {
+      params,
+      headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
+    })
     if (res.data.code === 200) {
       let list = res.data.data.records || []
       if (filterType.value) {
@@ -192,6 +195,8 @@ const submitReply = async () => {
   try {
     const res = await axios.post(`${userUrl}/feedback/reply/${currentFeedback.value.id}`, {
       reply: replyForm.value.reply
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
     })
     if (res.data.code === 200) {
       ElMessage.success('回复成功')
@@ -213,7 +218,7 @@ const handleDelete = (row) => {
   }).then(async () => {
     try {
       const res = await axios.delete(`${userUrl}/feedback/delete/${row.id}`, {
-        headers: { 'X-User-Id': 0 }
+        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
       })
       if (res.data.code === 200) {
         ElMessage.success('删除成功')

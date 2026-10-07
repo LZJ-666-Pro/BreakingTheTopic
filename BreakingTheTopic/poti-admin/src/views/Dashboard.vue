@@ -344,10 +344,11 @@ onMounted(async () => {
     userStats.value = userRes.data
     categoryStats.value = categoryRes.data || []
 
-    // 待处理反馈数（直连用户服务，未登录也可访问的统计口径）
+    // 待处理反馈数（直连用户服务，需携带后台登录令牌）
     try {
       const fbRes = await axios.get(`${userUrl}/feedback/page`, {
-        params: { pageNum: 1, pageSize: 1, status: 0 }
+        params: { pageNum: 1, pageSize: 1, status: 0 },
+        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
       })
       pendingFeedback.value = fbRes.data?.data?.total || 0
     } catch (e) {

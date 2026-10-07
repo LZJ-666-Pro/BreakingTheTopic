@@ -241,3 +241,33 @@ CREATE TABLE IF NOT EXISTS `feedback` (
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='意见反馈表';
+
+-- 题目讨论表(旧环境手动建表,依据 Discussion 实体反推补录)
+CREATE TABLE IF NOT EXISTS `discussion` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `question_id` bigint NOT NULL COMMENT '题目ID',
+  `user_id` bigint NOT NULL COMMENT '发表用户ID',
+  `user_name` varchar(100) DEFAULT NULL COMMENT '用户昵称(冗余)',
+  `avatar` varchar(500) DEFAULT NULL COMMENT '用户头像(冗余)',
+  `content` text NOT NULL COMMENT '讨论内容',
+  `like_count` int NOT NULL DEFAULT '0' COMMENT '点赞数',
+  `reply_to` bigint DEFAULT NULL COMMENT '回复的讨论ID',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态：1正常，0隐藏',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '逻辑删除：0正常，1删除',
+  PRIMARY KEY (`id`),
+  KEY `idx_question_id` (`question_id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='题目讨论表';
+
+-- 讨论点赞表(旧环境手动建表,依据 DiscussionLike 实体反推补录)
+CREATE TABLE IF NOT EXISTS `discussion_like` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `discussion_id` bigint NOT NULL COMMENT '讨论ID',
+  `user_id` bigint NOT NULL COMMENT '点赞用户ID',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '逻辑删除：0已赞，1取消赞',
+  PRIMARY KEY (`id`),
+  KEY `idx_discussion_user` (`discussion_id`,`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='讨论点赞表';

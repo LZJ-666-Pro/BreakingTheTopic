@@ -327,7 +327,12 @@ Page({
           Toast.success('发表成功')
           this.setData({ discussionContent: '' })
           this.loadDiscussions()
+        } else {
+          Toast.fail(res.data.msg || '发表失败，请稍后重试')
         }
+      },
+      fail: () => {
+        Toast.fail('网络错误，请重试')
       }
     })
   },

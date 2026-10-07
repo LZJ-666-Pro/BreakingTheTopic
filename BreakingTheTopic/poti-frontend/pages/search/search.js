@@ -177,11 +177,16 @@ Page({
 
   recordSearch(keyword) {
     const app = getApp()
+    // 未登录状态不上报搜索记录，避免401报错
+    if (!app.globalData.token) {
+      return
+    }
     wx.request({
       url: `${app.globalData.userUrl}/search/record`,
       method: 'POST',
       header: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${app.globalData.token}`,
         'X-User-Id': app.globalData.userId || ''
       },
       data: { keyword }
