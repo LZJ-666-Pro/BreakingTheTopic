@@ -9,7 +9,9 @@
           </transition>
         </div>
         <el-menu
+          ref="menuRef"
           :default-active="activeMenu"
+          :default-openeds="defaultOpeneds"
           router
           :collapse="isCollapse"
           background-color="transparent"
@@ -17,30 +19,23 @@
           active-text-color="#fff"
           class="sidebar-menu"
         >
-          <el-menu-item index="/dashboard">
-            <el-icon><HomeFilled /></el-icon>
-            <template #title>工作台</template>
-          </el-menu-item>
-          <el-menu-item index="/category">
-            <el-icon><Folder /></el-icon>
-            <template #title>分类管理</template>
-          </el-menu-item>
-          <el-menu-item index="/question">
-            <el-icon><Document /></el-icon>
-            <template #title>题目管理</template>
-          </el-menu-item>
-          <el-menu-item index="/ai-tasks">
-            <el-icon><MagicStick /></el-icon>
-            <template #title>AI任务</template>
-          </el-menu-item>
-          <el-menu-item index="/user">
-            <el-icon><User /></el-icon>
-            <template #title>用户管理</template>
-          </el-menu-item>
-          <el-menu-item index="/feedback">
-            <el-icon><ChatDotRound /></el-icon>
-            <template #title>反馈管理</template>
-          </el-menu-item>
+          <template v-for="menu in menus" :key="menu.index">
+            <!-- 分组菜单 -->
+            <el-sub-menu v-if="menu.children" :index="menu.index">
+              <template #title>
+                <el-icon><component :is="menu.icon" /></el-icon>
+                <span>{{ menu.title }}</span>
+              </template>
+              <el-menu-item v-for="child in menu.children" :key="child.index" :index="child.index">
+                {{ child.title }}
+              </el-menu-item>
+            </el-sub-menu>
+            <!-- 单项菜单 -->
+            <el-menu-item v-else :index="menu.index">
+              <el-icon><component :is="menu.icon" /></el-icon>
+              <template #title>{{ menu.title }}</template>
+            </el-menu-item>
+          </template>
         </el-menu>
         <div class="collapse-btn" @click="toggleCollapse">
           <el-icon :size="16">
@@ -82,7 +77,7 @@
                     <el-icon><User /></el-icon>
                     个人信息
                   </el-dropdown-item>
-                  <el-dropdown-item @click="router.push('/settings')">
+                  <el-dropdown-item @click="router.push('/settings/config')">
                     <el-icon><Setting /></el-icon>
                     系统设置
                   </el-dropdown-item>
@@ -108,15 +103,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, markRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import { 
-  HomeFilled, 
-  Folder, 
-  Document, 
-  User, 
-  Fold, 
+import {
+  HomeFilled,
+  Folder,
+  Document,
+  User,
+  Fold,
   Expand,
   Refresh,
   FullScreen,
@@ -124,7 +119,19 @@ import {
   Setting,
   SwitchButton,
   MagicStick,
-  ChatDotRound
+  ChatDotRound,
+  Plus,
+  PriceTag,
+  Collection,
+  AlarmClock,
+  Trophy,
+  Notebook,
+  Memo,
+  Bell,
+  Goods,
+  DataAnalysis,
+  Key,
+  Tickets
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -133,8 +140,87 @@ const userStore = useUserStore()
 
 const isCollapse = ref(false)
 
+// ===== 侧边栏菜单结构 =====
+const menus = [
+  { index: '/dashboard', title: '仪表盘', icon: markRaw(HomeFilled) },
+  {
+    index: '/user',
+    title: '用户管理',
+    icon: markRaw(User),
+    children: [
+      { index: '/user/list', title: '用户列表' },
+      { index: '/user/feedback', title: '反馈与举报' }
+    ]
+  },
+  {
+    index: '/question',
+    title: '题目管理',
+    icon: markRaw(Document),
+    children: [
+      { index: '/question/list', title: '题目列表' },
+      { index: '/question/add', title: '新增题目' },
+      { index: '/question/category', title: '分类管理' },
+      { index: '/question/tag', title: '标签管理' }
+    ]
+  },
+  {
+    index: '/special',
+    title: '题库专题',
+    icon: markRaw(Collection),
+    children: [
+      { index: '/special/manage', title: '专题管理' },
+      { index: '/special/daily', title: '每日一题' }
+    ]
+  },
+  { index: '/competition', title: '竞赛活动', icon: markRaw(Trophy) },
+  {
+    index: '/content',
+    title: '内容管理',
+    icon: markRaw(Notebook),
+    children: [
+      { index: '/content/solution-review', title: '题解审核' },
+      { index: '/content/article', title: '文章管理' },
+      { index: '/content/notice', title: '公告管理' }
+    ]
+  },
+  { index: '/membership', title: '会员订单', icon: markRaw(Goods) },
+  { index: '/stats', title: '数据统计', icon: markRaw(DataAnalysis) },
+  { index: '/ai-tasks', title: 'AI任务', icon: markRaw(MagicStick) },
+  {
+    index: '/settings',
+    title: '系统设置',
+    icon: markRaw(Setting),
+    children: [
+      { index: '/settings/permission', title: '权限管理' },
+      { index: '/settings/config', title: '系统配置' },
+      { index: '/settings/logs', title: '操作日志' }
+    ]
+  }
+]
+
 const activeMenu = computed(() => route.path)
 const currentRoute = computed(() => route)
+
+// 当前路由所属的一级分组
+const topGroupIndex = computed(() => {
+  const top = '/' + (route.path.split('/')[1] || '')
+  return menus.some(m => m.index === top && m.children) ? top : null
+})
+
+// 刷新页面时自动展开当前分组
+const defaultOpeneds = computed(() => (topGroupIndex.value ? [topGroupIndex.value] : []))
+
+// 运行时跨分组跳转（如工作台快捷按钮）自动展开对应分组
+const menuRef = ref()
+watch(
+  () => route.path,
+  () => {
+    if (topGroupIndex.value && !isCollapse.value) {
+      menuRef.value?.open(topGroupIndex.value)
+    }
+  },
+  { immediate: true }
+)
 
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value

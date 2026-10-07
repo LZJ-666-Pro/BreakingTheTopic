@@ -69,7 +69,7 @@
             <div class="chart-section">
               <div class="chart-title">题目分类分布（Top 10）</div>
               <div ref="categoryChart" class="chart chart-bar"></div>
-              <div class="chart-footer" @click="$router.push('/category')">
+              <div class="chart-footer" @click="$router.push('/question/category')">
                 查看全部分类 →
               </div>
             </div>
@@ -122,15 +122,15 @@
             </div>
           </div>
           <div class="quick-actions">
-            <el-button type="primary" @click="$router.push('/question')">
+            <el-button type="primary" @click="$router.push('/question/add')">
               <el-icon><Plus /></el-icon>
               添加题目
             </el-button>
-            <el-button @click="$router.push('/user')">
+            <el-button @click="$router.push('/user/list')">
               <el-icon><User /></el-icon>
               用户管理
             </el-button>
-            <el-button @click="$router.push('/feedback')">
+            <el-button @click="$router.push('/user/feedback')">
               <el-icon><ChatDotRound /></el-icon>
               反馈管理
             </el-button>

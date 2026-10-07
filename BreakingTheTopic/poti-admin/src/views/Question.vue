@@ -55,8 +55,16 @@
         <el-button type="primary" @click="loadQuestions">搜索</el-button>
         <el-button @click="resetSearch">重置</el-button>
       </div>
-      
-      <el-table :data="questions" v-loading="loading">
+
+      <div class="batch-bar" v-if="selectedQuestions.length > 0">
+        <span class="batch-info">已选 {{ selectedQuestions.length }} 道题目</span>
+        <el-button type="primary" size="small" @click="openBatchTag('add')">批量打标签</el-button>
+        <el-button type="warning" size="small" plain @click="openBatchTag('remove')">批量移除标签</el-button>
+        <el-button size="small" text @click="clearSelection">取消选择</el-button>
+      </div>
+
+      <el-table ref="tableRef" :data="questions" v-loading="loading" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="45" />
         <el-table-column prop="id" label="ID" width="70" align="center" />
         <el-table-column prop="content" label="题目内容" min-width="250" show-overflow-tooltip />
         <el-table-column prop="categoryId" label="分类" width="100" align="center">
@@ -167,7 +175,25 @@
           <el-input v-model="form.analysis" type="textarea" :rows="3" placeholder="请输入答案解析（可选）" />
         </el-form-item>
         <el-form-item label="标签" prop="tags">
-          <el-input v-model="form.tags" placeholder="多个标签用逗号分隔（可选）" />
+          <el-select
+            v-model="formTagList"
+            multiple
+            filterable
+            allow-create
+            default-first-option
+            placeholder="选择标签，或输入新标签后回车"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="t in tagOptions"
+              :key="t.name"
+              :label="t.name"
+              :value="t.name"
+            >
+              <span>{{ t.name }}</span>
+              <el-tag v-if="t.hot" type="danger" size="small" effect="plain" style="margin-left: 6px">热门</el-tag>
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -278,11 +304,34 @@
         </el-button>
       </template>
     </el-dialog>
+
+    <!-- 批量打/移除标签弹窗 -->
+    <el-dialog v-model="batchTagVisible" :title="batchAction === 'add' ? '批量打标签' : '批量移除标签'" width="440px">
+      <div class="batch-tip">
+        将对已选的 <strong>{{ selectedQuestions.length }}</strong> 道题目{{ batchAction === 'add' ? '追加' : '移除' }}以下标签
+      </div>
+      <el-select
+        v-model="batchTagNames"
+        multiple
+        filterable
+        allow-create
+        default-first-option
+        placeholder="选择标签，或输入新标签后回车"
+        style="width: 100%"
+      >
+        <el-option v-for="t in tagOptions" :key="t.name" :label="t.name" :value="t.name" />
+      </el-select>
+      <template #footer>
+        <el-button @click="batchTagVisible = false">取消</el-button>
+        <el-button type="primary" :loading="batchSaving" @click="submitBatchTag">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Close, Upload, MagicStick, Check, Loading, CircleCheck, CircleClose } from '@element-plus/icons-vue'
 import api from '../utils/api'
@@ -303,6 +352,71 @@ const aiResultVisible = ref(false)
 const aiGenerating = ref(false)
 const aiSaving = ref(false)
 const aiQuestions = ref([])
+
+// ===== 标签相关 =====
+const tagOptions = ref([])
+const tableRef = ref(null)
+const selectedQuestions = ref([])
+const batchTagVisible = ref(false)
+const batchSaving = ref(false)
+const batchAction = ref('add')
+const batchTagNames = ref([])
+
+// form.tags（逗号分隔）↔ 多选数组 双向同步
+const formTagList = computed({
+  get: () => (form.tags ? form.tags.replace(/，/g, ',').split(',').map(s => s.trim()).filter(Boolean) : []),
+  set: (val) => { form.tags = [...new Set(val)].join(',') }
+})
+
+const loadTagOptions = async () => {
+  try {
+    const res = await api.get('/admin/tag/all')
+    tagOptions.value = res.data || []
+  } catch (error) {
+    console.error('加载标签失败', error)
+  }
+}
+
+const handleSelectionChange = (rows) => {
+  selectedQuestions.value = rows
+}
+
+const clearSelection = () => {
+  tableRef.value?.clearSelection()
+}
+
+const openBatchTag = (action) => {
+  batchAction.value = action
+  batchTagNames.value = []
+  batchTagVisible.value = true
+}
+
+const submitBatchTag = async () => {
+  if (batchTagNames.value.length === 0) {
+    ElMessage.warning('请选择或输入标签')
+    return
+  }
+  batchSaving.value = true
+  try {
+    const res = await api.post('/admin/tag/batch-tag', {
+      tagNames: batchTagNames.value,
+      questionIds: selectedQuestions.value.map(q => q.id),
+      action: batchAction.value
+    })
+    if (res.code === 200) {
+      ElMessage.success(res.data || '操作成功')
+      batchTagVisible.value = false
+      clearSelection()
+      loadQuestions()
+    } else {
+      ElMessage.error(res.msg || '操作失败')
+    }
+  } catch (error) {
+    ElMessage.error('操作失败')
+  } finally {
+    batchSaving.value = false
+  }
+}
 
 const uploadUrl = computed(() => {
   return '/api/admin/question/import'
@@ -500,6 +614,10 @@ const handleSubmit = async () => {
         ElMessage.success('添加成功')
       }
       dialogVisible.value = false
+      // 独立「新增题目」页提交后回到题目列表
+      if (route.path === '/question/add') {
+        router.replace('/question/list')
+      }
       loadQuestions()
     } catch (error) {
       console.error(error)
@@ -702,9 +820,17 @@ const handleSaveAiQuestions = async () => {
   }
 }
 
+const route = useRoute()
+const router = useRouter()
+
 onMounted(() => {
   loadCategories()
   loadQuestions()
+  loadTagOptions()
+  // 「新增题目」菜单入口：进入页面后自动打开新增弹窗
+  if (route.path === '/question/add') {
+    handleAdd()
+  }
 })
 </script>
 
@@ -757,6 +883,29 @@ onMounted(() => {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid #f0f0f0;
+}
+
+.batch-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  background: #ecf5ff;
+  border: 1px solid #d9ecff;
+  border-radius: 4px;
+}
+
+.batch-info {
+  font-size: 13px;
+  color: #409eff;
+  font-weight: 500;
+}
+
+.batch-tip {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #666;
 }
 
 .options-wrapper {
