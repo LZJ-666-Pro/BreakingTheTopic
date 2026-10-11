@@ -22,7 +22,7 @@ public interface SpecialMapper extends BaseMapper<SpecialTopic> {
     @Select("SELECT COUNT(*) FROM special_question WHERE topic_id = #{topicId}")
     long countQuestions(@Param("topicId") Long topicId);
 
-    @Select("SELECT q.id, q.content, q.difficulty, sq.sort FROM special_question sq " +
+    @Select("SELECT q.id, COALESCE(NULLIF(q.title, ''), q.content) AS content, q.difficulty, sq.sort FROM special_question sq " +
             "JOIN question q ON q.id = sq.question_id AND q.deleted = 0 " +
             "WHERE sq.topic_id = #{topicId} ORDER BY sq.sort")
     List<Map<String, Object>> selectTopicQuestions(@Param("topicId") Long topicId);

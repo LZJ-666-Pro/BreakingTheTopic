@@ -169,7 +169,7 @@ function openDialog(row) {
     // 编辑时先拉详情（含题目列表），把已有题目回填进选项
     api.get(`/admin/special/${row.id}`).then((res) => {
       const qs = res.data.questions || []
-      qOptions.value = qs.map((q) => ({ id: q.id, content: q.content }))
+      qOptions.value = qs.map((q) => ({ id: q.id, content: q.title || q.content }))
       dialog.form.questionIds = qs.map((q) => q.id)
     })
   }
@@ -183,7 +183,7 @@ async function searchQuestions(keyword) {
     const res = await api.get('/admin/question/page', { params: { page: 1, size: 20, keyword: keyword.trim() } })
     const records = res.data.records || []
     const known = new Set(qOptions.value.map((o) => o.id))
-    qOptions.value = [...qOptions.value, ...records.filter((q) => !known.has(q.id)).map((q) => ({ id: q.id, content: q.content }))]
+    qOptions.value = [...qOptions.value, ...records.filter((q) => !known.has(q.id)).map((q) => ({ id: q.id, content: q.title || q.content }))]
   } finally {
     qLoading.value = false
   }
