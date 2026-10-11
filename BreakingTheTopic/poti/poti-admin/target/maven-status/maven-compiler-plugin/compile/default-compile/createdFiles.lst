@@ -4,6 +4,7 @@ com\poti\admin\mapper\QuestionMapper.class
 com\poti\admin\config\RestTemplateConfig.class
 com\poti\admin\entity\Role.class
 com\poti\admin\mapper\DashboardMapper.class
+com\poti\admin\mapper\CategoryGroupMapper.class
 com\poti\admin\dto\QuestionExcelDTO.class
 com\poti\admin\entity\SpecialTopic.class
 com\poti\admin\mapper\CategoryMapper.class
@@ -58,6 +59,7 @@ com\poti\admin\mapper\UserDataCleanMapper.class
 com\poti\admin\config\CorsConfig.class
 com\poti\admin\mapper\UserMapper.class
 com\poti\admin\controller\CategoryController.class
+com\poti\admin\controller\CategoryGroupController.class
 com\poti\admin\entity\Question.class
 com\poti\admin\controller\DailyController.class
 com\poti\admin\service\impl\AiQuestionServiceImpl$1.class
@@ -65,13 +67,16 @@ com\poti\admin\service\impl\AiQuestionServiceImpl.class
 com\poti\admin\service\DashboardService.class
 com\poti\admin\mapper\DailyMapper.class
 com\poti\admin\config\MybatisPlusConfig.class
+com\poti\admin\entity\CategoryGroup.class
 com\poti\admin\service\AiQuestionService.class
+com\poti\admin\mapper\CategoryGroupRelMapper.class
 com\poti\admin\config\RestTemplateConfig$1.class
 com\poti\admin\controller\UserController.class
 com\poti\admin\controller\ConfigController.class
 com\poti\admin\mapper\AiTaskMapper.class
 com\poti\admin\mapper\AdminMapper.class
 com\poti\admin\config\AiConfig.class
+com\poti\admin\entity\CategoryGroupRel.class
 com\poti\admin\entity\OperationLog.class
 com\poti\admin\config\WebMvcConfig.class
 com\poti\admin\mapper\ConfigMapper.class
