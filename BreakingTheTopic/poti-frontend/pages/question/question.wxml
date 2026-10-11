@@ -53,7 +53,7 @@
     <view class="card-grid">
       <view class="practice-card" wx:for="{{filteredCategories}}" wx:key="id" bindtap="goToCategory" data-type="{{item.type}}">
         <view class="card-icon-wrap" style="background: {{item.bgColor}}15;">
-          <text class="card-icon">{{item.icon}}</text>
+          <image class="card-icon-img" src="{{item.icon}}" mode="aspectFit" />
         </view>
         <text class="card-name">{{item.name}}</text>
         <text class="card-count">{{item.questionCount}}题</text>

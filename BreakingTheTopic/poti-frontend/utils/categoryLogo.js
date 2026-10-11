@@ -1,0 +1,61 @@
+// 分类图标统一映射：分类名 -> /images/questionLogo/ 下的 logo 图片
+const logoMap = {
+  'Java': 'java',
+  'Python': 'python',
+  'MySQL': 'mysql',
+  'Redis': 'redis',
+  'Spring': 'spring',
+  'MQ': 'mq',
+  '算法': 'algorithm',
+  '计算机网络': 'network',
+  '操作系统': 'os',
+  '设计模式': 'design_pattern',
+  'Go': 'go',
+  'JavaScript': 'javascript',
+  'PHP': 'php',
+  '数据结构': 'data_structure',
+  '计算机组成': 'computer_composition',
+  '编译原理': 'compiler',
+  'MongoDB': 'mongodb',
+  'PostgreSQL': 'postgresql',
+  'MyBatis': 'mybatis',
+  'Dubbo': 'dubbo',
+  'Netty': 'netty',
+  'Nginx': 'nginx',
+  'Zookeeper': 'zookeeper',
+  '微服务': 'microservice',
+  'Docker': 'docker',
+  'Kubernetes': 'kubernetes',
+  'Vue': 'vue',
+  'React': 'react',
+  'Node.js': 'nodejs',
+  'TypeScript': 'typescript',
+  '机器学习': 'ml',
+  '深度学习': 'dl',
+  'NLP': 'nlp',
+  '计算机视觉': 'cv',
+  'Hadoop': 'hadoop',
+  'Spark': 'spark',
+  'Flink': 'flink',
+  '数据仓库': 'data_warehouse',
+  'Web安全': 'web_security',
+  '密码学': 'cryptography',
+  '软件测试': 'software_test',
+  'Linux': 'linux',
+  'Git': 'git',
+  '高等数学': 'math',
+  '线性代数': 'linear_algebra',
+  '概率论': 'probability',
+  '离散数学': 'discrete_math',
+  '算法面试': 'interview_algorithm',
+  '系统设计': 'system_design',
+  'HR面试': 'hr_interview',
+  '行为面试': 'behavior_interview'
+}
+
+function getCategoryIcon(name) {
+  const slug = logoMap[name]
+  return `/images/questionLogo/${slug || 'default'}.png`
+}
+
+module.exports = { getCategoryIcon }

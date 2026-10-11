@@ -1,61 +1,10 @@
-const categoryIcons = {
-  'Java': '☕',
-  'Python': '🐍',
-  'C/C++': '⚙️',
-  'Go': '🔵',
-  'JavaScript': '🟨',
-  'PHP': '🐘',
-  '数据结构': '📊',
-  '操作系统': '💻',
-  '计算机网络': '🌐',
-  '计算机组成': '🔧',
-  '编译原理': '📝',
-  'MySQL': '🗄️',
-  'Redis': '🚀',
-  'MongoDB': '🍃',
-  'PostgreSQL': '🐘',
-  'Spring': '🍃',
-  'MyBatis': '📄',
-  'Dubbo': '📞',
-  'Netty': '⚡',
-  '消息队列': '📨',
-  'Nginx': '🌐',
-  'Zookeeper': '🌳',
-  '微服务': '🔷',
-  'Docker': '🐳',
-  'Kubernetes': '☸️',
-  'Vue': '💚',
-  'React': '⚛️',
-  'Node.js': '💚',
-  'TypeScript': '🔷',
-  '机器学习': '🤖',
-  '深度学习': '🧠',
-  'NLP': '💬',
-  '计算机视觉': '👁️',
-  'Hadoop': '🐘',
-  'Spark': '⚡',
-  'Flink': '🌊',
-  '数据仓库': '📦',
-  'Web安全': '🔒',
-  '密码学': '🔐',
-  '软件测试': '🧪',
-  'Linux': '🐧',
-  'Git': '📚',
-  '高等数学': '📐',
-  '线性代数': '📈',
-  '概率论': '🎲',
-  '离散数学': '🔢',
-  '算法面试': '🎯',
-  '系统设计': '🏗️',
-  'HR面试': '👥',
-  '行为面试': '💼'
-}
+const { getCategoryIcon } = require('../../utils/categoryLogo.js')
 
 Page({
   data: {
     categoryId: null,
     categoryName: '',
-    categoryIcon: '📚',
+    categoryIcon: '/images/questionLogo/default.png',
     questions: [],
     loading: true,
     showAll: false,
@@ -69,7 +18,7 @@ Page({
     this.setData({
       categoryId: categoryId,
       categoryName: categoryName,
-      categoryIcon: categoryIcons[categoryName] || '📚'
+      categoryIcon: getCategoryIcon(categoryName)
     })
     
     if (categoryId) {
