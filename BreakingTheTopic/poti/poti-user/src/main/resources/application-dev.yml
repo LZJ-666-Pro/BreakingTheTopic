@@ -1,4 +1,4 @@
-server:
+﻿server:
   port: 8200
 
 jwt:
@@ -28,7 +28,7 @@ spring:
       strict: false
       datasource:
         master:
-          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_user?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_user?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
           username: ${DB_USERNAME:root}
           password: ${DB_PASSWORD:123456}
           driver-class-name: com.mysql.cj.jdbc.Driver
@@ -40,7 +40,7 @@ spring:
             max-lifetime: 1800000
             connection-test-query: SELECT 1
         search:
-          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti-search?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti-search?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
           username: ${DB_USERNAME:root}
           password: ${DB_PASSWORD:123456}
           driver-class-name: com.mysql.cj.jdbc.Driver
