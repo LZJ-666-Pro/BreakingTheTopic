@@ -443,15 +443,22 @@ public class QuestionController {
             wrapper.eq(Question::getStatus, 1);
 
             if (keyword != null && !keyword.trim().isEmpty()) {
-                wrapper.and(w -> w
-                    .like(Question::getTitle, keyword)
-                    .or()
-                    .like(Question::getContent, keyword)
-                    .or()
-                    .like(Question::getAnalysis, keyword)
-                    .or()
-                    .like(Question::getTags, keyword)
-                );
+                String kw = keyword.trim();
+                // 分类名命中时把该分类下所有题一并纳入（如搜"Java"带出整个Java分类）
+                List<Long> matchedCategoryIds = categoryService.list(
+                        new LambdaQueryWrapper<Category>()
+                                .eq(Category::getDeleted, 0)
+                                .like(Category::getName, kw))
+                        .stream().map(Category::getId).collect(java.util.stream.Collectors.toList());
+                wrapper.and(w -> {
+                    w.like(Question::getTitle, kw)
+                        .or().like(Question::getContent, kw)
+                        .or().like(Question::getAnalysis, kw)
+                        .or().like(Question::getTags, kw);
+                    if (!matchedCategoryIds.isEmpty()) {
+                        w.or().in(Question::getCategoryId, matchedCategoryIds);
+                    }
+                });
             }
 
             if (categoryId != null) {

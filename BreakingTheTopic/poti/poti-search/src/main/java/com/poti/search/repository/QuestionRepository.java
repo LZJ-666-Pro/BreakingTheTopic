@@ -10,10 +10,10 @@ import java.util.List;
 
 public interface QuestionRepository extends ElasticsearchRepository<QuestionDocument, Long> {
 
-    @Query("{\"bool\": {\"should\": [{\"match\": {\"title\": \"?0\"}}, {\"match\": {\"content\": \"?0\"}}, {\"match\": {\"analysis\": \"?0\"}}, {\"match\": {\"tags\": \"?0\"}}]}}")
+    @Query("{\"bool\": {\"should\": [{\"match\": {\"title\": {\"query\": \"?0\", \"boost\": 2.0}}}, {\"match\": {\"content\": \"?0\"}}, {\"match\": {\"analysis\": \"?0\"}}, {\"match\": {\"tags\": \"?0\"}}, {\"match\": {\"categoryName.seg\": \"?0\"}}]}}")
     Page<QuestionDocument> searchByKeyword(String keyword, Pageable pageable);
 
-    @Query("{\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"match\": {\"title\": \"?0\"}}, {\"match\": {\"content\": \"?0\"}}, {\"match\": {\"analysis\": \"?0\"}}, {\"match\": {\"tags\": \"?0\"}}]}}, {\"term\": {\"categoryId\": \"?1\"}}]}}")
+    @Query("{\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"match\": {\"title\": {\"query\": \"?0\", \"boost\": 2.0}}}, {\"match\": {\"content\": \"?0\"}}, {\"match\": {\"analysis\": \"?0\"}}, {\"match\": {\"tags\": \"?0\"}}, {\"match\": {\"categoryName.seg\": \"?0\"}}]}}, {\"term\": {\"categoryId\": \"?1\"}}]}}")
     Page<QuestionDocument> searchByKeywordAndCategoryId(String keyword, Long categoryId, Pageable pageable);
 
     List<QuestionDocument> findByType(String type);

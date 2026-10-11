@@ -166,11 +166,16 @@ Page({
   onInput(e) {
     const keyword = e.detail.value
     this.setData({ keyword })
-    
+
+    // 输入实时搜索（500ms 防抖）：停止输入后自动出结果
+    if (this.debounceTimer) clearTimeout(this.debounceTimer)
     if (keyword.trim()) {
       this.getSuggestions(keyword)
+      this.debounceTimer = setTimeout(() => {
+        this.doSearch(false)
+      }, 500)
     } else {
-      this.setData({ showSuggestions: false, suggestions: [] })
+      this.setData({ showSuggestions: false, suggestions: [], searched: false, results: [], total: 0 })
     }
   },
 
@@ -209,6 +214,7 @@ Page({
   },
 
   clearInput() {
+    if (this.debounceTimer) clearTimeout(this.debounceTimer)
     this.setData({
       keyword: '',
       results: [],
@@ -216,6 +222,10 @@ Page({
       showSuggestions: false,
       suggestions: []
     })
+  },
+
+  onUnload() {
+    if (this.debounceTimer) clearTimeout(this.debounceTimer)
   },
 
   searchKeyword(e) {
@@ -230,20 +240,26 @@ Page({
   },
 
   onSearch() {
+    this.doSearch(true)
+  },
+
+  doSearch(saveHistory) {
     if (!this.data.keyword.trim()) {
       wx.showToast({ title: '请输入搜索关键词', icon: 'none' })
       return
     }
 
     const keyword = this.data.keyword.trim()
-    this.saveHistory(keyword)
-    this.recordSearch(keyword)
+    // 只有主动触发（搜索按钮/回车/点建议）才记录历史，实时搜索不上报避免刷屏
+    if (saveHistory) {
+      this.saveHistory(keyword)
+      this.recordSearch(keyword)
+    }
 
     this.setData({
       loading: true,
       searched: true,
-      pageNum: 1,
-      showSuggestions: false
+      pageNum: 1
     })
 
     searchApi.searchQuestions(keyword, this.data.currentCategoryId, this.data.currentDifficulty, 1, this.data.pageSize)
