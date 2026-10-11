@@ -49,6 +49,48 @@
           </el-form>
         </el-tab-pane>
         
+        <el-tab-pane label="业务开关" name="business">
+          <el-form :model="siteForm" label-width="150px">
+            <el-form-item label="开放注册">
+              <el-switch v-model="siteForm.register_enabled" active-value="true" inactive-value="false" />
+              <span class="form-tip" style="margin-left: 10px">关闭后小程序端无法注册新用户</span>
+            </el-form-item>
+
+            <el-form-item label="登录验证码">
+              <el-switch v-model="siteForm.login_captcha_enabled" active-value="true" inactive-value="false" />
+            </el-form-item>
+
+            <el-form-item label="竞赛功能">
+              <el-switch v-model="siteForm.competition_enabled" active-value="true" inactive-value="false" />
+            </el-form-item>
+
+            <el-form-item label="讨论区">
+              <el-switch v-model="siteForm.discussion_enabled" active-value="true" inactive-value="false" />
+            </el-form-item>
+
+            <el-form-item label="签到奖励">
+              <el-switch v-model="siteForm.checkin_reward_enabled" active-value="true" inactive-value="false" />
+            </el-form-item>
+
+            <el-form-item label="每日一题更新时间">
+              <el-input v-model="siteForm.daily_question_time" placeholder="如 00:00" style="width: 140px" />
+            </el-form-item>
+
+            <el-form-item label="默认分页条数">
+              <el-input-number v-model="siteForm.default_page_size" :min="5" :max="100" />
+            </el-form-item>
+
+            <el-form-item label="会员价格(元/月)">
+              <el-input-number v-model="siteForm.vip_price" :min="0" :max="999" />
+              <span class="form-tip" style="margin-left: 10px">0 表示免费</span>
+            </el-form-item>
+
+            <el-form-item label="联系邮箱">
+              <el-input v-model="siteForm.contact_email" placeholder="官方联系方式" style="width: 260px" />
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+
         <el-tab-pane label="邮件设置" name="email">
           <el-form :model="siteForm" label-width="120px">
             <el-form-item label="SMTP服务器">
@@ -118,7 +160,16 @@ const siteForm = reactive({
   sms_access_key: '',
   sms_access_secret: '',
   sms_sign_name: '',
-  sms_template_code: ''
+  sms_template_code: '',
+  register_enabled: 'true',
+  login_captcha_enabled: 'true',
+  competition_enabled: 'false',
+  discussion_enabled: 'true',
+  checkin_reward_enabled: 'true',
+  daily_question_time: '00:00',
+  default_page_size: 10,
+  vip_price: 0,
+  contact_email: ''
 })
 
 onMounted(async () => {
@@ -132,7 +183,7 @@ const loadConfigs = async () => {
     
     for (const key in configs) {
       if (siteForm.hasOwnProperty(key)) {
-        if (key === 'upload_max_size' || key === 'email_smtp_port') {
+        if (key === 'upload_max_size' || key === 'email_smtp_port' || key === 'default_page_size' || key === 'vip_price') {
           siteForm[key] = parseInt(configs[key]) || siteForm[key]
         } else {
           siteForm[key] = configs[key]

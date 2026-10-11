@@ -82,10 +82,18 @@ public class ConfigController {
                     if (existingConfig != null) {
                         existingConfig.setConfigValue(config.getConfigValue());
                         configService.updateById(existingConfig);
+                    } else {
+                        // 不存在的 key 直接创建，避免前端提交的新配置项被静默丢弃
+                        Config created = new Config();
+                        created.setConfigKey(config.getConfigKey().trim());
+                        created.setConfigValue(config.getConfigValue());
+                        created.setConfigName(config.getConfigKey().trim());
+                        created.setStatus(1);
+                        configService.save(created);
                     }
                 }
             }
-            
+
             log.info("批量更新配置成功，共更新{}项", configs.size());
             return R.success(null);
         } catch (Exception e) {

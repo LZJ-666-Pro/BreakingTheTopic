@@ -28,6 +28,9 @@ public class Admin {
 
     private Integer role;
 
+    /** 关联角色ID（sys_role） */
+    private Long roleId;
+
     private LocalDateTime lastLoginTime;
 
     private String lastLoginIp;

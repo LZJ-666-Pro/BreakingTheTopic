@@ -1,0 +1,35 @@
+<view class="page">
+  <view class="header">
+    <text class="header-title">刷题专题</text>
+    <text class="header-desc">系统化的学习路线，按专题刷题更有方向</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+
+  <view wx:elif="{{topics.length === 0}}" class="empty">
+    <view class="empty-icon">📚</view>
+    <view class="empty-title">专题正在整理中</view>
+    <view class="empty-desc">先去题库随便刷几题吧</view>
+  </view>
+
+  <block wx:else>
+    <view
+      class="topic-card"
+      wx:for="{{topics}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="topic-top">
+        <text class="topic-name">{{item.name}}</text>
+        <text class="topic-diff d{{item.difficulty}}">{{item.difficultyLabel}}</text>
+      </view>
+      <text class="topic-desc">{{item.description}}</text>
+      <view class="topic-meta">
+        <text class="meta-item">{{item.questionCount}} 道题</text>
+        <text class="meta-item">预计 {{item.estimatedDays}} 天完成</text>
+        <text class="meta-item">{{item.unlockType === 1 ? '按顺序解锁' : '自由刷'}}</text>
+      </view>
+    </view>
+  </block>
+</view>

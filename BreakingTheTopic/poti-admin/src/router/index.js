@@ -87,13 +87,13 @@ const routes = [
           {
             path: 'manage',
             name: 'SpecialManage',
-            component: placeholder,
+            component: () => import('../views/Special.vue'),
             meta: { title: '专题管理', icon: 'Collection' }
           },
           {
             path: 'daily',
             name: 'SpecialDaily',
-            component: placeholder,
+            component: () => import('../views/Daily.vue'),
             meta: { title: '每日一题', icon: 'AlarmClock' }
           }
         ]
@@ -116,19 +116,19 @@ const routes = [
           {
             path: 'solution-review',
             name: 'SolutionReview',
-            component: placeholder,
+            component: () => import('../views/SolutionReview.vue'),
             meta: { title: '题解审核', icon: 'Notebook' }
           },
           {
             path: 'article',
             name: 'Article',
-            component: placeholder,
+            component: () => import('../views/Article.vue'),
             meta: { title: '文章管理', icon: 'Memo' }
           },
           {
             path: 'notice',
             name: 'Notice',
-            component: placeholder,
+            component: () => import('../views/Notice.vue'),
             meta: { title: '公告管理', icon: 'Bell' }
           }
         ]
@@ -167,7 +167,7 @@ const routes = [
           {
             path: 'permission',
             name: 'Permission',
-            component: placeholder,
+            component: () => import('../views/Permission.vue'),
             meta: { title: '权限管理', icon: 'Key' }
           },
           {
@@ -179,7 +179,7 @@ const routes = [
           {
             path: 'logs',
             name: 'OperationLogs',
-            component: placeholder,
+            component: () => import('../views/OperationLogs.vue'),
             meta: { title: '操作日志', icon: 'Tickets' }
           }
         ]

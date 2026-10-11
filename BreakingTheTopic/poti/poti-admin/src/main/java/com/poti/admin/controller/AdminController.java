@@ -1,7 +1,11 @@
 package com.poti.admin.controller;
 
 import cn.hutool.crypto.digest.BCrypt;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.poti.admin.entity.Admin;
+import com.poti.admin.entity.Role;
+import com.poti.admin.mapper.AdminMapper;
+import com.poti.admin.mapper.RoleMapper;
 import com.poti.admin.service.AdminService;
 import com.poti.admin.service.CaptchaService;
 import com.poti.common.R;
@@ -28,6 +32,12 @@ public class AdminController {
 
     @Autowired
     private CaptchaService captchaService;
+
+    @Autowired
+    private RoleMapper roleMapper;
+
+    @Autowired
+    private AdminMapper adminMapper;
 
     @GetMapping("/captcha")
     public R<Map<String, Object>> captcha() {
@@ -81,6 +91,8 @@ public class AdminController {
             user.put("nickname", admin.getNickname());
             user.put("avatar", admin.getAvatar());
             user.put("role", admin.getRole());
+            user.put("roleId", admin.getRoleId());
+            user.put("permissions", resolvePermissions(admin));
             result.put("user", user);
             
             log.info("管理员登录成功: {}", username);
@@ -183,7 +195,9 @@ public class AdminController {
             user.put("email", admin.getEmail());
             user.put("phone", admin.getPhone());
             user.put("role", admin.getRole());
-            
+            user.put("roleId", admin.getRoleId());
+            user.put("permissions", resolvePermissions(admin));
+
             return R.success(user);
         } catch (Exception e) {
             log.error("获取管理员信息失败", e);
@@ -281,6 +295,236 @@ public class AdminController {
         } catch (Exception e) {
             log.error("更新管理员信息失败", e);
             return R.error("更新失败：" + e.getMessage());
+        }
+    }
+
+    // ==================== 管理员账号管理（权限管理页） ====================
+
+    /** 管理员账号列表（不返回密码） */
+    @GetMapping("/account/list")
+    public R<java.util.List<Map<String, Object>>> accountList() {
+        try {
+            java.util.List<Admin> admins = adminMapper.selectList(
+                    new LambdaQueryWrapper<Admin>().orderByAsc(Admin::getId));
+            java.util.List<Map<String, Object>> result = new java.util.ArrayList<>();
+            java.util.Map<Long, String> roleNames = new HashMap<>();
+            for (Role role : roleMapper.selectList(new LambdaQueryWrapper<Role>())) {
+                roleNames.put(role.getId(), role.getName());
+            }
+            for (Admin a : admins) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", a.getId());
+                item.put("username", a.getUsername());
+                item.put("nickname", a.getNickname());
+                item.put("email", a.getEmail());
+                item.put("phone", a.getPhone());
+                item.put("avatar", a.getAvatar());
+                item.put("status", a.getStatus());
+                item.put("role", a.getRole());
+                item.put("roleId", a.getRoleId());
+                item.put("roleName", a.getRoleId() != null ? roleNames.get(a.getRoleId()) : null);
+                item.put("lastLoginTime", a.getLastLoginTime());
+                item.put("lastLoginIp", a.getLastLoginIp());
+                item.put("createTime", a.getCreateTime());
+                result.add(item);
+            }
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("获取管理员账号列表失败", e);
+            return R.error("获取管理员账号列表失败");
+        }
+    }
+
+    /** 新增管理员账号 */
+    @PostMapping("/account/create")
+    public R<Void> accountCreate(@RequestBody Map<String, Object> request) {
+        try {
+            String username = trim(request.get("username"));
+            String password = trim(request.get("password"));
+            String nickname = trim(request.get("nickname"));
+            String email = trim(request.get("email"));
+            String phone = trim(request.get("phone"));
+            Long roleId = toLong(request.get("roleId"));
+
+            if (username == null || password == null) {
+                return R.error("用户名和密码不能为空");
+            }
+            if (username.length() < 3 || username.length() > 20) {
+                return R.error("用户名长度必须在3-20个字符之间");
+            }
+            if (password.length() < 6 || password.length() > 20) {
+                return R.error("密码长度必须在6-20个字符之间");
+            }
+            if (adminService.getByUsername(username) != null) {
+                return R.error("用户名已存在");
+            }
+            if (roleId != null && roleMapper.selectById(roleId) == null) {
+                return R.error("所选角色不存在");
+            }
+
+            Admin admin = new Admin();
+            admin.setUsername(username);
+            admin.setPassword(BCrypt.hashpw(password));
+            admin.setNickname(nickname);
+            admin.setEmail(email);
+            admin.setPhone(phone);
+            admin.setStatus(1);
+            admin.setRole(1);
+            admin.setRoleId(roleId);
+            adminService.save(admin);
+            return R.success(null);
+        } catch (Exception e) {
+            log.error("新增管理员失败", e);
+            return R.error("新增管理员失败");
+        }
+    }
+
+    /** 编辑管理员：昵称/邮箱/手机号/角色/状态 */
+    @PutMapping("/account/update")
+    public R<Void> accountUpdate(
+            @RequestHeader(value = "X-User-Id", required = false) Long operatorId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            Long id = toLong(request.get("id"));
+            if (id == null) {
+                return R.error("参数错误");
+            }
+            Admin admin = adminService.getById(id);
+            if (admin == null) {
+                return R.error("账号不存在");
+            }
+            // 系统内置超管账号只允许编辑基础资料，不允许禁用/改角色（防止锁死）
+            boolean builtin = "admin".equals(admin.getUsername());
+            Integer status = toInteger(request.get("status"));
+            Long roleId = toLong(request.get("roleId"));
+
+            if (builtin && (roleId != null && !roleId.equals(admin.getRoleId()))) {
+                return R.error("内置超级管理员账号不允许修改角色");
+            }
+            if (builtin && status != null && status != 1) {
+                return R.error("内置超级管理员账号不允许禁用");
+            }
+            if (operatorId != null && operatorId.equals(id) && status != null && status != 1) {
+                return R.error("不能禁用自己的账号");
+            }
+            if (roleId != null && roleMapper.selectById(roleId) == null) {
+                return R.error("所选角色不存在");
+            }
+
+            String nickname = trim(request.get("nickname"));
+            if (nickname != null) {
+                admin.setNickname(nickname);
+            }
+            String email = trim(request.get("email"));
+            if (email != null) {
+                admin.setEmail(email.isEmpty() ? null : email);
+            }
+            String phone = trim(request.get("phone"));
+            if (phone != null) {
+                admin.setPhone(phone.isEmpty() ? null : phone);
+            }
+            if (roleId != null) {
+                admin.setRoleId(roleId);
+            }
+            if (status != null) {
+                admin.setStatus(status);
+            }
+            adminService.updateById(admin);
+            return R.success(null);
+        } catch (Exception e) {
+            log.error("编辑管理员失败", e);
+            return R.error("编辑管理员失败");
+        }
+    }
+
+    /** 重置管理员密码 */
+    @PostMapping("/account/reset-password/{id}")
+    public R<Void> resetPassword(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        try {
+            String newPassword = request.get("newPassword");
+            if (newPassword == null || newPassword.length() < 6 || newPassword.length() > 20) {
+                return R.error("新密码长度必须在6-20个字符之间");
+            }
+            Admin admin = adminService.getById(id);
+            if (admin == null) {
+                return R.error("账号不存在");
+            }
+            admin.setPassword(BCrypt.hashpw(newPassword));
+            adminService.updateById(admin);
+            return R.success(null);
+        } catch (Exception e) {
+            log.error("重置密码失败", e);
+            return R.error("重置密码失败");
+        }
+    }
+
+    /** 删除管理员账号 */
+    @DeleteMapping("/account/delete/{id}")
+    public R<Void> accountDelete(
+            @RequestHeader(value = "X-User-Id", required = false) Long operatorId,
+            @PathVariable Long id) {
+        try {
+            Admin admin = adminService.getById(id);
+            if (admin == null) {
+                return R.error("账号不存在");
+            }
+            if ("admin".equals(admin.getUsername())) {
+                return R.error("内置超级管理员账号不允许删除");
+            }
+            if (operatorId != null && operatorId.equals(id)) {
+                return R.error("不能删除自己的账号");
+            }
+            adminMapper.deleteById(id);
+            return R.success(null);
+        } catch (Exception e) {
+            log.error("删除管理员失败", e);
+            return R.error("删除管理员失败");
+        }
+    }
+
+    /**
+     * 解析管理员菜单权限：
+     * super 角色 / 权限为空 / 旧 role=2 → 全部权限(*)；
+     * 否则返回角色配置的路由 index 串；无任何角色时默认仅仪表盘。
+     */
+    private String resolvePermissions(Admin admin) {
+        if (admin.getRoleId() != null) {
+            Role role = roleMapper.selectById(admin.getRoleId());
+            if (role != null && role.getStatus() != null && role.getStatus() == 1) {
+                if ("super".equals(role.getCode())
+                        || role.getPermissions() == null || role.getPermissions().trim().isEmpty()) {
+                    return "*";
+                }
+                return role.getPermissions();
+            }
+        }
+        if (admin.getRole() != null && admin.getRole() == 2) {
+            return "*";
+        }
+        return "/dashboard";
+    }
+
+    private String trim(Object value) {
+        if (value == null) return null;
+        String s = String.valueOf(value);
+        return s.trim().isEmpty() ? null : s.trim();
+    }
+
+    private Long toLong(Object value) {
+        if (value == null) return null;
+        try {
+            return Long.valueOf(String.valueOf(value));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Integer toInteger(Object value) {
+        if (value == null) return null;
+        try {
+            return Integer.valueOf(String.valueOf(value));
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 

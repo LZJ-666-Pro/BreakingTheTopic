@@ -1,5 +1,19 @@
-server:
+﻿server:
   port: 8088
+
+# 本地开发：AI任务接口免鉴权（批量补题脚本直连使用；外网请求仍受网关JWT保护）
+poti:
+  security:
+    exclude-paths:
+      - /auth/login
+      - /admin/login
+      - /admin/register
+      - /admin/captcha
+      - /admin/question/ai/task/**
+      - /actuator/**
+      - /error
+      - /uploads/**
+      - /avatars/**
 
 jwt:
   secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
@@ -25,7 +39,7 @@ spring:
       datasource:
         admin:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_admin?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_admin?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: ${DB_USERNAME:root}
           password: ${DB_PASSWORD:123456}
           hikari:
@@ -37,7 +51,7 @@ spring:
             connection-test-query: SELECT 1
         question:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_question?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_question?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: ${DB_USERNAME:root}
           password: ${DB_PASSWORD:123456}
           hikari:
@@ -49,7 +63,7 @@ spring:
             connection-test-query: SELECT 1
         user:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: ${DB_USERNAME:root}
           password: ${DB_PASSWORD:123456}
           hikari:
@@ -61,7 +75,43 @@ spring:
             connection-test-query: SELECT 1
         practice:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_practice?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_practice?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
+        wrongbook:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_wrongbook?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
+        favorite:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_favorite?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
+        interview:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_interview?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: ${DB_USERNAME:root}
           password: ${DB_PASSWORD:123456}
           hikari:
@@ -115,7 +165,7 @@ upload:
 
 ai:
   provider: ${AI_PROVIDER:zhipu}
-  api-key: ${AI_API_KEY:37dcefbb79ac4311895829544de4fb4d.Zp7iMJWtuAaiCXX2}
+  api-key: ${AI_API_KEY:2794361da43a4a71ac28781fe1916910.TTvqqqy9O8Jha82e}
   base-url: ${AI_BASE_URL:https://open.bigmodel.cn/api/paas/v4}
   model: ${AI_MODEL:glm-4-flash}
   max-tokens: 4000

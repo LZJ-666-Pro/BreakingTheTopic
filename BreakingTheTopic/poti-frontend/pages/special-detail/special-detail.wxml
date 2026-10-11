@@ -1,0 +1,34 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+
+  <block wx:elif="{{info}}">
+    <view class="topic-header">
+      <view class="topic-name-row">
+        <text class="topic-name">{{info.name}}</text>
+        <text class="topic-diff d{{info.difficulty}}">{{info.unlockType === 1 ? '顺序解锁' : '自由刷'}}</text>
+      </view>
+      <text class="topic-desc" wx:if="{{info.description}}">{{info.description}}</text>
+      <view class="topic-meta">
+        <text class="meta-item">共 {{questions.length}} 道题</text>
+        <text class="meta-item">预计 {{info.estimatedDays}} 天</text>
+      </view>
+    </view>
+
+    <view class="q-list">
+      <view
+        class="q-item"
+        wx:for="{{questions}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goQuestion"
+      >
+        <text class="q-index">{{item.index}}</text>
+        <view class="q-body">
+          <text class="q-content">{{item.content}}</text>
+          <text class="q-diff d{{item.difficulty}}">{{item.difficulty === 1 ? '简单' : item.difficulty === 3 ? '困难' : '中等'}}</text>
+        </view>
+        <text class="q-arrow">›</text>
+      </view>
+    </view>
+  </block>
+</view>

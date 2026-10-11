@@ -19,7 +19,7 @@
           active-text-color="#fff"
           class="sidebar-menu"
         >
-          <template v-for="menu in menus" :key="menu.index">
+          <template v-for="menu in visibleMenus" :key="menu.index">
             <!-- 分组菜单 -->
             <el-sub-menu v-if="menu.children" :index="menu.index">
               <template #title>
@@ -201,10 +201,25 @@ const menus = [
 const activeMenu = computed(() => route.path)
 const currentRoute = computed(() => route)
 
+// ===== 按角色权限过滤菜单 =====
+// permissions 为 '*' 或缺失（旧缓存/超管）时显示全部；否则按路由 index 白名单过滤
+const visibleMenus = computed(() => {
+  const perms = userStore.userInfo?.permissions
+  if (!perms || perms === '*') return menus
+  const allow = String(perms).split(',').filter(Boolean)
+  return menus
+    .map((m) => {
+      if (!m.children) return allow.includes(m.index) ? m : null
+      const children = m.children.filter((c) => allow.includes(c.index))
+      return children.length > 0 ? { ...m, children } : null
+    })
+    .filter(Boolean)
+})
+
 // 当前路由所属的一级分组
 const topGroupIndex = computed(() => {
   const top = '/' + (route.path.split('/')[1] || '')
-  return menus.some(m => m.index === top && m.children) ? top : null
+  return visibleMenus.value.some((m) => m.index === top && m.children) ? top : null
 })
 
 // 刷新页面时自动展开当前分组

@@ -23,6 +23,10 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => {
+    // 文件流（CSV 导出等）直接返回完整 response，不做 code 校验
+    if (response.config.responseType === 'blob') {
+      return response
+    }
     console.log('收到响应：', response.config.url, response.data)
     const res = response.data
     if (res.code !== 200) {
