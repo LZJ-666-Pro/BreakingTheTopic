@@ -6,6 +6,14 @@
     </view>
   </view>
 
+  <view class="special-banner" bindtap="goSpecial">
+    <view class="special-banner-left">
+      <text class="special-banner-title">🎯 刷题专题</text>
+      <text class="special-banner-desc">系统学习路线，按专题逐个击破</text>
+    </view>
+    <van-icon name="arrow" size="14px" color="#fff" />
+  </view>
+
   <view class="category-section">
     <view class="tag-container" wx:if="{{!showAllTags}}">
       <scroll-view class="tag-scroll" scroll-x enhanced show-scrollbar="{{false}}">

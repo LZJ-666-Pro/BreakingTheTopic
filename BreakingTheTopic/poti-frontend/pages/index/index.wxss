@@ -240,6 +240,62 @@ page {
   background: #F0F0F0;
 }
 
+.daily-card {
+  margin-top: 16rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #eef3ff, #f3efff);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.daily-left {
+  flex: 1;
+  min-width: 0;
+  margin-right: 20rpx;
+}
+
+.daily-tag {
+  display: inline-block;
+  font-size: 20rpx;
+  color: #2979ff;
+  background: rgba(41, 121, 255, 0.1);
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+  margin-bottom: 10rpx;
+}
+
+.daily-title {
+  display: block;
+  font-size: 28rpx;
+  color: #1a1a1a;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-reason {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 6rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-btn {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  color: #fff;
+  background: #2979ff;
+  padding: 12rpx 28rpx;
+  border-radius: 32rpx;
+}
+
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

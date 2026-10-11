@@ -31,6 +31,33 @@ page {
   box-sizing: border-box;
 }
 
+.special-banner {
+  margin: 16rpx 28rpx 0;
+  padding: 22rpx 28rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #2979ff, #6f6fff);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.special-banner-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.special-banner-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4rpx;
+}
+
+.special-banner-desc {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .search-placeholder {
   margin-left: 16rpx;
   font-size: 28rpx;

@@ -301,6 +301,7 @@ const hiddenCategories = [
 Page({
   data: {
     userInfo: {},
+    dailyQuestion: null,
     todayCount: 0,
     wrongCount: 0,
     favoriteCount: 0,
@@ -337,6 +338,7 @@ Page({
     this.checkUnfinished()
     this.checkTodayCheckIn()
     this.loadUnreadCount()
+    this.loadDailyQuestion()
   },
 
   loadUnreadCount() {
@@ -595,6 +597,31 @@ Page({
     wx.navigateTo({
       url: '/pages/wrongbook/wrongbook'
     })
+  },
+
+  loadDailyQuestion() {
+    const app = getApp()
+    const token = app.globalData.token
+    wx.request({
+      url: `${app.globalData.questionUrl}/question/daily/today`,
+      method: 'GET',
+      header: token ? { Authorization: `Bearer ${token}` } : {},
+      success: (res) => {
+        const d = (res.data && res.data.data) || null
+        if (d && d.questionId) {
+          this.setData({ dailyQuestion: d })
+        } else {
+          this.setData({ dailyQuestion: null })
+        }
+      }
+    })
+  },
+
+  goDailyQuestion() {
+    const qid = this.data.dailyQuestion && this.data.dailyQuestion.questionId
+    if (qid) {
+      wx.navigateTo({ url: `/pages/question-detail/question-detail?id=${qid}` })
+    }
   },
 
   goToFavorite() {

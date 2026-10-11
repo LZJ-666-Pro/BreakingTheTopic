@@ -474,6 +474,12 @@ Page({
     })
   },
 
+  goSpecial() {
+    wx.navigateTo({
+      url: '/pages/special/special'
+    })
+  },
+
   goToCategory(e) {
     const type = e.currentTarget.dataset.type
     const category = this.data.categories.find(function(c) {

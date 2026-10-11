@@ -55,6 +55,15 @@
       </view>
     </view>
 
+    <view class="daily-card" wx:if="{{dailyQuestion}}" bindtap="goDailyQuestion">
+      <view class="daily-left">
+        <view class="daily-tag">每日一题 · {{dailyQuestion.date}}</view>
+        <text class="daily-title">{{dailyQuestion.content || '今日题目暂未配置'}}</text>
+        <text class="daily-reason" wx:if="{{dailyQuestion.reason}}">{{dailyQuestion.reason}}</text>
+      </view>
+      <view class="daily-btn">去答题</view>
+    </view>
+
     <view class="quick-grid">
       <view class="quick-item" bindtap="goToWrongbook">
         <van-icon name="warning-o" size="22px" color="#FA5151" />
