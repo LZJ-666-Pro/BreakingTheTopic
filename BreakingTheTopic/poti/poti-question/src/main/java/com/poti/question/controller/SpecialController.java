@@ -86,7 +86,8 @@ public class SpecialController {
                 Map<String, Object> item = new LinkedHashMap<>();
                 item.put("id", q.getId());
                 item.put("index", index++);
-                item.put("content", q.getContent());
+                // 题干优先取 title（题库题目题干存于 title 字段），旧数据回退 content
+                item.put("content", q.getTitle() != null && !q.getTitle().isEmpty() ? q.getTitle() : q.getContent());
                 item.put("difficulty", q.getDifficulty());
                 questions.add(item);
             }
@@ -152,7 +153,8 @@ public class SpecialController {
             data.put("hint", daily.getHint());
             Question q = questionMapper.selectById(daily.getQuestionId());
             if (q != null && (q.getDeleted() == null || q.getDeleted() == 0)) {
-                data.put("content", q.getContent());
+                // 题干优先取 title，旧数据回退 content
+                data.put("content", q.getTitle() != null && !q.getTitle().isEmpty() ? q.getTitle() : q.getContent());
                 data.put("difficulty", q.getDifficulty());
             }
         }

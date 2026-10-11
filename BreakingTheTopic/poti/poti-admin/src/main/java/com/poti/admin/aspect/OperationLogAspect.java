@@ -5,6 +5,7 @@ import com.poti.admin.entity.Admin;
 import com.poti.admin.entity.OperationLog;
 import com.poti.admin.mapper.AdminMapper;
 import com.poti.admin.mapper.OperationLogMapper;
+import com.poti.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,6 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 操作日志切面：自动拦截 admin 后台所有写操作（POST/PUT/DELETE），
@@ -41,21 +43,23 @@ public class OperationLogAspect {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
         Throwable error = null;
+        Object result = null;
         try {
-            return joinPoint.proceed();
+            result = joinPoint.proceed();
+            return result;
         } catch (Throwable t) {
             error = t;
             throw t;
         } finally {
             try {
-                saveLog(joinPoint, System.currentTimeMillis() - start, error);
+                saveLog(joinPoint, System.currentTimeMillis() - start, error, result);
             } catch (Exception e) {
                 log.warn("操作日志记录失败: {}", e.getMessage());
             }
         }
     }
 
-    private void saveLog(ProceedingJoinPoint joinPoint, long costMs, Throwable error) {
+    private void saveLog(ProceedingJoinPoint joinPoint, long costMs, Throwable error, Object result) {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attrs == null) {
             return;
@@ -89,6 +93,34 @@ public class OperationLogAspect {
         } catch (NumberFormatException ignore) {
             // 非数字头，按未知处理
         }
+
+        // 登录/注册接口：请求时尚无令牌（网关不会注入 X-User-Id），从接口返回结果中解析操作人
+        if ((logEntry.getAdminName() == null || logEntry.getAdminName().isEmpty())
+                && (uri.contains("/admin/login") || uri.contains("/admin/register"))
+                && result instanceof R) {
+            try {
+                Object data = ((R<?>) result).getData();
+                if (data instanceof Map) {
+                    Object user = ((Map<?, ?>) data).get("user");
+                    if (user instanceof Map) {
+                        Map<?, ?> u = (Map<?, ?>) user;
+                        Object id = u.get("id");
+                        if (id instanceof Number) {
+                            logEntry.setAdminId(((Number) id).longValue());
+                        }
+                        String nickname = u.get("nickname") == null ? "" : String.valueOf(u.get("nickname"));
+                        String username = u.get("username") == null ? "" : String.valueOf(u.get("username"));
+                        String name = !nickname.isEmpty() ? nickname : username;
+                        if (!name.isEmpty()) {
+                            logEntry.setAdminName(name);
+                        }
+                    }
+                }
+            } catch (Exception ignore) {
+                // 解析失败按未知处理
+            }
+        }
+
         if (logEntry.getAdminName() == null || logEntry.getAdminName().isEmpty()) {
             logEntry.setAdminId(0L);
             logEntry.setAdminName("未知");

@@ -125,7 +125,22 @@ const logoMap = {
   'C++面向对象': 'cpp',
   'C++STL': 'cpp',
   'C++并发编程': 'cpp',
-  'C#': 'csharp'
+  'C#': 'csharp',
+  // 区块链系列（24_blockchain_smart_contract.sql）
+  'Solidity': 'solidity',
+  'Web3 开发': 'web3',
+  '区块链开发': 'blockchain',
+  '智能合约开发': 'contract',
+  // 测试系列（25_test_categories.sql）
+  '测试基础理论': 'test_theory',
+  '自动化测试': 'automation',
+  '接口测试': 'api_test',
+  'Web 测试': 'web_test',
+  '移动端测试': 'mobile_test',
+  '测试工具': 'test_tools',
+  '性能测试': 'performance_test',
+  '安全测试': 'security_test',
+  '测试场景': 'test_scene'
 }
 
 /**
