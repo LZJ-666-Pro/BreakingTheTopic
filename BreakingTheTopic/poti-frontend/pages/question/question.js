@@ -21,6 +21,45 @@ const categoryColors = {
   'Dubbo': '#FF6A00',
   'Netty': '#FF4500',
   '消息队列': '#7B61FF',
+  'Java 集合': '#F9A825',
+  'Java 并发': '#E76F00',
+  'Java 虚拟机': '#D84315',
+  'SpringBoot': '#6DB33F',
+  'SpringCloud': '#36CFC9',
+  'RabbitMQ': '#FF6600',
+  'Kafka': '#E25A1C',
+  'Elasticsearch': '#00BFB3',
+  'AI Agent': '#7B61FF',
+  '前端 HTML': '#E34F26',
+  '前端 CSS': '#1572B6',
+  'ES6': '#F7DF1E',
+  '前端手写题': '#42B883',
+  '前端工程化': '#0288D1',
+  '前端性能优化': '#FF6F61',
+  '后端场景题': '#795548',
+  '前端场景题': '#795548',
+  '智力题': '#FF9800',
+  '大厂面经': '#607D8B',
+  'DevOps': '#009688',
+  '双指针': '#42A5F5',
+  '滑动窗口': '#26A69A',
+  '二分法': '#7E57C2',
+  '排序': '#FFA726',
+  '链表': '#EC407A',
+  '栈': '#8D6E63',
+  '树': '#66BB6A',
+  '图': '#5C6BC0',
+  '回溯': '#EF5350',
+  '贪心': '#FFCA28',
+  '动态规划': '#29B6F6',
+  '前缀和': '#26C6DA',
+  '差分': '#9CCC65',
+  '位运算': '#78909C',
+  'Trie': '#D4E157',
+  '并查集': '#FF7043',
+  '字符串': '#AB47BC',
+  '数学': '#42B883',
+  '大厂算法真题': '#FFD54F',
   'Nginx': '#009639',
   'Zookeeper': '#FF6B35',
   '微服务': '#1890FF',
@@ -64,6 +103,7 @@ const categoryColors = {
   'Unity游戏开发': '#222C37',
   '游戏引擎原理': '#FF6B6B',
   '云原生': '#009688',
+  'C++': '#00599C',
   'C++基础': '#00599C',
   'C++进阶': '#0077B5',
   'C++新特性': '#00B4D8',
@@ -93,155 +133,34 @@ const categoryColors = {
   'C#框架': '#4A235A',
   'C#底层原理': '#3D1F5C',
   'C#WPF': '#6B3FA0',
-  'C#.NET': '#512BD4'
-}
-
-const tagNames = {
-  all: '全部题库',
-  hot: '热门题库',
-  backend: '后端',
-  frontend: '前端',
-  ai: '人工智能',
-  bigdata: '大数据',
-  test: '测试',
-  basic: '基础学科',
-  interview: '面试',
-  mobile: '移动开发',
-  game: '游戏开发',
-  ops: '运维',
-  security: '安全',
-  blockchain: '区块链',
-  java: 'Java',
-  cpp: 'C/C++',
-  go: 'Go',
-  python: 'Python',
-  csharp: 'C#.NET',
-  php: 'PHP'
-}
-
-const tagList = [
-  { key: 'all', name: '全部' },
-  { key: 'hot', name: '热门' },
-  { key: 'backend', name: '后端' },
-  { key: 'frontend', name: '前端' },
-  { key: 'ai', name: '人工智能' },
-  { key: 'bigdata', name: '大数据' },
-  { key: 'test', name: '测试' },
-  { key: 'basic', name: '基础学科' },
-  { key: 'interview', name: '面试' },
-  { key: 'mobile', name: '移动开发' },
-  { key: 'game', name: '游戏开发' },
-  { key: 'ops', name: '运维' },
-  { key: 'security', name: '安全' },
-  { key: 'blockchain', name: '区块链' },
-  { key: 'java', name: 'Java' },
-  { key: 'cpp', name: 'C/C++' },
-  { key: 'go', name: 'Go' },
-  { key: 'python', name: 'Python' },
-  { key: 'csharp', name: 'C#.NET' },
-  { key: 'php', name: 'PHP' }
-]
-
-const categoryTags = {
-  'Java': ['hot', 'backend', 'interview', 'java'],
-  'Python': ['hot', 'backend', 'ai', 'python'],
-  'C/C++': ['backend', 'interview', 'game', 'cpp'],
-  'Go': ['hot', 'backend', 'interview', 'blockchain', 'go'],
-  'JavaScript': ['hot', 'frontend', 'backend'],
-  'PHP': ['backend', 'php'],
-  'MySQL': ['hot', 'backend', 'interview'],
-  'Redis': ['hot', 'backend', 'interview'],
-  'MongoDB': ['backend'],
-  'PostgreSQL': ['backend'],
-  'Spring': ['hot', 'backend', 'interview', 'java'],
-  'MyBatis': ['backend', 'interview', 'java'],
-  'Dubbo': ['backend', 'java'],
-  'Netty': ['backend', 'java'],
-  '消息队列': ['backend', 'interview'],
-  'Nginx': ['backend', 'interview', 'ops'],
-  'Zookeeper': ['backend', 'ops'],
-  '微服务': ['backend', 'interview'],
-  'Docker': ['backend', 'ops'],
-  'Kubernetes': ['backend', 'ops'],
-  'Vue': ['hot', 'frontend', 'interview'],
-  'React': ['hot', 'frontend', 'interview', 'mobile'],
-  'Node.js': ['frontend', 'backend'],
-  'TypeScript': ['frontend'],
-  '数据结构': ['hot', 'backend', 'basic', 'interview', 'game'],
-  '操作系统': ['backend', 'basic', 'interview', 'ops'],
-  '计算机网络': ['backend', 'basic', 'interview'],
-  '计算机组成': ['backend', 'basic'],
-  '编译原理': ['backend', 'basic'],
-  '机器学习': ['ai', 'python'],
-  '深度学习': ['ai', 'python'],
-  'NLP': ['ai', 'python'],
-  '计算机视觉': ['ai', 'python'],
-  'Hadoop': ['bigdata'],
-  'Spark': ['bigdata'],
-  'Flink': ['bigdata'],
-  '数据仓库': ['bigdata'],
-  'Web安全': ['backend', 'interview', 'security'],
-  '密码学': ['backend', 'security', 'blockchain'],
-  '网络安全': ['security'],
-  '渗透测试': ['security'],
-  '软件测试': ['test'],
-  'Linux': ['backend', 'interview', 'ops'],
-  'Git': ['backend'],
-  '高等数学': ['basic'],
-  '线性代数': ['basic'],
-  '概率论': ['basic'],
-  '离散数学': ['basic'],
-  '算法面试': ['hot', 'interview'],
-  '系统设计': ['hot', 'backend', 'interview'],
-  'HR面试': ['interview'],
-  '行为面试': ['interview'],
-  '区块链开发': ['blockchain'],
-  'Web3开发': ['blockchain'],
-  'Solidity': ['blockchain'],
-  '以太坊': ['blockchain'],
-  'Android开发': ['mobile'],
-  'iOS开发': ['mobile'],
-  'Flutter': ['mobile', 'frontend'],
-  'React Native': ['mobile', 'frontend'],
-  'Unity游戏开发': ['game'],
-  '游戏引擎原理': ['game'],
-  '云原生': ['backend', 'ops'],
-  'C++基础': ['backend', 'cpp', 'hidden'],
-  'C++进阶': ['backend', 'cpp', 'hidden'],
-  'C++新特性': ['backend', 'cpp', 'hidden'],
-  'C++面向对象': ['backend', 'cpp', 'hidden'],
-  'C++STL': ['backend', 'cpp', 'hidden'],
-  'C++并发编程': ['backend', 'cpp', 'hidden'],
-  'Go基础': ['backend', 'go', 'hidden'],
-  'Go标准库': ['backend', 'go', 'hidden'],
-  'Go面向对象': ['backend', 'go', 'hidden'],
-  'Go底层原理': ['backend', 'go', 'hidden'],
-  'Go性能优化': ['backend', 'go', 'hidden'],
-  'Go并发编程': ['backend', 'go', 'hidden'],
-  'Go垃圾回收': ['backend', 'go', 'hidden'],
-  'Go代码分析': ['backend', 'go', 'hidden'],
-  'PHP基础': ['backend', 'php', 'hidden'],
-  'PHP面向对象': ['backend', 'php', 'hidden'],
-  'PHP框架': ['backend', 'php', 'hidden'],
-  'PHP应用场景': ['backend', 'php', 'hidden'],
-  'Python代码分析': ['backend', 'ai', 'python', 'hidden'],
-  'Python手写代码': ['backend', 'ai', 'python', 'hidden'],
-  '最全AI大模型库': ['ai', 'python', 'hidden'],
-  'C#': ['backend', 'csharp', 'hidden'],
-  'C#基础': ['backend', 'csharp', 'hidden'],
-  'C#集合': ['backend', 'csharp', 'hidden'],
-  'C#面向对象': ['backend', 'csharp', 'hidden'],
-  'C#并发库': ['backend', 'csharp', 'hidden'],
-  'C#框架': ['backend', 'csharp', 'hidden'],
-  'C#底层原理': ['backend', 'csharp', 'hidden'],
-  'C#WPF': ['backend', 'csharp', 'hidden'],
-  'C#.NET': ['backend', 'csharp', 'hidden']
+  'C#.NET': '#512BD4',
+  'Android 基础': '#3DDC84',
+  'Android 进阶': '#38B26D',
+  'Android UI': '#34A853',
+  'Android 库': '#2E9E5B',
+  'Android 性能优化': '#43CC71',
+  'Android 原理': '#27994F',
+  'Android 数据存储': '#35B568',
+  'Android 网络通信': '#2FA85C',
+  'Swift': '#F05138',
+  'Kotlin': '#7F52FF',
+  'Flutter': '#02569B',
+  'Dart': '#0175C2',
+  'React Native': '#61DAFB',
+  'H5 网站开发': '#E34F26',
+  '鸿蒙开发': '#0A59F7',
+  'Git 基础': '#F05032',
+  'Git 进阶': '#E04425',
+  'Git 操作': '#D63A1E',
+  'Git 概念': '#C73518',
+  'Git 协作应用': '#B83012'
 }
 
 Page({
   data: {
-    tagList: tagList,
-    displayTagList: tagList.slice(0, 5),
+    tagList: [{ key: 'all', name: '全部' }],
+    tagNameMap: { all: '全部题库' },
+    displayTagList: [{ key: 'all', name: '全部' }],
     activeTag: 'all',
     activeTagName: '全部题库',
     showAllTags: false,
@@ -267,32 +186,46 @@ Page({
     const app = getApp()
     const that = this
     wx.request({
-      url: `${app.globalData.questionUrl}/question/categories`,
+      url: `${app.globalData.questionUrl}/question/category/groups`,
       method: 'GET',
       header: {
         'Authorization': `Bearer ${app.globalData.token}`
       },
       success: function(res) {
-        console.log('分类接口响应:', res.data)
-        if (res.data.code === 200 && res.data.data) {
-          const serverCategories = res.data.data
-          console.log('原始数据:', serverCategories.slice(0, 3))
-          
-          const categories = serverCategories.map(function(cat) {
-            return {
-              type: cat.icon || cat.name.toLowerCase(),
-              name: cat.name,
-              icon: getCategoryIcon(cat.name),
-              bgColor: categoryColors[cat.name] || '#999999',
-              questionCount: cat.questionCount || 0,
-              id: cat.id,
-              tags: categoryTags[cat.name] || []
-            }
-          })
-          
-          console.log('处理后数据:', categories.slice(0, 3))
-          
-          that.setData({ 
+        const payload = res.data && res.data.data
+        if (res.data.code === 200 && payload) {
+          // 分组标签：全部固定在最前，hidden 为内部标记不在顶部展示
+          const tagNameMap = { all: '全部题库' }
+          const tagList = [{ key: 'all', name: '全部' }]
+          const groups = payload.groups || []
+          for (let i = 0; i < groups.length; i++) {
+            const g = groups[i]
+            if (g.key === 'hidden') continue
+            tagNameMap[g.key] = g.name
+            tagList.push({ key: g.key, name: g.name })
+          }
+
+          // 分类：挂 hidden 标签的不在宫格展示
+          const categories = (payload.categories || [])
+            .filter(function(cat) {
+              return !(cat.groupKeys || []).some(function(k) { return k === 'hidden' })
+            })
+            .map(function(cat) {
+              return {
+                type: cat.icon || cat.name.toLowerCase(),
+                name: cat.name,
+                icon: getCategoryIcon(cat),
+                bgColor: categoryColors[cat.name] || '#999999',
+                questionCount: cat.questionCount || 0,
+                id: cat.id,
+                tags: cat.groupKeys || []
+              }
+            })
+
+          that.setData({
+            tagList: tagList,
+            tagNameMap: tagNameMap,
+            displayTagList: tagList.slice(0, 5),
             categories: categories,
             filteredCategories: categories
           })
@@ -342,34 +275,20 @@ Page({
 
   selectTag(e) {
     const tag = e.currentTarget.dataset.tag
-    const { categories } = this.data
+    const { categories, tagNameMap } = this.data
     let filtered = []
-    
+
     if (tag === 'all') {
-      filtered = categories.filter(function(c) {
-        return !c.tags || c.tags.indexOf('hidden') < 0
-      })
-    } else if (tag === 'hot') {
-      filtered = categories.filter(function(c) {
-        return c.tags && c.tags.indexOf('hot') >= 0 && c.tags.indexOf('hidden') < 0
-      })
-    } else if (tag === 'cpp' || tag === 'go' || tag === 'php' || tag === 'python' || tag === 'csharp') {
+      filtered = categories
+    } else {
       filtered = categories.filter(function(c) {
         return c.tags && c.tags.indexOf(tag) >= 0
       })
-    } else if (tagNames[tag]) {
-      filtered = categories.filter(function(c) {
-        return c.tags && c.tags.indexOf(tag) >= 0 && c.tags.indexOf('hidden') < 0
-      })
-    } else {
-      filtered = categories.filter(function(c) {
-        return c.type === tag
-      })
     }
-    
+
     this.setData({
       activeTag: tag,
-      activeTagName: tagNames[tag] || tag,
+      activeTagName: tagNameMap[tag] || tag,
       filteredCategories: filtered
     })
   },

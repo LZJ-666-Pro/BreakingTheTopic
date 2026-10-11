@@ -6,11 +6,77 @@ const logoMap = {
   'Redis': 'redis',
   'Spring': 'spring',
   'MQ': 'mq',
+  '消息队列': 'mq',
+  'Java 集合': 'java',
+  'Java 并发': 'java',
+  'Java 虚拟机': 'java',
+  'SpringBoot': 'spring',
+  'SpringCloud': 'spring',
+  'RabbitMQ': 'rabbitmq',
+  'Kafka': 'kafka',
+  'Elasticsearch': 'elasticsearch',
+  'AI Agent': 'ai_agent',
+  '前端 HTML': 'html',
+  '前端 CSS': 'css',
+  'ES6': 'javascript',
+  '前端手写题': 'handwritten',
+  '前端工程化': 'webpack',
+  '前端性能优化': 'performance',
+  '后端场景题': 'scene',
+  '前端场景题': 'scene',
+  '智力题': 'puzzle',
+  '大厂面经': 'company',
+  'DevOps': 'devops',
+  'Android 基础': 'android',
+  'Android 进阶': 'android',
+  'Android UI': 'android',
+  'Android 库': 'android',
+  'Android 性能优化': 'android',
+  'Android 原理': 'android',
+  'Android 数据存储': 'android',
+  'Android 网络通信': 'android',
+  'Swift': 'swift',
+  'Kotlin': 'kotlin',
+  'Flutter': 'flutter',
+  'Dart': 'dart',
+  'React Native': 'reactnative',
+  'H5 网站开发': 'h5',
+  '鸿蒙开发': 'harmonyos',
+  'Git 基础': 'git',
+  'Git 进阶': 'git',
+  'Git 操作': 'git',
+  'Git 概念': 'git',
+  'Git 协作应用': 'git',
   '算法': 'algorithm',
+  '双指针': 'twopointers',
+  '滑动窗口': 'slidingwindow',
+  '二分法': 'binarysearch',
+  '排序': 'sort',
+  '链表': 'linkedlist',
+  '栈': 'stack',
+  '树': 'tree',
+  '图': 'graph',
+  '回溯': 'backtrack',
+  '贪心': 'greedy',
+  '动态规划': 'dp',
+  '前缀和': 'prefixsum',
+  '差分': 'delta',
+  '位运算': 'bitwise',
+  'Trie': 'trie',
+  '并查集': 'unionfind',
+  '字符串': 'string',
+  '数学': 'math',
+  '大厂算法真题': 'trophy',
   '计算机网络': 'network',
   '操作系统': 'os',
   '设计模式': 'design_pattern',
   'Go': 'go',
+  'Go基础': 'go',
+  'Go标准库': 'go',
+  'Go面向对象': 'go',
+  'Go底层原理': 'go',
+  'Go性能优化': 'go',
+  'Go并发编程': 'go',
   'JavaScript': 'javascript',
   'PHP': 'php',
   '数据结构': 'data_structure',
@@ -50,11 +116,29 @@ const logoMap = {
   '算法面试': 'interview_algorithm',
   '系统设计': 'system_design',
   'HR面试': 'hr_interview',
-  '行为面试': 'behavior_interview'
+  '行为面试': 'behavior_interview',
+  // 补齐分类（17_category_backfill.sql 新增）
+  'C++': 'cpp',
+  'C++基础': 'cpp',
+  'C++进阶': 'cpp',
+  'C++新特性': 'cpp',
+  'C++面向对象': 'cpp',
+  'C++STL': 'cpp',
+  'C++并发编程': 'cpp',
+  'C#': 'csharp'
 }
 
-function getCategoryIcon(name) {
-  const slug = logoMap[name]
+/**
+ * 获取分类图标地址。
+ * @param {string|object} source 分类名称，或含 name/iconUrl 的分类对象
+ * 分类配置了 iconUrl 时优先使用远程图标，否则用本地 logo 映射
+ */
+function getCategoryIcon(source) {
+  if (source && typeof source === 'object') {
+    if (source.iconUrl) return source.iconUrl
+    source = source.name
+  }
+  const slug = logoMap[source]
   return `/images/questionLogo/${slug || 'default'}.png`
 }
 

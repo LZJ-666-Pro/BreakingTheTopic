@@ -90,7 +90,7 @@ import { onMounted, ref, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../utils/api'
 
-const modules = ['题目管理', '分类管理', '标签管理', '题库专题', '每日一题', '题解审核', '文章管理', '公告管理', '角色管理', '管理员账号', '用户管理', '反馈与举报', '系统配置', '登录注册', '其他']
+const modules = ['题目管理', '题库设置', '标签管理', '题库专题', '每日一题', '题解审核', '文章管理', '公告管理', '角色管理', '管理员账号', '用户管理', '反馈与举报', '系统配置', '登录注册', '其他']
 
 const loading = ref(false)
 const logs = ref([])

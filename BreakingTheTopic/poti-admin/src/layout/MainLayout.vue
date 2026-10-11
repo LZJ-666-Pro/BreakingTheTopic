@@ -159,7 +159,7 @@ const menus = [
     children: [
       { index: '/question/list', title: '题目列表' },
       { index: '/question/add', title: '新增题目' },
-      { index: '/question/category', title: '分类管理' },
+      { index: '/question/category', title: '题库设置' },
       { index: '/question/tag', title: '标签管理' }
     ]
   },

@@ -100,7 +100,7 @@ public class OperationLogAspect {
     /** URI 前缀 → 中文模块名 */
     private String resolveModule(String uri) {
         if (uri.contains("/admin/question")) return "题目管理";
-        if (uri.contains("/admin/category")) return "分类管理";
+        if (uri.contains("/admin/category")) return "题库设置";
         if (uri.contains("/admin/tag")) return "标签管理";
         if (uri.contains("/admin/special")) return "题库专题";
         if (uri.contains("/admin/daily")) return "每日一题";

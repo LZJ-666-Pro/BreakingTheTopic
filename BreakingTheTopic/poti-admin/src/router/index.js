@@ -67,7 +67,7 @@ const routes = [
             path: 'category',
             name: 'Category',
             component: () => import('../views/Category.vue'),
-            meta: { title: '分类管理', icon: 'Folder' }
+            meta: { title: '题库设置', icon: 'Folder' }
           },
           {
             path: 'tag',

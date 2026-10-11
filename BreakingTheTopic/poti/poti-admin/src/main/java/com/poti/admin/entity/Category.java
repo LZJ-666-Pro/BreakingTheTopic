@@ -20,6 +20,12 @@ public class Category {
 
     private String icon;
 
+    /** 图标URL（小程序优先使用，为空时用本地映射） */
+    private String iconUrl;
+
+    /** 分类描述 */
+    private String description;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
