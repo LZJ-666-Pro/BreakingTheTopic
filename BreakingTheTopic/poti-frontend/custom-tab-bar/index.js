@@ -6,32 +6,32 @@ Component({
     list: [
       {
         pagePath: "/pages/index/index",
-        iconPath: "/images/1.png",
-        selectedIconPath: "/images/1-active.png",
+        iconPath: "/images/tabItem/home.png",
+        selectedIconPath: "/images/tabItem/home-active.png",
         text: "首页"
       },
       {
         pagePath: "/pages/question/question",
-        iconPath: "/images/2.png",
-        selectedIconPath: "/images/2-active.png",
+        iconPath: "/images/tabItem/book.png",
+        selectedIconPath: "/images/tabItem/book-active.png",
         text: "题库"
       },
       {
         pagePath: "/pages/practice/practice",
-        iconPath: "/images/3.png",
-        selectedIconPath: "/images/3-active.png",
+        iconPath: "/images/tabItem/pencil.png",
+        selectedIconPath: "/images/tabItem/pencil-active.png",
         text: "练习"
       },
       {
         pagePath: "/pages/statistics/statistics",
-        iconPath: "/images/4.png",
-        selectedIconPath: "/images/4-active.png",
+        iconPath: "/images/tabItem/chart.png",
+        selectedIconPath: "/images/tabItem/chart-active.png",
         text: "统计"
       },
       {
         pagePath: "/pages/user/user",
-        iconPath: "/images/5.png",
-        selectedIconPath: "/images/5-active.png",
+        iconPath: "/images/tabItem/user.png",
+        selectedIconPath: "/images/tabItem/user-active.png",
         text: "我的"
       }
     ]
