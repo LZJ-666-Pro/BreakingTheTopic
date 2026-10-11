@@ -4,7 +4,8 @@ server:
 spring:
   elasticsearch:
     rest:
-      uris: http://localhost:9201
+      # 用 127.0.0.1 而非 localhost：WSL2 端口转发仅监听 IPv4，localhost 优先解析 IPv6 会超时
+      uris: http://127.0.0.1:9201
 
 logging:
   level:

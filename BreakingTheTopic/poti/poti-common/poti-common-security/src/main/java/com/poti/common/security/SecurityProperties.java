@@ -39,6 +39,8 @@ public class SecurityProperties {
             // ===== 题目浏览公开接口 =====
             "/question/categories", "/question/list", "/question/random/**", "/question/search",
             "/question/detail/**", "/question/view/**", "/question/category/list", "/question/internal/**",
+            // 刷题专题与每日一题（公开浏览）
+            "/question/special/**", "/question/daily/**",
 
             // ===== 内部聚合接口（服务间 Feign 调用） =====
             "/practice/internal/**",
@@ -47,6 +49,8 @@ public class SecurityProperties {
 
             // ===== 搜索公开接口 =====
             "/search/question", "/search/questions", "/search/hot",
+            // 题目索引同步（服务间 Feign 及运维触发，ES 数据写入入口）
+            "/search/sync/**", "/question/sync-to-es",
 
             // ===== 管理后台登录 =====
             "/admin/login", "/admin/register", "/admin/captcha",

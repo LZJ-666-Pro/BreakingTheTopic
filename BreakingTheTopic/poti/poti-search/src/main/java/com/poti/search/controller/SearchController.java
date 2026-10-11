@@ -35,7 +35,8 @@ public class SearchController {
 
     @GetMapping("/question")
     public R<Map<String, Object>> searchQuestion(@RequestParam(required = false) String keyword,
-                                                  @RequestParam(required = false) String type,
+                                                  @RequestParam(required = false) Long categoryId,
+                                                  @RequestParam(required = false) Integer difficulty,
                                                   @RequestParam(defaultValue = "1") Integer pageNum,
                                                   @RequestParam(defaultValue = "20") Integer pageSize,
                                                   @RequestHeader(value = "X-User-Id", required = false) Long userId) {
@@ -46,17 +47,17 @@ public class SearchController {
                 }
                 searchCacheService.incrementHotSearch(keyword);
             }
-            
+
             if (esEnabled && questionRepository != null) {
-                return searchWithElasticsearch(keyword, type, pageNum, pageSize);
+                return searchWithElasticsearch(keyword, categoryId, pageNum, pageSize);
             }
-            
-            R<Map<String, Object>> dbResult = questionClient.searchQuestions(keyword, null, pageNum, pageSize);
-            
+
+            R<Map<String, Object>> dbResult = questionClient.searchQuestions(keyword, categoryId, difficulty, pageNum, pageSize);
+
             if (dbResult != null && dbResult.getData() != null) {
                 return R.success(dbResult.getData());
             }
-            
+
             return R.success(getEmptyResult());
         } catch (Exception e) {
             log.error("搜索题目失败", e);
@@ -64,14 +65,14 @@ public class SearchController {
         }
     }
 
-    private R<Map<String, Object>> searchWithElasticsearch(String keyword, String type, Integer pageNum, Integer pageSize) {
+    private R<Map<String, Object>> searchWithElasticsearch(String keyword, Long categoryId, Integer pageNum, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
         Page<QuestionDocument> page;
-        
+
         if (keyword == null || keyword.trim().isEmpty()) {
             page = questionRepository.findAll(pageable);
-        } else if (type != null && !type.isEmpty()) {
-            page = questionRepository.searchByKeywordAndType(keyword, type, pageable);
+        } else if (categoryId != null) {
+            page = questionRepository.searchByKeywordAndCategoryId(keyword, categoryId, pageable);
         } else {
             page = questionRepository.searchByKeyword(keyword, pageable);
         }
@@ -118,11 +119,12 @@ public class SearchController {
 
     @GetMapping("/questions")
     public R<Map<String, Object>> searchQuestions(@RequestParam(required = false) String keyword,
-                                                   @RequestParam(required = false) String type,
+                                                   @RequestParam(required = false) Long categoryId,
+                                                   @RequestParam(required = false) Integer difficulty,
                                                    @RequestParam(defaultValue = "1") Integer pageNum,
                                                    @RequestParam(defaultValue = "20") Integer pageSize,
                                                    @RequestHeader(value = "X-User-Id", required = false) Long userId) {
-        return searchQuestion(keyword, type, pageNum, pageSize, userId);
+        return searchQuestion(keyword, categoryId, difficulty, pageNum, pageSize, userId);
     }
 
     @GetMapping("/history")

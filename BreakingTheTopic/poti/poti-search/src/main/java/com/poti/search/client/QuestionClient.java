@@ -14,6 +14,7 @@ public interface QuestionClient {
     R<Map<String, Object>> searchQuestions(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "difficulty", required = false) Integer difficulty,
             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize
     );

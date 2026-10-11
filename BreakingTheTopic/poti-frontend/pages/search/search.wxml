@@ -76,7 +76,7 @@
           <view class="result-title">{{item.title}}</view>
           <view class="result-content" wx:if="{{item.content}}">{{item.content}}</view>
           <view class="result-meta">
-            <view class="result-type {{item.type}}">{{item.typeName || item.type}}</view>
+            <view class="result-type" wx:if="{{item.categoryName}}">{{item.categoryName}}</view>
             <view class="result-difficulty difficulty-{{item.difficulty}}">{{item.difficultyName || '中等'}}</view>
             <view class="result-time" wx:if="{{item.createTime}}">{{item.createTime}}</view>
           </view>
@@ -152,28 +152,12 @@
   <van-action-sheet show="{{showFilterSheet}}" bind:close="closeFilter" title="筛选条件">
     <view class="filter-sheet">
       <view class="filter-group">
-        <view class="filter-group-title">题目类型</view>
+        <view class="filter-group-title">题目分类</view>
         <view class="filter-options">
-          <view class="filter-option {{currentType === '' ? 'active' : ''}}" bindtap="selectType" data-type="">全部</view>
-          <view class="filter-option {{currentType === 'java' ? 'active' : ''}}" bindtap="selectType" data-type="java">Java</view>
-          <view class="filter-option {{currentType === 'python' ? 'active' : ''}}" bindtap="selectType" data-type="python">Python</view>
-          <view class="filter-option {{currentType === 'cpp' ? 'active' : ''}}" bindtap="selectType" data-type="cpp">C/C++</view>
-          <view class="filter-option {{currentType === 'go' ? 'active' : ''}}" bindtap="selectType" data-type="go">Go</view>
-          <view class="filter-option {{currentType === 'js' ? 'active' : ''}}" bindtap="selectType" data-type="js">JavaScript</view>
-          <view class="filter-option {{currentType === 'mysql' ? 'active' : ''}}" bindtap="selectType" data-type="mysql">MySQL</view>
-          <view class="filter-option {{currentType === 'redis' ? 'active' : ''}}" bindtap="selectType" data-type="redis">Redis</view>
-          <view class="filter-option {{currentType === 'spring' ? 'active' : ''}}" bindtap="selectType" data-type="spring">Spring</view>
-          <view class="filter-option {{currentType === 'mq' ? 'active' : ''}}" bindtap="selectType" data-type="mq">消息队列</view>
-          <view class="filter-option {{currentType === 'ds' ? 'active' : ''}}" bindtap="selectType" data-type="ds">数据结构</view>
-          <view class="filter-option {{currentType === 'os' ? 'active' : ''}}" bindtap="selectType" data-type="os">操作系统</view>
-          <view class="filter-option {{currentType === 'network' ? 'active' : ''}}" bindtap="selectType" data-type="network">计算机网络</view>
-          <view class="filter-option {{currentType === 'docker' ? 'active' : ''}}" bindtap="selectType" data-type="docker">Docker</view>
-          <view class="filter-option {{currentType === 'vue' ? 'active' : ''}}" bindtap="selectType" data-type="vue">Vue</view>
-          <view class="filter-option {{currentType === 'react' ? 'active' : ''}}" bindtap="selectType" data-type="react">React</view>
-          <view class="filter-option {{currentType === 'ml' ? 'active' : ''}}" bindtap="selectType" data-type="ml">机器学习</view>
-          <view class="filter-option {{currentType === 'linux' ? 'active' : ''}}" bindtap="selectType" data-type="linux">Linux</view>
-          <view class="filter-option {{currentType === 'algo' ? 'active' : ''}}" bindtap="selectType" data-type="algo">算法面试</view>
-          <view class="filter-option {{currentType === 'hr' ? 'active' : ''}}" bindtap="selectType" data-type="hr">HR面试</view>
+          <view class="filter-option {{currentCategoryId === '' ? 'active' : ''}}" bindtap="selectCategory" data-id="">全部</view>
+          <view wx:for="{{categoryList}}" wx:key="id"
+                class="filter-option {{currentCategoryId === item.id ? 'active' : ''}}"
+                bindtap="selectCategory" data-id="{{item.id}}">{{item.name}}</view>
         </view>
       </view>
       

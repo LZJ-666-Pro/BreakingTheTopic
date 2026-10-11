@@ -1,5 +1,6 @@
 package com.poti.question.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poti.question.client.SearchClient;
@@ -73,8 +74,21 @@ public class SearchSyncService {
             return;
         }
         try {
-            List<Question> questions = questionMapper.selectList(null);
-            syncQuestions(questions);
+            // 只同步未删除且已上架的题，避免脏数据进入 ES
+            LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Question::getDeleted, 0).eq(Question::getStatus, 1);
+            List<Question> questions = questionMapper.selectList(wrapper);
+            // 分批同步，避免一次性提交过大 payload 导致 Feign 超时
+            int batchSize = 500;
+            for (int i = 0; i < questions.size(); i += batchSize) {
+                List<Question> batch = questions.subList(i, Math.min(i + batchSize, questions.size()));
+                List<QuestionDocumentDTO> dtos = new ArrayList<>();
+                for (Question q : batch) {
+                    dtos.add(convertToDTO(q));
+                }
+                searchClient.syncQuestions(dtos);
+                log.info("批量同步题目到ES: {} 条（进度 {}/{})", batch.size(), Math.min(i + batchSize, questions.size()), questions.size());
+            }
             log.info("全量同步题目到ES完成: {} 条", questions.size());
         } catch (Exception e) {
             log.error("全量同步题目到ES失败", e);

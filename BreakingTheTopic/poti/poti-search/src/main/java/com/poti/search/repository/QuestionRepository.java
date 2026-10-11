@@ -13,9 +13,6 @@ public interface QuestionRepository extends ElasticsearchRepository<QuestionDocu
     @Query("{\"bool\": {\"should\": [{\"match\": {\"title\": \"?0\"}}, {\"match\": {\"content\": \"?0\"}}, {\"match\": {\"analysis\": \"?0\"}}, {\"match\": {\"tags\": \"?0\"}}]}}")
     Page<QuestionDocument> searchByKeyword(String keyword, Pageable pageable);
 
-    @Query("{\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"match\": {\"title\": \"?0\"}}, {\"match\": {\"content\": \"?0\"}}, {\"match\": {\"analysis\": \"?0\"}}, {\"match\": {\"tags\": \"?0\"}}]}}, {\"term\": {\"type\": \"?1\"}}]}}")
-    Page<QuestionDocument> searchByKeywordAndType(String keyword, String type, Pageable pageable);
-
     @Query("{\"bool\": {\"must\": [{\"bool\": {\"should\": [{\"match\": {\"title\": \"?0\"}}, {\"match\": {\"content\": \"?0\"}}, {\"match\": {\"analysis\": \"?0\"}}, {\"match\": {\"tags\": \"?0\"}}]}}, {\"term\": {\"categoryId\": \"?1\"}}]}}")
     Page<QuestionDocument> searchByKeywordAndCategoryId(String keyword, Long categoryId, Pageable pageable);
 

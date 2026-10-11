@@ -434,13 +434,14 @@ public class QuestionController {
     public R<Map<String, Object>> searchQuestions(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "difficulty", required = false) Integer difficulty,
             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize) {
         try {
             LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(Question::getDeleted, 0);
             wrapper.eq(Question::getStatus, 1);
-            
+
             if (keyword != null && !keyword.trim().isEmpty()) {
                 wrapper.and(w -> w
                     .like(Question::getTitle, keyword)
@@ -452,9 +453,13 @@ public class QuestionController {
                     .like(Question::getTags, keyword)
                 );
             }
-            
+
             if (categoryId != null) {
                 wrapper.eq(Question::getCategoryId, categoryId);
+            }
+
+            if (difficulty != null) {
+                wrapper.eq(Question::getDifficulty, difficulty);
             }
             
             wrapper.orderByDesc(Question::getId);
