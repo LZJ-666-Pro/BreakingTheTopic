@@ -17,7 +17,7 @@
 
   <scroll-view class="main-scroll" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="continue-card" wx:if="{{hasUnfinished}}" bindtap="continuePractice">
-      <van-icon name="play-circle-o" size="24px" color="#07C160" />
+      <image class="continue-play-img" src="/images/contentIcon/play.png" mode="aspectFit" />
       <view class="continue-content">
         <text class="continue-title">继续上次练习</text>
         <text class="continue-desc">{{unfinishedCategory}} · 已完成 {{unfinishedProgress}}%</text>
@@ -66,22 +66,22 @@
 
     <view class="quick-grid">
       <view class="quick-item" bindtap="goToWrongbook">
-        <van-icon name="warning-o" size="22px" color="#FA5151" />
+        <image class="quick-icon" src="/images/contentIcon/wrong.png" mode="aspectFit" />
         <text class="quick-name">错题本</text>
         <text class="quick-count">{{wrongCount}}</text>
       </view>
       <view class="quick-item" bindtap="goToFavorite">
-        <van-icon name="star-o" size="22px" color="#FF9500" />
+        <image class="quick-icon" src="/images/contentIcon/favorite.png" mode="aspectFit" />
         <text class="quick-name">收藏</text>
         <text class="quick-count">{{favoriteCount}}</text>
       </view>
       <view class="quick-item" bindtap="randomPractice">
-        <van-icon name="exchange" size="22px" color="#7B61FF" />
+        <image class="quick-icon" src="/images/contentIcon/random.png" mode="aspectFit" />
         <text class="quick-name">随机刷题</text>
         <text class="quick-count">{{totalQuestions}}</text>
       </view>
       <view class="quick-item" bindtap="goToHistory">
-        <van-icon name="clock-o" size="22px" color="#1890FF" />
+        <image class="quick-icon" src="/images/contentIcon/history.png" mode="aspectFit" />
         <text class="quick-name">刷题记录</text>
         <text class="quick-count">{{historyCount}}</text>
       </view>

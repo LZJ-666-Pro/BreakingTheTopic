@@ -158,6 +158,11 @@ page {
   margin-bottom: 12rpx;
 }
 
+.function-icon-img {
+  width: 48rpx;
+  height: 48rpx;
+}
+
 .function-icon.train {
   background: rgba(255, 107, 107, 0.1);
 }

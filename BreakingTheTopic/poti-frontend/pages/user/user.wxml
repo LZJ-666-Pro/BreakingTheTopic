@@ -47,56 +47,56 @@
       <view class="function-grid">
         <view class="function-item" bindtap="goToTrain">
           <view class="function-icon train">
-            <van-icon name="fire-o" size="24px" color="#FF6B6B" />
+            <image class="function-icon-img" src="/images/contentIcon/train.png" mode="aspectFit" />
           </view>
           <text class="function-name">面试特训营</text>
         </view>
         <view class="function-item" bindtap="goToInterview">
           <view class="function-icon interview">
-            <van-icon name="chat-o" size="24px" color="#07C160" />
+            <image class="function-icon-img" src="/images/contentIcon/interview.png" mode="aspectFit" />
           </view>
           <text class="function-name">1v1模拟面试</text>
         </view>
         <view class="function-item" bindtap="goToAnswer">
           <view class="function-icon answer">
-            <van-icon name="comment-o" size="24px" color="#1890FF" />
+            <image class="function-icon-img" src="/images/contentIcon/answer.png" mode="aspectFit" />
           </view>
           <text class="function-name">我的回答</text>
         </view>
         <view class="function-item" bindtap="goToFavorite">
           <view class="function-icon favorite">
-            <van-icon name="star-o" size="24px" color="#FF9500" />
+            <image class="function-icon-img" src="/images/contentIcon/favorite.png" mode="aspectFit" />
           </view>
           <text class="function-name">题目收藏</text>
         </view>
         <view class="function-item" bindtap="goToWrongbook">
           <view class="function-icon wrong">
-            <van-icon name="warning-o" size="24px" color="#FA5151" />
+            <image class="function-icon-img" src="/images/contentIcon/wrong.png" mode="aspectFit" />
           </view>
           <text class="function-name">错题本</text>
         </view>
         <view class="function-item" bindtap="goToHistory">
           <view class="function-icon history">
-            <van-icon name="clock-o" size="24px" color="#7B61FF" />
+            <image class="function-icon-img" src="/images/contentIcon/history.png" mode="aspectFit" />
           </view>
           <text class="function-name">刷题记录</text>
         </view>
         <view class="function-item" bindtap="goToRank">
           <view class="function-icon rank">
-            <van-icon name="medal-o" size="24px" color="#FFD700" />
+            <image class="function-icon-img" src="/images/contentIcon/rank.png" mode="aspectFit" />
           </view>
           <text class="function-name">排行榜</text>
         </view>
         <view class="function-item" bindtap="goToFriends">
           <view class="function-icon friends">
-            <van-icon name="friends-o" size="24px" color="#FFB800" />
+            <image class="function-icon-img" src="/images/contentIcon/friends.png" mode="aspectFit" />
           </view>
           <text class="function-name">好友管理</text>
           <view wx:if="{{unreadCount > 0}}" class="unread-dot">{{unreadCount > 99 ? '99+' : unreadCount}}</view>
         </view>
         <view class="function-item" bindtap="goToAchieve">
           <view class="function-icon achieve">
-            <van-icon name="gem-o" size="24px" color="#EB2F96" />
+            <image class="function-icon-img" src="/images/contentIcon/achieve.png" mode="aspectFit" />
           </view>
           <text class="function-name">成就中心</text>
         </view>
