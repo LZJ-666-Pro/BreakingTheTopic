@@ -59,7 +59,7 @@
         :page-sizes="[10, 20, 50, 100]"
         layout="total, sizes, prev, pager, next, jumper"
         class="pagination"
-        @size-change="load"
+        @size-change="handleSizeChange"
         @current-change="load"
       />
     </el-card>
@@ -101,11 +101,19 @@ const detail = ref(null)
 
 const query = reactive({
   pageNum: 1,
-  pageSize: 20,
+  // 每页条数持久化到 localStorage，刷新后保持用户选择
+  pageSize: Number(localStorage.getItem('oplog_page_size')) || 20,
   adminName: '',
   module: '',
   result: null
 })
+
+const handleSizeChange = () => {
+  // 切换每页条数时重置页码，避免超出范围显示空白
+  query.pageNum = 1
+  localStorage.setItem('oplog_page_size', String(query.pageSize))
+  load()
+}
 
 const buildParams = () => {
   const params = {

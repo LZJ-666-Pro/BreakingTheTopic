@@ -182,23 +182,48 @@ Page({
   getSuggestions(keyword) {
     const suggestions = []
     const lowerKeyword = keyword.toLowerCase()
-    
-    this.data.hotKeywords.forEach(item => {
-      if (item.toLowerCase().includes(lowerKeyword)) {
-        suggestions.push(item)
-      }
-    })
-    
+
+    // 本地候选：搜索历史 > 热搜词 > 分类名
     this.data.historyList.forEach(item => {
       if (item.toLowerCase().includes(lowerKeyword) && !suggestions.includes(item)) {
         suggestions.push(item)
       }
     })
-    
+
+    this.data.hotKeywords.forEach(item => {
+      if (item.toLowerCase().includes(lowerKeyword) && !suggestions.includes(item)) {
+        suggestions.push(item)
+      }
+    })
+
+    this.data.categoryList.forEach(item => {
+      if (item.name && item.name.toLowerCase().includes(lowerKeyword) && !suggestions.includes(item.name)) {
+        suggestions.push(item.name)
+      }
+    })
+
     this.setData({
-      suggestions: suggestions.slice(0, 8),
+      suggestions: suggestions.slice(0, 10),
       showSuggestions: suggestions.length > 0
     })
+
+    // 题库候选：后端从题干/标签/分类名联想，追加到本地候选之后
+    searchApi.getSuggestions(keyword.trim())
+      .then(res => {
+        if (res.code === 200 && Array.isArray(res.data) && this.data.keyword.trim() === keyword.trim()) {
+          const merged = [...this.data.suggestions]
+          res.data.forEach(item => {
+            if (item && !merged.includes(item)) {
+              merged.push(item)
+            }
+          })
+          this.setData({
+            suggestions: merged.slice(0, 10),
+            showSuggestions: merged.length > 0
+          })
+        }
+      })
+      .catch(() => {})
   },
 
   selectSuggestion(e) {

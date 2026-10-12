@@ -49,6 +49,11 @@ const searchApi = {
     return get('/search/question', data)
   },
 
+  // 搜索联想：根据输入前缀获取题库候选词
+  getSuggestions(keyword) {
+    return get('/search/suggest', { keyword })
+  },
+
   syncQuestion(data) {
     return post('/search/sync', data)
   },

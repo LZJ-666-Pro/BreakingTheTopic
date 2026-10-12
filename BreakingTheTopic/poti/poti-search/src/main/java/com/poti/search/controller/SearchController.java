@@ -145,6 +145,62 @@ public class SearchController {
         return R.success(hotSearches);
     }
 
+    /**
+     * 搜索联想：根据输入前缀从题库（题干/标签/分类名）提取候选词
+     */
+    @GetMapping("/suggest")
+    public R<List<String>> suggest(@RequestParam String keyword) {
+        List<String> result = new ArrayList<>();
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return R.success(result);
+        }
+        String kw = keyword.trim();
+        String lower = kw.toLowerCase();
+        try {
+            if (esEnabled && questionRepository != null) {
+                Page<QuestionDocument> page = questionRepository.suggestByKeyword(kw, PageRequest.of(0, 50));
+                for (QuestionDocument doc : page.getContent()) {
+                    collectCandidate(result, doc.getCategoryName(), lower);
+                    collectTags(result, doc.getTags(), lower);
+                    String title = doc.getTitle();
+                    if (title != null && title.length() <= 25 && title.toLowerCase().contains(lower)) {
+                        collectCandidate(result, title.trim(), lower);
+                    }
+                    if (result.size() >= 10) {
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("搜索联想失败", e);
+        }
+        return R.success(result);
+    }
+
+    private void collectCandidate(List<String> result, String candidate, String lower) {
+        if (candidate == null || candidate.trim().isEmpty()) {
+            return;
+        }
+        String c = candidate.trim();
+        if (c.toLowerCase().contains(lower) && !result.contains(c)) {
+            result.add(c);
+        }
+    }
+
+    private void collectTags(List<String> result, String tags, String lower) {
+        if (tags == null || tags.trim().isEmpty()) {
+            return;
+        }
+        // tags 兼容 JSON 数组字符串与分隔符字符串两种存储格式
+        String cleaned = tags.replace("[", " ").replace("]", " ").replace("\"", " ");
+        for (String t : cleaned.split("[,，、;；|/]")) {
+            collectCandidate(result, t, lower);
+            if (result.size() >= 10) {
+                return;
+            }
+        }
+    }
+
     @PostMapping("/sync")
     public R<Void> syncQuestion(@RequestBody QuestionDocumentDTO dto) {
         if (!esEnabled || questionRepository == null) {
