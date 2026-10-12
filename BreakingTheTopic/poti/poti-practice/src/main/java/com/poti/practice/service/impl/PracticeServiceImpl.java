@@ -164,6 +164,53 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeMapper, Practice> i
     }
 
     @Override
+    public Map<Long, Map<String, Object>> getStatisticsBatch(List<Long> userIds) {
+        Map<Long, Map<String, Object>> result = new HashMap<>();
+        if (userIds == null || userIds.isEmpty()) {
+            return result;
+        }
+
+        // 一条 IN 查询拉取全部用户的刷题记录后内存聚合，替代逐用户查询
+        LambdaQueryWrapper<Practice> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(Practice::getUserId, userIds);
+        List<Practice> allPractices = baseMapper.selectList(wrapper);
+
+        LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        for (Long userId : userIds) {
+            int totalCount = 0;
+            int correctCount = 0;
+            int todayCount = 0;
+            int todayCorrectCount = 0;
+            for (Practice p : allPractices) {
+                if (!userId.equals(p.getUserId())) {
+                    continue;
+                }
+                totalCount++;
+                boolean correct = Boolean.TRUE.equals(p.getIsCorrect());
+                if (correct) {
+                    correctCount++;
+                }
+                if (p.getPracticeTime() != null && p.getPracticeTime().isAfter(todayStart)) {
+                    todayCount++;
+                    if (correct) {
+                        todayCorrectCount++;
+                    }
+                }
+            }
+
+            Map<String, Object> statistics = new HashMap<>();
+            statistics.put("totalQuestionCount", totalCount);
+            statistics.put("correctCount", correctCount);
+            statistics.put("wrongCount", totalCount - correctCount);
+            statistics.put("todayCount", todayCount);
+            statistics.put("todayCorrectCount", todayCorrectCount);
+            statistics.put("todayWrongCount", todayCount - todayCorrectCount);
+            result.put(userId, statistics);
+        }
+        return result;
+    }
+
+    @Override
     public Map<String, Object> getCalendar(Long userId, Integer year, Integer month) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> calendar = baseMapper.getCalendarByMonth(userId, year, month);

@@ -124,7 +124,16 @@ Page({
       },
       success: (res) => {
         if (res.data.code === 200) {
-          const messages = res.data.data || []
+          // 媒体地址兼容历史数据：老数据存的是 localhost/旧 IP，真机无法访问，统一替换为当前配置的服务地址
+          const fixMediaUrl = (url) => {
+            if (!url) return url
+            const m = url.match(/^https?:\/\/[^/]+(\/chat\/.+)$/)
+            return m ? app.globalData.userUrl + m[1] : url
+          }
+          const messages = (res.data.data || []).map(msg => ({
+            ...msg,
+            media_url: fixMediaUrl(msg.media_url)
+          }))
           this.setData({ messages })
           
           if (messages.length > 0) {
@@ -217,7 +226,15 @@ Page({
         'X-User-Id': app.globalData.userId || 1
       },
       success: (res) => {
-        const data = JSON.parse(res.data)
+        console.log('[chat] 上传响应', res.statusCode, res.data)
+        let data = null
+        try {
+          data = JSON.parse(res.data)
+        } catch (e) {
+          console.error('[chat] 上传响应解析失败', res.data)
+          wx.showToast({ title: '上传响应异常', icon: 'none' })
+          return
+        }
         if (data.code === 200) {
           const mediaUrl = data.data
           if (type === 2) {
@@ -225,18 +242,15 @@ Page({
           } else if (type === 3) {
             this.sendVoiceMessage(mediaUrl)
           }
+        } else if (data.code === 401) {
+          app._handleUnauthorized()
         } else {
-          wx.showToast({
-            title: '上传失败',
-            icon: 'none'
-          })
+          wx.showToast({ title: data.msg || '上传失败', icon: 'none' })
         }
       },
-      fail: () => {
-        wx.showToast({
-          title: '上传失败',
-          icon: 'none'
-        })
+      fail: (err) => {
+        console.error('[chat] 上传请求失败', err)
+        wx.showToast({ title: '网络错误', icon: 'none' })
       }
     })
   },
@@ -263,7 +277,16 @@ Page({
           } else {
             this.loadMessages()
           }
+        } else if (res.data.code === 401) {
+          app._handleUnauthorized()
+        } else {
+          console.error('[chat] 图片消息发送失败', res.data)
+          wx.showToast({ title: res.data.msg || '发送失败', icon: 'none' })
         }
+      },
+      fail: (err) => {
+        console.error('[chat] 图片消息请求失败', err)
+        wx.showToast({ title: '网络错误', icon: 'none' })
       }
     })
   },
@@ -305,7 +328,16 @@ Page({
           } else {
             this.loadMessages()
           }
+        } else if (res.data.code === 401) {
+          app._handleUnauthorized()
+        } else {
+          console.error('[chat] 语音消息发送失败', res.data)
+          wx.showToast({ title: res.data.msg || '发送失败', icon: 'none' })
         }
+      },
+      fail: (err) => {
+        console.error('[chat] 语音消息请求失败', err)
+        wx.showToast({ title: '网络错误', icon: 'none' })
       }
     })
   },
@@ -362,9 +394,44 @@ Page({
 
   startPolling() {
     this.pollingTimer = setInterval(() => {
-      if (this.data.conversationId) {
-        this.getMessages(this.data.conversationId)
-      }
+      this.pollMessages()
     }, 3000)
+  },
+
+  // 轮询增量拉取：只取最后一条消息之后的新消息，避免每 3 秒全量重拉 + 重复写库
+  pollMessages() {
+    if (!this.data.conversationId) {
+      return
+    }
+    const messages = this.data.messages
+    const afterId = messages.length > 0 ? messages[messages.length - 1].id : null
+    wx.request({
+      url: `${app.globalData.userUrl}/chat/messages`,
+      method: 'GET',
+      data: afterId
+        ? { userId: this.data.userId, conversationId: this.data.conversationId, afterId: afterId, size: 50 }
+        : { userId: this.data.userId, conversationId: this.data.conversationId, page: 1, size: 100 },
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId || 1
+      },
+      success: (res) => {
+        if (res.data.code !== 200) {
+          return
+        }
+        const newMsgs = res.data.data || []
+        if (afterId) {
+          if (newMsgs.length > 0) {
+            this.setData({
+              messages: messages.concat(newMsgs),
+              scrollToView: `msg-${newMsgs[newMsgs.length - 1].id}`
+            })
+          }
+        } else if (newMsgs.length > 0) {
+          this.setData({ messages: newMsgs })
+          this.setData({ scrollToView: `msg-${newMsgs[newMsgs.length - 1].id}` })
+        }
+      }
+    })
   }
 })

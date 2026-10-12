@@ -4,6 +4,8 @@ import com.poti.common.R;
 import com.poti.user.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -14,6 +16,9 @@ public interface PracticeFeignClient {
 
     @GetMapping("/internal/statistics")
     R<Map<String, Object>> getStatistics(@RequestParam("userId") Long userId);
+
+    @PostMapping("/internal/statistics/batch")
+    R<Map<String, Map<String, Object>>> getStatisticsBatch(@RequestBody List<Long> userIds);
 
     @GetMapping("/internal/calendar")
     R<Map<String, Object>> getCalendar(@RequestParam("userId") Long userId,

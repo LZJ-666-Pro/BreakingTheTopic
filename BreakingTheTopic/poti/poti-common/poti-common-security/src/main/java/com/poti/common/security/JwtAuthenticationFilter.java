@@ -75,10 +75,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = resolveToken(request);
 
-        // 内部调用令牌放行（用于 auth -> user 等没有用户 Token 的服务间调用）
+        // 内部调用令牌放行（仅限服务间内部接口 /internal/**，防止令牌泄露后绕过全部业务鉴权）
         if (token == null && StringUtils.hasText(properties.getInternalToken())) {
-            String internalToken = request.getHeader(properties.getInternalTokenHeader());
-            if (properties.getInternalToken().equals(internalToken)) {
+            String path = getRequestPath(request);
+            if (pathMatcher.match("/**/internal/**", path)
+                    && properties.getInternalToken().equals(request.getHeader(properties.getInternalTokenHeader()))) {
                 log.debug("鉴权过滤器通过内部令牌放行: {}", request.getRequestURI());
                 filterChain.doFilter(request, response);
                 return;

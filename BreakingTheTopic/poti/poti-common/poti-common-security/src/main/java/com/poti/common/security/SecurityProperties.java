@@ -30,26 +30,19 @@ public class SecurityProperties {
             "/auth/login", "/auth/admin/login", "/auth/dev/login", "/auth/validate",
 
             // ===== 用户服务公开接口 =====
-            "/user/register", "/user/login/**", "/user/password/reset", "/user/internal/**", "/user/avatar/upload",
+            "/user/register", "/user/login/**", "/user/password/reset", "/user/avatar/upload",
             "/sms/**",
             "/config/**",
-            // 小程序首页签到接口（小程序端未带 Token 直接调用，需后续改前端补 Token）
-            "/checkin/**",
 
             // ===== 题目浏览公开接口 =====
             "/question/categories", "/question/list", "/question/random/**", "/question/search",
-            "/question/detail/**", "/question/view/**", "/question/category/list", "/question/internal/**",
+            "/question/detail/**", "/question/view/**", "/question/category/list",
             // 刷题专题与每日一题（公开浏览）
             "/question/special/**", "/question/daily/**",
 
-            // ===== 内部聚合接口（服务间 Feign 调用） =====
-            "/practice/internal/**",
-            "/wrongbook/internal/**",
-            "/favorite/internal/**",
-
             // ===== 搜索公开接口 =====
             "/search/question", "/search/questions", "/search/hot",
-            // 题目索引同步（服务间 Feign 及运维触发，ES 数据写入入口）
+            // 题目索引同步（运维触发，ES 数据写入入口）
             "/search/sync/**", "/question/sync-to-es",
 
             // ===== 管理后台登录 =====
@@ -57,7 +50,11 @@ public class SecurityProperties {
 
             // ===== 监控、文档、静态资源 =====
             "/actuator/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**", "/doc.html",
-            "/uploads/**", "/avatars/**", "/error"
+            // 说明：/xxx/internal/** 服务间接口与 /checkin/** 均已移出白名单，
+            // 内部接口统一走 X-Internal-Token（仅 /internal/** 路径生效），签到接口前端已补 JWT
+            "/uploads/**", "/avatars/**", "/error",
+            // 聊天媒体文件（小程序 <image>/audio 组件加载资源时无法携带 JWT，需放行直连访问）
+            "/chat/images/**", "/chat/voices/**"
     );
 
     /**

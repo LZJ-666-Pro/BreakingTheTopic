@@ -13,6 +13,8 @@ public interface PracticeService extends IService<Practice> {
     Map<String, Object> getHistory(Long userId, Integer pageNum, Integer pageSize);
     
     Map<String, Object> getStatistics(Long userId);
+
+    Map<Long, Map<String, Object>> getStatisticsBatch(List<Long> userIds);
     
     Map<String, Object> getCalendar(Long userId, Integer year, Integer month);
     

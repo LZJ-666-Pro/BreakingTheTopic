@@ -219,7 +219,18 @@ public class FriendshipServiceImpl implements FriendshipService {
             }
             
             List<Map<String, Object>> friends = new ArrayList<>();
-            
+
+            // 一次批量拉取全部好友的刷题统计，替代循环内逐个 Feign 调用（N+1 → 1）
+            Map<String, Map<String, Object>> statsMap = new HashMap<>();
+            try {
+                R<Map<String, Map<String, Object>>> batchResponse = practiceFeignClient.getStatisticsBatch(friendIds);
+                if (batchResponse != null && batchResponse.getData() != null) {
+                    statsMap = batchResponse.getData();
+                }
+            } catch (Exception se) {
+                log.error("批量获取好友统计数据失败（practice服务不可用），统计降级为0", se);
+            }
+
             for (Long friendId : friendIds) {
                 try {
                     User user = userMapper.selectById(friendId);
@@ -227,40 +238,31 @@ public class FriendshipServiceImpl implements FriendshipService {
                         continue;
                     }
 
-                    // 统计调用单独捕获：practice 服务不可用时仅降级为0，不影响好友本身展示
-                    R<Map<String, Object>> statsResponse = null;
-                    try {
-                        statsResponse = practiceFeignClient.getStatistics(friendId);
-                    } catch (Exception se) {
-                        log.error("获取好友 {} 统计数据失败（practice服务不可用）", friendId, se);
-                    }
-                    
                     Map<String, Object> friend = new HashMap<>();
                     friend.put("user_id", friendId);
                     friend.put("nickname", user.getNickname());
                     friend.put("avatar_url", user.getAvatarUrl());
-                    
-                    if (statsResponse != null && statsResponse.getData() != null) {
-                        Map<String, Object> stats = statsResponse.getData();
-                        friend.put("total_questions", stats.get("totalQuestionCount") != null ? 
-                                ((Number) stats.get("totalQuestionCount")).intValue() : 0);
-                        friend.put("today_questions", stats.get("todayCount") != null ? 
-                                ((Number) stats.get("todayCount")).intValue() : 0);
-                        
-                        Integer total = stats.get("totalQuestionCount") != null ? 
+
+                    Map<String, Object> stats = statsMap.get(String.valueOf(friendId));
+                    if (stats != null) {
+                        Integer total = stats.get("totalQuestionCount") != null ?
                                 ((Number) stats.get("totalQuestionCount")).intValue() : 0;
-                        Integer correct = stats.get("correctCount") != null ? 
+                        Integer correct = stats.get("correctCount") != null ?
                                 ((Number) stats.get("correctCount")).intValue() : 0;
+                        Integer today = stats.get("todayCount") != null ?
+                                ((Number) stats.get("todayCount")).intValue() : 0;
+                        friend.put("total_questions", total);
+                        friend.put("today_questions", today);
                         friend.put("accuracy", total > 0 ? Math.round(correct * 100.0 / total * 100) / 100.0 : 0);
                     } else {
                         friend.put("total_questions", 0);
                         friend.put("today_questions", 0);
                         friend.put("accuracy", 0);
                     }
-                    
+
                     friends.add(friend);
                 } catch (Exception e) {
-                    log.error("获取好友 {} 统计数据失败", friendId, e);
+                    log.error("组装好友 {} 信息失败", friendId, e);
                 }
             }
             
@@ -346,20 +348,31 @@ public class FriendshipServiceImpl implements FriendshipService {
             
             List<Map<String, Object>> recommendations = friendshipMapper.getFriendRecommendations(userId, limit);
             
-            for (Map<String, Object> rec : recommendations) {
-                Long recUserId = ((Number) rec.get("user_id")).longValue();
+            // 一次批量拉取推荐用户的刷题统计，替代循环内逐个 Feign 调用（N+1 → 1）
+            if (!recommendations.isEmpty()) {
+                List<Long> recUserIds = new ArrayList<>();
+                for (Map<String, Object> rec : recommendations) {
+                    recUserIds.add(((Number) rec.get("user_id")).longValue());
+                }
+
+                Map<String, Map<String, Object>> statsMap = new HashMap<>();
                 try {
-                    R<Map<String, Object>> statsResponse = practiceFeignClient.getStatistics(recUserId);
-                    if (statsResponse != null && statsResponse.getData() != null) {
-                        Map<String, Object> stats = statsResponse.getData();
-                        rec.put("total_questions", stats.get("totalQuestionCount") != null ? 
-                                ((Number) stats.get("totalQuestionCount")).intValue() : 0);
+                    R<Map<String, Map<String, Object>>> batchResponse = practiceFeignClient.getStatisticsBatch(recUserIds);
+                    if (batchResponse != null && batchResponse.getData() != null) {
+                        statsMap = batchResponse.getData();
+                    }
+                } catch (Exception e) {
+                    log.error("批量获取推荐用户统计数据失败（practice服务不可用），统计降级为0", e);
+                }
+
+                for (Map<String, Object> rec : recommendations) {
+                    Long recUserId = ((Number) rec.get("user_id")).longValue();
+                    Map<String, Object> stats = statsMap.get(String.valueOf(recUserId));
+                    if (stats != null && stats.get("totalQuestionCount") != null) {
+                        rec.put("total_questions", ((Number) stats.get("totalQuestionCount")).intValue());
                     } else {
                         rec.put("total_questions", 0);
                     }
-                } catch (Exception e) {
-                    log.error("获取推荐用户 {} 统计数据失败", recUserId, e);
-                    rec.put("total_questions", 0);
                 }
             }
             

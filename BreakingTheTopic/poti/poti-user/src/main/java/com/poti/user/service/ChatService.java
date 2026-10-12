@@ -11,7 +11,7 @@ public interface ChatService {
     
     Result<List<Map<String, Object>>> getConversationList(Long userId);
     
-    Result<List<Map<String, Object>>> getMessages(Long userId, Long conversationId, Integer page, Integer size);
+    Result<List<Map<String, Object>>> getMessages(Long userId, Long conversationId, Integer page, Integer size, Long afterId);
     
     Result<Void> sendMessage(Long senderId, Long receiverId, String content, Integer type, String mediaUrl, Integer duration);
     

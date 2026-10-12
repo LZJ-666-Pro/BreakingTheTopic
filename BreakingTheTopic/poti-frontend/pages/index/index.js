@@ -413,6 +413,7 @@ Page({
     wx.request({
       url: `${app.globalData.baseUrl}/checkin/status?userId=${app.globalData.userId}`,
       method: 'GET',
+      header: { 'Authorization': `Bearer ${app.globalData.token || wx.getStorageSync('token')}` },
       success: (res) => {
         if (res.data.code === 200) {
           this.setData({
@@ -692,6 +693,7 @@ Page({
     wx.request({
       url: `${app.globalData.baseUrl}/checkin/do?userId=${app.globalData.userId}`,
       method: 'POST',
+      header: { 'Authorization': `Bearer ${app.globalData.token || wx.getStorageSync('token')}` },
       success: (res) => {
         if (res.data.code === 200) {
           this.setData({

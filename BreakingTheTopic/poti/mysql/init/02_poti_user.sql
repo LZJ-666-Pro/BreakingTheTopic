@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS `message` (
   `sender_id` bigint NOT NULL COMMENT '发送者ID',
   `receiver_id` bigint NOT NULL COMMENT '接收者ID',
   `content` varchar(1000) NOT NULL COMMENT '消息内容',
+  `media_url` varchar(500) DEFAULT NULL COMMENT '媒体文件URL(图片/语音)',
+  `duration` int DEFAULT NULL COMMENT '语音时长(秒)',
   `type` tinyint DEFAULT '1' COMMENT '消息类型：1文本，2图片，3语音',
   `status` tinyint DEFAULT '1' COMMENT '状态：1已发送，2已读',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

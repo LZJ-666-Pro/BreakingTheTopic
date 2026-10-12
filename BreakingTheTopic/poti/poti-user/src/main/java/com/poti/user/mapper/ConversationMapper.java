@@ -27,6 +27,15 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "OR (user1_id = #{userId2} AND user2_id = #{userId1})) " +
             "AND deleted = 0 LIMIT 1")
     Conversation findByUsers(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+
+    @Select("SELECT * FROM conversation " +
+            "WHERE (user1_id = #{userId1} AND user2_id = #{userId2}) " +
+            "OR (user1_id = #{userId2} AND user2_id = #{userId1}) LIMIT 1")
+    Conversation findAnyByUsers(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+
+    @Update("UPDATE conversation SET deleted = 0, user1_unread = 0, user2_unread = 0 " +
+            "WHERE id = #{id} AND deleted = 1")
+    int restore(@Param("id") Long id);
     
     @Update("UPDATE conversation SET " +
             "last_message = #{lastMessage}, " +

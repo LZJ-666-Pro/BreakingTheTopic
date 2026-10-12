@@ -64,6 +64,19 @@ public class PracticeController {
         }
     }
 
+    @PostMapping("/internal/statistics/batch")
+    public R<Map<Long, Map<String, Object>>> getStatisticsBatchInternal(@RequestBody List<Long> userIds) {
+        try {
+            if (userIds == null || userIds.isEmpty()) {
+                return R.success(Map.of());
+            }
+            return R.success(practiceService.getStatisticsBatch(userIds));
+        } catch (Exception e) {
+            log.error("批量获取学习统计失败", e);
+            return R.error("批量获取学习统计失败");
+        }
+    }
+
     @GetMapping("/internal/calendar")
     public R<Map<String, Object>> getCalendarInternal(
             @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,

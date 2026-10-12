@@ -21,7 +21,11 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class ChatServiceImpl implements ChatService {
-    
+
+    // 上传扩展名白名单（type 2=图片，3=语音），防止恶意文件落盘后被静态服务回源造成存储型 XSS
+    private static final List<String> IMAGE_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".gif", ".webp");
+    private static final List<String> VOICE_EXTENSIONS = List.of(".aac", ".m4a", ".mp3", ".wav");
+
     @Autowired
     private ConversationMapper conversationMapper;
     
@@ -46,23 +50,33 @@ public class ChatServiceImpl implements ChatService {
     }
     
     @Override
-    public Result<List<Map<String, Object>>> getMessages(Long userId, Long conversationId, Integer page, Integer size) {
+    public Result<List<Map<String, Object>>> getMessages(Long userId, Long conversationId, Integer page, Integer size, Long afterId) {
         try {
             Conversation conversation = conversationMapper.selectById(conversationId);
             if (conversation == null) {
                 return Result.error("会话不存在");
             }
-            
+
             if (!conversation.getUser1Id().equals(userId) && !conversation.getUser2Id().equals(userId)) {
                 return Result.error("无权访问此会话");
             }
-            
+
+            // 增量拉取：轮询只取 afterId 之后的新消息，无新消息时零写库
+            if (afterId != null) {
+                List<Map<String, Object>> newMessages = messageMapper.getNewMessages(conversationId, afterId, size != null ? size : 50);
+                if (!newMessages.isEmpty()) {
+                    conversationMapper.clearUnread(conversationId, userId);
+                    messageMapper.markAsRead(conversationId, userId);
+                }
+                return Result.success(newMessages);
+            }
+
             int offset = (page - 1) * size;
             List<Map<String, Object>> messages = messageMapper.getMessages(conversationId, offset, size);
-            
+
             conversationMapper.clearUnread(conversationId, userId);
             messageMapper.markAsRead(conversationId, userId);
-            
+
             return Result.success(messages);
         } catch (Exception e) {
             log.error("获取消息列表失败", e);
@@ -77,18 +91,25 @@ public class ChatServiceImpl implements ChatService {
             Conversation conversation = conversationMapper.findByUsers(senderId, receiverId);
             
             if (conversation == null) {
-                conversation = new Conversation();
-                if (senderId < receiverId) {
-                    conversation.setUser1Id(senderId);
-                    conversation.setUser2Id(receiverId);
+                // 会话可能被软删过：uk_users 唯一键仍被占用，直接新增会报 Duplicate entry，需先尝试恢复原会话
+                conversation = conversationMapper.findAnyByUsers(senderId, receiverId);
+                if (conversation != null) {
+                    conversationMapper.restore(conversation.getId());
+                    log.info("恢复被删除的会话: id={}", conversation.getId());
                 } else {
-                    conversation.setUser1Id(receiverId);
-                    conversation.setUser2Id(senderId);
+                    conversation = new Conversation();
+                    if (senderId < receiverId) {
+                        conversation.setUser1Id(senderId);
+                        conversation.setUser2Id(receiverId);
+                    } else {
+                        conversation.setUser1Id(receiverId);
+                        conversation.setUser2Id(senderId);
+                    }
+                    conversation.setUser1Unread(0);
+                    conversation.setUser2Unread(0);
+                    conversationMapper.insert(conversation);
+                    log.info("创建新会话: id={}", conversation.getId());
                 }
-                conversation.setUser1Unread(0);
-                conversation.setUser2Unread(0);
-                conversationMapper.insert(conversation);
-                log.info("创建新会话: id={}", conversation.getId());
             }
             
             Message message = new Message();
@@ -143,6 +164,11 @@ public class ChatServiceImpl implements ChatService {
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+
+            List<String> allowedExtensions = type != null && type == 2 ? IMAGE_EXTENSIONS : VOICE_EXTENSIONS;
+            if (!allowedExtensions.contains(extension.toLowerCase())) {
+                return Result.error("不支持的文件类型");
             }
             
             String fileName = UUID.randomUUID().toString() + extension;

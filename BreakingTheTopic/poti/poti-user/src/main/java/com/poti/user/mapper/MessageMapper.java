@@ -23,7 +23,17 @@ public interface MessageMapper extends BaseMapper<Message> {
     List<Map<String, Object>> getMessages(@Param("conversationId") Long conversationId,
                                           @Param("offset") Integer offset,
                                           @Param("limit") Integer limit);
-    
+
+    @Select("SELECT m.*, u.nickname as sender_name, u.avatar_url as sender_avatar " +
+            "FROM message m " +
+            "LEFT JOIN user u ON m.sender_id = u.id " +
+            "WHERE m.conversation_id = #{conversationId} AND m.deleted = 0 AND m.id > #{afterId} " +
+            "ORDER BY m.create_time ASC " +
+            "LIMIT #{limit}")
+    List<Map<String, Object>> getNewMessages(@Param("conversationId") Long conversationId,
+                                             @Param("afterId") Long afterId,
+                                             @Param("limit") Integer limit);
+
     @Update("UPDATE message SET status = 2 WHERE conversation_id = #{conversationId} AND receiver_id = #{userId} AND status = 1")
     int markAsRead(@Param("conversationId") Long conversationId, @Param("userId") Long userId);
     
