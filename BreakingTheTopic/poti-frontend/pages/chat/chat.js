@@ -59,7 +59,19 @@ Page({
     
     this.recorderManager = wx.getRecorderManager()
     this.innerAudioContext = wx.createInnerAudioContext()
-    
+
+    // 录音结束监听只注册一次，避免每次录音重复上传
+    this.recorderManager.onStop((res) => {
+      const { tempFilePath, duration } = res
+      this.recordDuration = Math.floor(duration / 1000)
+      this.uploadFile(tempFilePath, 3)
+    })
+
+    // 播放失败输出日志，避免静默无响应
+    this.innerAudioContext.onError((e) => {
+      console.error('语音播放失败', e)
+    })
+
     this.loadMessages()
     this.startPolling()
   },
@@ -258,16 +270,10 @@ Page({
 
   startRecord() {
     this.setData({ isRecording: true })
+    // 格式必须用 aac：开发者工具不支持 mp3 录制，录出的文件无法播放
     this.recorderManager.start({
-      format: 'mp3',
+      format: 'aac',
       duration: 60000
-    })
-    
-    this.recorderManager.onStop((res) => {
-      const { tempFilePath, duration } = res
-      const durationSec = Math.floor(duration / 1000)
-      this.uploadFile(tempFilePath, 3)
-      this.recordDuration = durationSec
     })
   },
 

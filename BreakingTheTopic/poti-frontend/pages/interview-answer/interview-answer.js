@@ -180,7 +180,8 @@ Page({
     this.setData({ isRecording: true, recordDuration: 0 })
     
     recorderManager.start({
-      format: 'mp3',
+      // 格式必须用 aac：开发者工具不支持 mp3 录制，录出的文件无法播放
+      format: 'aac',
       duration: 60000
     })
 

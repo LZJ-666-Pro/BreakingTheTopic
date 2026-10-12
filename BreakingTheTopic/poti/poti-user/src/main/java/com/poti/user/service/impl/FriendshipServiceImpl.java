@@ -226,8 +226,14 @@ public class FriendshipServiceImpl implements FriendshipService {
                     if (user == null) {
                         continue;
                     }
-                    
-                    R<Map<String, Object>> statsResponse = practiceFeignClient.getStatistics(friendId);
+
+                    // 统计调用单独捕获：practice 服务不可用时仅降级为0，不影响好友本身展示
+                    R<Map<String, Object>> statsResponse = null;
+                    try {
+                        statsResponse = practiceFeignClient.getStatistics(friendId);
+                    } catch (Exception se) {
+                        log.error("获取好友 {} 统计数据失败（practice服务不可用）", friendId, se);
+                    }
                     
                     Map<String, Object> friend = new HashMap<>();
                     friend.put("user_id", friendId);
