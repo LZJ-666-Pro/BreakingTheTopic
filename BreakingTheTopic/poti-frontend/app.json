@@ -40,7 +40,8 @@
     "pages/camp-detail/camp-detail",
     "pages/special/special",
     "pages/special-detail/special-detail",
-    "pages/camp-home/camp-home"
+    "pages/camp-home/camp-home",
+    "pages/agent/agent"
   ],
   "window": {
     "backgroundTextStyle": "light",

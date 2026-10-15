@@ -9,7 +9,8 @@ const config = {
   wrongbookUrl: 'http://10.16.145.198:8500',
   favoriteUrl: 'http://10.16.145.198:8600',
   interviewUrl: 'http://10.16.145.198:8700',
-  searchUrl: 'http://10.16.145.198:8800'
+  searchUrl: 'http://10.16.145.198:8800',
+  agentUrl: 'http://10.16.145.198:8900'
 }
 
 module.exports = config

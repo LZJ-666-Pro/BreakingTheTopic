@@ -319,6 +319,20 @@ page {
   height: 48rpx;
 }
 
+/* AI 导师入口徽标（与快捷图标同尺寸，渐变底白字） */
+.ai-badge {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 14rpx;
+  background: linear-gradient(135deg, #2979FF, #7C4DFF);
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .continue-play-img {
   width: 48rpx;
   height: 48rpx;

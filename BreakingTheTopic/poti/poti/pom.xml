@@ -110,6 +110,7 @@
         <module>../poti-question</module>
         <module>../poti-search</module>
         <module>../poti-wrongbook</module>
+        <module>../poti-agent</module>
         <module>../poti-dependencies</module>
         <module>../poti-admin</module>
     </modules>

@@ -1,0 +1,48 @@
+<view class="agent-page">
+  <view class="toolbar">
+    <view class="new-session-btn" bindtap="startNewSession">+ 新对话</view>
+  </view>
+  <scroll-view class="msg-list" scroll-y scroll-into-view="{{scrollToView}}" scroll-with-animation>
+    <view class="welcome" wx:if="{{messages.length === 0}}">
+      <view class="welcome-badge">AI</view>
+      <view class="welcome-title">我是你的 AI 学习助手</view>
+      <view class="welcome-desc">我可以帮你分析学习情况、推荐练习方向、搜题答疑（作答前不会透露答案）</view>
+      <view class="welcome-chips">
+        <view class="chip" bindtap="quickAsk" data-q="我最近的学习情况怎么样？">我最近学习怎么样？</view>
+        <view class="chip" bindtap="quickAsk" data-q="我的错题主要集中在哪些方面？">帮我分析薄弱点</view>
+        <view class="chip" bindtap="quickAsk" data-q="推荐几个适合我的刷题分类">推荐刷题分类</view>
+      </view>
+    </view>
+
+    <block wx:for="{{messages}}" wx:key="id">
+      <!-- 用户消息 -->
+      <view class="row row-user" wx:if="{{item.role === 'user'}}">
+        <view class="bubble bubble-user">{{item.text}}</view>
+      </view>
+
+      <!-- 助手消息 -->
+      <view class="row row-ai" wx:else>
+        <view class="ai-avatar">AI</view>
+        <view class="bubble bubble-ai {{item.failed ? 'bubble-failed' : ''}}">
+          <text>{{item.text}}</text>
+          <view class="loading-dots" wx:if="{{item.loading}}">
+            <view class="dot"></view><view class="dot"></view><view class="dot"></view>
+          </view>
+          <view class="retry" wx:if="{{item.failed}}" bindtap="retrySend" data-id="{{item.id}}">点击重试</view>
+          <view class="sources" wx:if="{{item.sources.length > 0 && !item.loading}}">
+            <text class="source-tag" wx:for="{{item.sources}}" wx:for-item="s" wx:key="*this" wx:for-index="sIdx">数据来源：{{s}}</text>
+          </view>
+          <view class="actions" wx:if="{{item.actions.length > 0 && !item.loading}}">
+            <view class="action-btn" wx:for="{{item.actions}}" wx:for-item="a" wx:key="label" wx:for-index="aIdx" bindtap="handleAction" data-action="{{a}}">{{a.label}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view id="msg-bottom" class="list-bottom"></view>
+  </scroll-view>
+
+  <view class="input-bar">
+    <input class="input" value="{{input}}" placeholder="问我任何学习相关的问题…" confirm-type="send" bindinput="onInput" bindconfirm="sendMessage" disabled="{{sending}}" />
+    <view class="send-btn {{input && !sending ? 'send-btn-active' : ''}}" bindtap="sendMessage">发送</view>
+  </view>
+</view>

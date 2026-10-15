@@ -1,0 +1,70 @@
+server:
+  port: 8900
+
+jwt:
+  secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
+  expire: 86400000
+
+poti:
+  security:
+    internal-token: ${INTERNAL_TOKEN:poti-internal-secret-2024}
+  service:
+    user-url: ${USER_SERVICE_URL:http://localhost:8200}
+    practice-url: ${PRACTICE_SERVICE_URL:http://localhost:8400}
+    wrongbook-url: ${WRONGBOOK_SERVICE_URL:http://localhost:8500}
+    question-url: ${QUESTION_SERVICE_URL:http://localhost:8300}
+    search-url: ${SEARCH_SERVICE_URL:http://localhost:8800}
+
+# AI 助手配置：密钥与模型沿用项目统一的环境变量约定（AI_API_KEY 与批量出题共用）
+agent:
+  llm:
+    api-key: ${AI_API_KEY:2794361da43a4a71ac28781fe1916910.TTvqqqy9O8Jha82e}
+    base-url: ${AI_BASE_URL:https://open.bigmodel.cn/api/paas/v4}
+    model: ${AI_MODEL:glm-4-flash}
+    temperature: 0.4
+    max-tokens: 2000
+  limits:
+    # R-2：每用户每日提问上限
+    daily-question-limit: 20
+    # 单次回答内业务调度步数上限
+    max-rounds: 5
+  session:
+    # R-5：会话记录保留天数（清理任务 P1 实现）
+    retain-days: 7
+
+# 各业务服务直连地址已合并到上方 poti.service
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_agent?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

@@ -130,6 +130,7 @@ App({
     favoriteUrl: config.favoriteUrl,
     interviewUrl: config.interviewUrl,
     searchUrl: config.searchUrl,
+    agentUrl: config.agentUrl,
     viewQuestionId: null,
     practiceType: null
   }

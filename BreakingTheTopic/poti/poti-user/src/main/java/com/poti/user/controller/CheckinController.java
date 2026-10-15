@@ -55,4 +55,24 @@ public class CheckinController {
             return R.error("获取签到状态失败: " + e.getMessage());
         }
     }
+
+    /**
+     * internal：签到状态查询（AI 助手 poti-agent 经内部令牌调用，userId 由调用方显式指定）
+     */
+    @GetMapping("/internal/status")
+    public R<Map<String, Object>> getCheckInStatusInternal(@RequestParam("userId") Long userId) {
+        try {
+            boolean hasCheckedIn = checkinService.hasCheckedInToday(userId);
+            int streakDays = checkinService.getStreakDays(userId);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("hasCheckedIn", hasCheckedIn);
+            result.put("streakDays", streakDays);
+
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("internal 获取签到状态失败", e);
+            return R.error("获取签到状态失败: " + e.getMessage());
+        }
+    }
 }

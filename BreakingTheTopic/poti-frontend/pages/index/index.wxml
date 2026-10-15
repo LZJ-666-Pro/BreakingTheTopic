@@ -85,6 +85,11 @@
         <text class="quick-name">刷题记录</text>
         <text class="quick-count">{{historyCount}}</text>
       </view>
+      <view class="quick-item" bindtap="goToAgent">
+        <view class="quick-icon ai-badge">AI</view>
+        <text class="quick-name">AI 导师</text>
+        <text class="quick-count">NEW</text>
+      </view>
     </view>
 
     <view class="category-section">

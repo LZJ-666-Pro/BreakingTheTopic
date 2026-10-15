@@ -65,6 +65,31 @@ public class SearchController {
         }
     }
 
+    /**
+     * internal：题目搜索（AI 助手 poti-agent 调用）：
+     * 与 /search/question 相同的检索逻辑，但不写搜索历史、不加热热搜
+     */
+    @GetMapping("/internal/question")
+    public R<Map<String, Object>> searchQuestionInternal(@RequestParam(required = false) String keyword,
+                                                         @RequestParam(required = false) Long categoryId,
+                                                         @RequestParam(required = false) Integer difficulty,
+                                                         @RequestParam(defaultValue = "1") Integer pageNum,
+                                                         @RequestParam(defaultValue = "10") Integer pageSize) {
+        try {
+            if (esEnabled && questionRepository != null) {
+                return searchWithElasticsearch(keyword, categoryId, pageNum, pageSize);
+            }
+            R<Map<String, Object>> dbResult = questionClient.searchQuestions(keyword, categoryId, difficulty, pageNum, pageSize);
+            if (dbResult != null && dbResult.getData() != null) {
+                return R.success(dbResult.getData());
+            }
+            return R.success(getEmptyResult());
+        } catch (Exception e) {
+            log.error("internal 搜索题目失败", e);
+            return R.success(getEmptyResult());
+        }
+    }
+
     private R<Map<String, Object>> searchWithElasticsearch(String keyword, Long categoryId, Integer pageNum, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
         Page<QuestionDocument> page;

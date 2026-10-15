@@ -146,6 +146,47 @@ public class WrongbookController {
         }
     }
 
+    /**
+     * internal：错题分布（AI 助手 poti-agent 调用）：
+     * 按分类计数、按难度计数、最近错题标题样例，供模型总结薄弱点
+     */
+    @GetMapping("/internal/distribution")
+    public R<java.util.Map<String, Object>> getWrongDistributionInternal(@RequestParam("userId") Long userId) {
+        try {
+            LambdaQueryWrapper<Wrongbook> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Wrongbook::getUserId, userId)
+                   .orderByDesc(Wrongbook::getLastWrongTime);
+            List<Wrongbook> wrongbooks = wrongbookService.list(wrapper);
+
+            // 按 categoryId 计数
+            java.util.Map<Long, Integer> byCategory = new java.util.LinkedHashMap<>();
+            // 按难度计数：1简单 2中等 3困难
+            java.util.Map<Integer, Integer> byDifficulty = new java.util.LinkedHashMap<>();
+            java.util.List<String> titleSamples = new java.util.ArrayList<>();
+            for (Wrongbook w : wrongbooks) {
+                if (w.getCategoryId() != null) {
+                    byCategory.merge(w.getCategoryId(), 1, Integer::sum);
+                }
+                if (w.getDifficulty() != null) {
+                    byDifficulty.merge(w.getDifficulty(), 1, Integer::sum);
+                }
+                if (titleSamples.size() < 5 && w.getTitle() != null && !w.getTitle().isBlank()) {
+                    titleSamples.add(w.getTitle().length() > 50 ? w.getTitle().substring(0, 50) : w.getTitle());
+                }
+            }
+
+            java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+            result.put("total", wrongbooks.size());
+            result.put("byCategory", byCategory);
+            result.put("byDifficulty", byDifficulty);
+            result.put("titleSamples", titleSamples);
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("internal 获取错题分布失败", e);
+            return R.error("获取错题分布失败");
+        }
+    }
+
     @PutMapping("/mastered/{questionId}")
     public R<Void> markAsMastered(@RequestHeader("X-User-Id") Long userId,
                                    @PathVariable Long questionId) {

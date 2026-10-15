@@ -545,6 +545,12 @@ Page({
     })
   },
 
+  goToAgent() {
+    wx.navigateTo({
+      url: '/pages/agent/agent'
+    })
+  },
+
   loadDailyQuestion() {
     const app = getApp()
     const token = app.globalData.token
