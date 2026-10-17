@@ -14,7 +14,7 @@ Page({
 
   lastQuestion: '',
 
-  onLoad() {
+  onLoad(options) {
     if (guestUtils.checkGuest()) {
       wx.showModal({
         title: '提示',
@@ -31,6 +31,13 @@ Page({
           }
         }
       })
+      return
+    }
+    // 悬浮球带入的题目问题：开新会话自动提问（不混入最近会话上下文）
+    const prefill = options && options.prefill ? decodeURIComponent(options.prefill) : ''
+    if (prefill) {
+      this.setData({ sessionId: null, input: prefill })
+      wx.nextTick(() => this.sendMessage())
       return
     }
     this.loadLatestSession()

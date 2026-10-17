@@ -134,4 +134,7 @@
       </view>
     </view>
   </van-action-sheet>
+
+  <!-- AI 导师悬浮球：答题中可随时提问，不离开当前作答 -->
+  <agent-fab question-title="{{currentQuestion.title || currentQuestion.content || ''}}" />
 </view>

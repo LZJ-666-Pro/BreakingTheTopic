@@ -3,6 +3,8 @@ const config = require('./config/index.js')
 App({
   onLaunch() {
     console.log('小程序启动')
+    // 每次冷启动重置 AI 悬浮球收起状态，避免用户永久找不到入口
+    wx.removeStorageSync('agentFabClosed')
     this.checkLogin()
   },
 

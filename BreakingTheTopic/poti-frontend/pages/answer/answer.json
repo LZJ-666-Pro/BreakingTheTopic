@@ -4,6 +4,7 @@
     "van-icon": "@vant/weapp/icon/index",
     "van-action-sheet": "@vant/weapp/action-sheet/index",
     "van-loading": "@vant/weapp/loading/index",
-    "van-dialog": "@vant/weapp/dialog/index"
+    "van-dialog": "@vant/weapp/dialog/index",
+    "agent-fab": "/components/agent-fab/agent-fab"
   }
 }

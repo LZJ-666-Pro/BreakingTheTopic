@@ -37,6 +37,8 @@ public class SecurityProperties {
             // ===== 题目浏览公开接口 =====
             "/question/categories", "/question/list", "/question/random/**", "/question/search",
             "/question/detail/**", "/question/view/**", "/question/category/list",
+            // 题库页分组+分类聚合数据（公共只读，AI 导师 Feign 也复用）
+            "/question/category/groups",
             // 刷题专题与每日一题（公开浏览）
             "/question/special/**", "/question/daily/**",
 

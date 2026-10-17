@@ -2,7 +2,8 @@
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index",
     "van-loading": "@vant/weapp/loading/index",
-    "van-toast": "@vant/weapp/toast/index"
+    "van-toast": "@vant/weapp/toast/index",
+    "agent-fab": "/components/agent-fab/agent-fab"
   },
   "navigationBarTitleText": "题目详情"
 }

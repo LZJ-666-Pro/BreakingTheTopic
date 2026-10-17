@@ -186,4 +186,7 @@
   </view>
 </view>
 
+<!-- AI 导师悬浮球：随时就本题向 AI 提问 -->
+<agent-fab question-title="{{question.title || question.content || ''}}" />
+
 <van-toast id="van-toast" />
