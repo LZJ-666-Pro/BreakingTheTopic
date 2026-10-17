@@ -1,5 +1,6 @@
 <view class="agent-page">
   <view class="toolbar">
+    <view class="history-btn" bindtap="openHistory">聊天记录</view>
     <view class="new-session-btn" bindtap="startNewSession">+ 新对话</view>
   </view>
   <scroll-view class="msg-list" scroll-y scroll-into-view="{{scrollToView}}" scroll-with-animation>
@@ -44,5 +45,25 @@
   <view class="input-bar">
     <input class="input" value="{{input}}" placeholder="问我任何学习相关的问题…" confirm-type="send" bindinput="onInput" bindconfirm="sendMessage" disabled="{{sending}}" />
     <view class="send-btn {{input && !sending ? 'send-btn-active' : ''}}" bindtap="sendMessage">发送</view>
+  </view>
+
+  <!-- 聊天记录弹层：查看/切换/删除历史会话 -->
+  <view class="history-mask" wx:if="{{historyShow}}" bindtap="closeHistory">
+    <view class="history-panel" catchtap="noop">
+      <view class="history-header">
+        <text class="history-title">聊天记录</text>
+        <view class="history-close" bindtap="closeHistory">×</view>
+      </view>
+      <scroll-view scroll-y class="history-list">
+        <view wx:if="{{sessions.length === 0}}" class="history-empty">暂无历史会话</view>
+        <view class="session-item" wx:for="{{sessions}}" wx:key="id" bindtap="onSessionTap" data-id="{{item.id}}">
+          <view class="session-main">
+            <view class="session-title">{{item.title || '新对话'}}</view>
+            <view class="session-time">{{item.timeText}}</view>
+          </view>
+          <view class="session-del" catchtap="onDeleteSession" data-id="{{item.id}}">删除</view>
+        </view>
+      </scroll-view>
+    </view>
   </view>
 </view>

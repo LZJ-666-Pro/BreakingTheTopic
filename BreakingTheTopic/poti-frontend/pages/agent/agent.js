@@ -9,7 +9,9 @@ Page({
     input: '',
     sessionId: null,
     sending: false,
-    scrollToView: ''
+    scrollToView: '',
+    historyShow: false,
+    sessions: []
   },
 
   lastQuestion: '',
@@ -60,6 +62,85 @@ Page({
         }
       }
     })
+  },
+
+  /** 打开聊天记录弹层并拉取全部历史会话 */
+  openHistory() {
+    wx.request({
+      url: `${app.globalData.agentUrl}/agent/sessions`,
+      method: 'GET',
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId
+      },
+      success: (res) => {
+        if (res.data.code === 200) {
+          const sessions = (res.data.data || []).map(s => ({
+            id: s.id,
+            title: s.title,
+            timeText: this.fmtTime(s.updateTime || s.createTime)
+          }))
+          this.setData({ historyShow: true, sessions })
+        } else if (res.data.code === 401) {
+          app._handleUnauthorized()
+        }
+      }
+    })
+  },
+
+  closeHistory() {
+    this.setData({ historyShow: false })
+  },
+
+  noop() { /* 阻止冒泡关闭弹层 */ },
+
+  /** 切换到选中的历史会话 */
+  onSessionTap(e) {
+    const id = e.currentTarget.dataset.id
+    this.setData({ historyShow: false, sessionId: id })
+    this.loadMessages(id)
+  },
+
+  /** 删除历史会话（连带消息与 AI 记忆）；删的是当前会话则回到欢迎态 */
+  onDeleteSession(e) {
+    const id = e.currentTarget.dataset.id
+    wx.showModal({
+      title: '删除会话',
+      content: '删除后聊天记录将无法恢复，确定删除吗？',
+      confirmColor: '#EF4444',
+      success: (res) => {
+        if (!res.confirm) return
+        wx.request({
+          url: `${app.globalData.agentUrl}/agent/session/${id}`,
+          method: 'DELETE',
+          header: {
+            'Authorization': `Bearer ${app.globalData.token}`,
+            'X-User-Id': app.globalData.userId
+          },
+          success: (r) => {
+            if (r.data.code === 200) {
+              const sessions = this.data.sessions.filter(s => s.id !== id)
+              const patch = { sessions }
+              if (this.data.sessionId === id) {
+                patch.sessionId = null
+                patch.messages = []
+              }
+              this.setData(patch)
+              wx.showToast({ title: '已删除', icon: 'success' })
+            } else {
+              wx.showToast({ title: r.data.msg || '删除失败', icon: 'none' })
+            }
+          }
+        })
+      }
+    })
+  },
+
+  /** "2026-10-17T09:46:54" → "10-17 09:46" */
+  fmtTime(iso) {
+    if (!iso) return ''
+    const s = String(iso).replace('T', ' ')
+    return s.length >= 16 ? s.slice(5, 16) : s
   },
 
   loadMessages(sessionId) {

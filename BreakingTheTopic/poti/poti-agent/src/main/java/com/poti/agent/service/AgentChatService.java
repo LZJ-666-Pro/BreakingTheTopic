@@ -6,11 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poti.agent.dto.AgentAnswer;
 import com.poti.agent.entity.AgentMessage;
 import com.poti.agent.entity.AgentSession;
+import com.poti.agent.entity.AgentToolLog;
 import com.poti.agent.mapper.AgentMessageMapper;
 import com.poti.agent.mapper.AgentSessionMapper;
+import com.poti.agent.mapper.AgentToolLogMapper;
 import com.poti.agent.service.tools.AgentTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,8 +32,10 @@ public class AgentChatService {
 
     private final AgentSessionMapper sessionMapper;
     private final AgentMessageMapper messageMapper;
+    private final AgentToolLogMapper toolLogMapper;
     private final Assistant assistant;
     private final AgentTools agentTools;
+    private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${agent.limits.daily-question-limit:20}")
@@ -38,12 +43,16 @@ public class AgentChatService {
 
     public AgentChatService(AgentSessionMapper sessionMapper,
                             AgentMessageMapper messageMapper,
+                            AgentToolLogMapper toolLogMapper,
                             Assistant assistant,
-                            AgentTools agentTools) {
+                            AgentTools agentTools,
+                            JdbcTemplate jdbcTemplate) {
         this.sessionMapper = sessionMapper;
         this.messageMapper = messageMapper;
+        this.toolLogMapper = toolLogMapper;
         this.assistant = assistant;
         this.agentTools = agentTools;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     /** 新建会话 */
@@ -149,6 +158,22 @@ public class AgentChatService {
         return sessionMapper.selectList(new LambdaQueryWrapper<AgentSession>()
                 .eq(AgentSession::getUserId, userId)
                 .orderByDesc(AgentSession::getUpdateTime));
+    }
+
+    /**
+     * 删除会话：校验归属后硬删会话、消息、工具日志与 LLM 记忆（用户明确要求删除，不留软删残留）
+     */
+    public void deleteSession(Long userId, Long sessionId) {
+        AgentSession session = sessionMapper.selectById(sessionId);
+        if (session == null || !session.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("会话不存在");
+        }
+        messageMapper.delete(new LambdaQueryWrapper<AgentMessage>()
+                .eq(AgentMessage::getSessionId, sessionId));
+        toolLogMapper.delete(new LambdaQueryWrapper<AgentToolLog>()
+                .eq(AgentToolLog::getSessionId, sessionId));
+        jdbcTemplate.update("DELETE FROM agent_chat_memory WHERE memory_id = ?", String.valueOf(sessionId));
+        sessionMapper.deleteById(sessionId);
     }
 
     // ==================== 内部方法 ====================

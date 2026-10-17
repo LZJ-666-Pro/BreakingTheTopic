@@ -4,7 +4,9 @@ import com.poti.agent.entity.AgentSession;
 import com.poti.agent.service.AgentChatService;
 import com.poti.common.R;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -84,6 +86,21 @@ public class AgentController {
         } catch (Exception e) {
             log.error("查询消息历史失败", e);
             return R.error("查询消息历史失败");
+        }
+    }
+
+    /** 删除会话（连带消息、工具日志与 LLM 记忆） */
+    @DeleteMapping("/session/{sessionId}")
+    public R<Void> deleteSession(@RequestHeader("X-User-Id") Long userId,
+                                 @PathVariable Long sessionId) {
+        try {
+            chatService.deleteSession(userId, sessionId);
+            return R.success();
+        } catch (IllegalArgumentException e) {
+            return R.error(e.getMessage());
+        } catch (Exception e) {
+            log.error("删除会话失败", e);
+            return R.error("删除会话失败");
         }
     }
 

@@ -12,7 +12,17 @@ page {
 .toolbar {
   display: flex;
   justify-content: flex-end;
+  gap: 16rpx;
   padding: 16rpx 24rpx 0;
+}
+
+.history-btn {
+  padding: 10rpx 24rpx;
+  background: #fff;
+  border: 1rpx solid #E5E7EB;
+  border-radius: 28rpx;
+  font-size: 24rpx;
+  color: #6366F1;
 }
 
 .new-session-btn {
@@ -22,6 +32,106 @@ page {
   border-radius: 28rpx;
   font-size: 24rpx;
   color: #374151;
+}
+
+/* ===== 聊天记录弹层 ===== */
+.history-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.history-panel {
+  width: 100%;
+  max-height: 70vh;
+  background: #fff;
+  border-radius: 32rpx 32rpx 0 0;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 32rpx 20rpx;
+}
+
+.history-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #111827;
+}
+
+.history-close {
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 52rpx;
+  text-align: center;
+  font-size: 36rpx;
+  color: #9CA3AF;
+  background: #F3F4F6;
+  border-radius: 50%;
+}
+
+.history-list {
+  max-height: calc(70vh - 120rpx);
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.history-empty {
+  padding: 80rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: #9CA3AF;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 16rpx;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+
+.session-item:active {
+  background: #F9FAFB;
+}
+
+.session-main {
+  flex: 1;
+  overflow: hidden;
+}
+
+.session-title {
+  font-size: 28rpx;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-time {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #9CA3AF;
+}
+
+.session-del {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  padding: 8rpx 20rpx;
+  font-size: 24rpx;
+  color: #EF4444;
+  background: #FEF2F2;
+  border-radius: 24rpx;
 }
 
 .new-session-btn:active {
