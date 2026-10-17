@@ -28,6 +28,17 @@ public class CampController {
         }
     }
 
+    /** 特训营列表（internal 通道，供 AI 导师工具调用） */
+    @GetMapping("/internal/list")
+    public R<List<Map<String, Object>>> getCampListInternal(@RequestParam("userId") Long userId) {
+        try {
+            return R.success(campService.getCampList(userId));
+        } catch (Exception e) {
+            log.error("internal获取特训营列表失败", e);
+            return R.error("获取特训营列表失败");
+        }
+    }
+
     /** 特训营详情 */
     @GetMapping("/detail/{campId}")
     public R<Map<String, Object>> getCampDetail(@RequestHeader("X-User-Id") Long userId,

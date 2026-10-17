@@ -2,6 +2,8 @@ package com.poti.agent.service.tools;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poti.agent.entity.AgentToolLog;
+import com.poti.agent.feign.FavoriteFeignClient;
+import com.poti.agent.feign.InterviewFeignClient;
 import com.poti.agent.feign.PracticeFeignClient;
 import com.poti.agent.feign.QuestionFeignClient;
 import com.poti.agent.feign.SearchFeignClient;
@@ -20,14 +22,16 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Agent 工具集：LLM 可调用的业务能力（P0 六个只读工具）。
+ * Agent 工具集：LLM 可调用的业务能力（12 个只读工具，覆盖小程序全部读类业务）。
  *
  * 安全设计（对应 02 规范 4.3）：
  * - 工具方法不暴露 userId 形参，一律从 ThreadLocal 注入当前登录用户，LLM 无法伪造；
  * - 每次执行写 agent_tool_log（内联记录，等价 AOP，便于追溯）；
- * - get_question_detail 剥离 answer 字段（防作弊），search_questions 剥离答案/解析字段；
+ * - get_question_detail/get_daily_question 剥离 answer 字段（防作弊），search_questions 剥离答案/解析字段，
+ *   收藏/每日一题/专题等接口本身不含答案字段；
  * - 单次回答内调度步数超上限后，工具返回收敛提示，引导模型直接总结。
  */
 @Slf4j
@@ -39,6 +43,8 @@ public class AgentTools {
     private final WrongbookFeignClient wrongbookFeignClient;
     private final QuestionFeignClient questionFeignClient;
     private final SearchFeignClient searchFeignClient;
+    private final FavoriteFeignClient favoriteFeignClient;
+    private final InterviewFeignClient interviewFeignClient;
     private final AgentToolLogMapper toolLogMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -56,12 +62,16 @@ public class AgentTools {
                       WrongbookFeignClient wrongbookFeignClient,
                       QuestionFeignClient questionFeignClient,
                       SearchFeignClient searchFeignClient,
+                      FavoriteFeignClient favoriteFeignClient,
+                      InterviewFeignClient interviewFeignClient,
                       AgentToolLogMapper toolLogMapper) {
         this.userFeignClient = userFeignClient;
         this.practiceFeignClient = practiceFeignClient;
         this.wrongbookFeignClient = wrongbookFeignClient;
         this.questionFeignClient = questionFeignClient;
         this.searchFeignClient = searchFeignClient;
+        this.favoriteFeignClient = favoriteFeignClient;
+        this.interviewFeignClient = interviewFeignClient;
         this.toolLogMapper = toolLogMapper;
     }
 
@@ -202,6 +212,128 @@ public class AgentTools {
     private long questionCount(Map<?, ?> m) {
         Object v = m.get("questionCount");
         return v instanceof Number n ? n.longValue() : 0L;
+    }
+
+    // ==================== 工具 7：每日一题 ====================
+
+    @Tool("查询今天的每日一题：日期、题干、题型分类、难度、出题理由、提示。不包含标准答案（作答前不可泄露答案）")
+    public String get_daily_question() {
+        return execute("get_daily_question", () -> {
+            R<Map<String, Object>> r = questionFeignClient.getDailyQuestion();
+            if (r == null || r.getCode() != 200 || r.getData() == null) {
+                return Map.of("error", "今日暂无每日一题");
+            }
+            Map<String, Object> data = new LinkedHashMap<>(r.getData());
+            data.remove("answer");
+            return data;
+        });
+    }
+
+    // ==================== 工具 8：刷题专题列表 ====================
+
+    @Tool("查询刷题专题列表（专题ID、名称、简介、难度、预计天数、题目数量），用于回答有哪些专题可刷或推荐学习计划")
+    public String get_special_list() {
+        return execute("get_special_list", () -> {
+            R<List<Map<String, Object>>> r = questionFeignClient.getSpecialList();
+            if (r == null || r.getCode() != 200 || r.getData() == null) {
+                return Map.of("specials", List.of());
+            }
+            List<Map<String, Object>> slim = new ArrayList<>();
+            for (Map<String, Object> m : r.getData()) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("id", m.get("id"));
+                item.put("name", m.get("name"));
+                item.put("description", m.get("description"));
+                item.put("difficulty", m.get("difficulty"));
+                item.put("estimatedDays", m.get("estimatedDays"));
+                item.put("questionCount", m.get("questionCount"));
+                slim.add(item);
+            }
+            return Map.of("specials", slim);
+        });
+    }
+
+    // ==================== 工具 9：热搜词 ====================
+
+    @Tool("查询当前热搜的搜索关键词列表，用于回答大家都在搜什么、帮助用户发现热门题目方向")
+    public String get_hot_searches() {
+        return execute("get_hot_searches", () -> {
+            R<Set<Object>> r = searchFeignClient.getHotSearches(10);
+            if (r == null || r.getCode() != 200 || r.getData() == null) {
+                return Map.of("hotSearches", List.of());
+            }
+            return Map.of("hotSearches", new ArrayList<>(r.getData()));
+        });
+    }
+
+    // ==================== 工具 10：收藏列表 ====================
+
+    @Tool("查询当前用户收藏的题目列表（题目ID、题干、分类、难度、题型），用于回答用户收藏了哪些题")
+    public String get_favorite_list() {
+        return execute("get_favorite_list", () -> {
+            R<List<Map<String, Object>>> r = favoriteFeignClient.getFavoriteList(currentUserId(), 1, 50);
+            if (r == null || r.getCode() != 200 || r.getData() == null) {
+                return Map.of("favorites", List.of(), "total", 0);
+            }
+            List<Map<String, Object>> slim = new ArrayList<>();
+            for (Map<String, Object> m : r.getData()) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("questionId", m.get("questionId"));
+                item.put("title", m.get("title"));
+                item.put("categoryId", m.get("categoryId"));
+                item.put("type", m.get("type"));
+                item.put("difficulty", m.get("difficulty"));
+                slim.add(item);
+            }
+            return Map.of("total", slim.size(), "favorites", slim);
+        });
+    }
+
+    // ==================== 工具 11：面试特训营列表 ====================
+
+    @Tool("查询面试特训营列表（营名、方向、周期、人数、当前用户是否已加入），用于推荐特训营或回答用户打卡情况")
+    public String get_interview_camps() {
+        return execute("get_interview_camps", () -> {
+            R<List<Map<String, Object>>> r = interviewFeignClient.getCampList(currentUserId());
+            if (r == null || r.getCode() != 200 || r.getData() == null) {
+                return Map.of("camps", List.of());
+            }
+            return Map.of("camps", r.getData());
+        });
+    }
+
+    // ==================== 工具 12：好友刷题排行 ====================
+
+    @Tool("查询当前用户与好友的刷题排行榜（名次、昵称、刷题量或连续天数），用于回答好友排行、自己排第几")
+    public String get_friend_ranking(@P(value = "排行类型：total按累计刷题量（默认），streak按连续刷题天数", required = false) String type) {
+        String rankType = (type == null || type.isBlank()) ? "total" : type.trim();
+        return execute("get_friend_ranking", () -> {
+            R<Map<String, Object>> r = userFeignClient.getFriendRanking(currentUserId(), rankType);
+            if (r == null || r.getCode() != 200 || r.getData() == null) {
+                return Map.of("rankList", List.of());
+            }
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("rankType", rankType);
+            // 精简排行条目：去掉头像 URL（对 LLM 无用且占上下文）
+            for (String key : List.of("topThree", "rankList", "myRank")) {
+                Object v = r.getData().get(key);
+                if (v instanceof List<?> list) {
+                    data.put(key, list.stream().map(this::slimRankItem).collect(java.util.stream.Collectors.toList()));
+                } else if (v instanceof Map<?, ?>) {
+                    data.put(key, slimRankItem(v));
+                }
+            }
+            return data;
+        });
+    }
+
+    private Map<String, Object> slimRankItem(Object o) {
+        Map<?, ?> m = (Map<?, ?>) o;
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("rank", m.get("rank"));
+        item.put("nickname", m.get("nickname"));
+        item.put("score", m.get("score"));
+        return item;
     }
 
     // ==================== 执行骨架 ====================

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 搜索服务（poti-search 8800）
@@ -20,4 +21,8 @@ public interface SearchFeignClient {
                                            @RequestParam(value = "difficulty", required = false) Integer difficulty,
                                            @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize);
+
+    /** 热搜词（公开白名单接口 /search/hot） */
+    @GetMapping("/search/hot")
+    R<Set<Object>> getHotSearches(@RequestParam(value = "limit", defaultValue = "10") Integer limit);
 }

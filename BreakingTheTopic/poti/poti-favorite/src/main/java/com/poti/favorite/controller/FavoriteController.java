@@ -107,6 +107,23 @@ public class FavoriteController {
         }
     }
 
+    /** 收藏列表（internal 通道，供 AI 导师工具调用） */
+    @GetMapping("/internal/list")
+    public R<List<Favorite>> getFavoritesInternal(@RequestParam("userId") Long userId,
+                                                  @RequestParam(defaultValue = "1") Integer pageNum,
+                                                  @RequestParam(defaultValue = "20") Integer pageSize) {
+        try {
+            LambdaQueryWrapper<Favorite> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Favorite::getUserId, userId)
+                   .orderByDesc(Favorite::getCreateTime);
+            List<Favorite> favorites = favoriteService.list(wrapper);
+            return R.success(favorites);
+        } catch (Exception e) {
+            log.error("internal获取收藏列表失败", e);
+            return R.error("获取收藏列表失败");
+        }
+    }
+
     @GetMapping("/internal/count")
     public R<Integer> getFavoriteCount(
             @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,

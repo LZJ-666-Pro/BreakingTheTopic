@@ -16,4 +16,9 @@ public interface UserFeignClient {
     /** 签到状态（连续天数）——poti-user 需提供 /checkin/internal/status */
     @GetMapping("/checkin/internal/status")
     R<Map<String, Object>> getCheckinStatus(@RequestParam("userId") Long userId);
+
+    /** 好友刷题排行（internal 通道，含用户自己） */
+    @GetMapping("/user/rank/internal/friends")
+    R<Map<String, Object>> getFriendRanking(@RequestParam("userId") Long userId,
+                                            @RequestParam(value = "type", defaultValue = "total") String type);
 }

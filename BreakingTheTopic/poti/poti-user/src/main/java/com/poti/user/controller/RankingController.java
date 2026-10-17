@@ -13,6 +13,14 @@ public class RankingController {
     @Autowired
     private RankingService rankingService;
     
+    /** 好友刷题排行（internal 通道，供 AI 导师工具调用） */
+    @GetMapping("/internal/friends")
+    public Result<RankDTO> getFriendRankingInternal(
+            @RequestParam("userId") Long userId,
+            @RequestParam(defaultValue = "total") String type) {
+        return rankingService.getFriendRanking(userId, type, 0, 10);
+    }
+
     @GetMapping
     public Result<RankDTO> getRanking(
             @RequestHeader(value = "X-User-Id", required = false) Long userId,
