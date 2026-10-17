@@ -5,7 +5,7 @@
   </view>
   <scroll-view class="msg-list" scroll-y scroll-into-view="{{scrollToView}}" scroll-with-animation>
     <view class="welcome" wx:if="{{messages.length === 0}}">
-      <view class="welcome-badge">AI</view>
+      <image class="welcome-badge" src="/images/contentIcon/agent.png" mode="aspectFit" />
       <view class="welcome-title">我是你的 AI 学习助手</view>
       <view class="welcome-desc">我可以帮你分析学习情况、推荐练习方向、搜题答疑（作答前不会透露答案）</view>
       <view class="welcome-chips">
@@ -23,7 +23,7 @@
 
       <!-- 助手消息 -->
       <view class="row row-ai" wx:else>
-        <view class="ai-avatar">AI</view>
+        <image class="ai-avatar" src="/images/contentIcon/agent.png" mode="aspectFit" />
         <view class="bubble bubble-ai {{item.failed ? 'bubble-failed' : ''}}">
           <text>{{item.text}}</text>
           <view class="loading-dots" wx:if="{{item.loading}}">
