@@ -61,6 +61,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/admin/login",
             "/admin/register",
             "/admin/captcha",
+            // 登录页未登录时读取验证码开关（只读接口，服务端已同步放行）
+            "/admin/config/value",
             "/admin/upload/",
             "/admin/test"
     );

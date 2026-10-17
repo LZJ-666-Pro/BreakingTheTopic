@@ -58,4 +58,28 @@ public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> i
         feedback.setStatus(1);
         return updateById(feedback);
     }
+
+    @Override
+    public int batchMarkResolved(List<Long> ids, String reply) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        LambdaQueryWrapper<Feedback> query = new LambdaQueryWrapper<>();
+        query.in(Feedback::getId, ids).eq(Feedback::getStatus, 0);
+        List<Feedback> pending = list(query);
+        if (pending.isEmpty()) {
+            return 0;
+        }
+        String replyText = (reply != null && !reply.trim().isEmpty()) ? reply.trim() : "已处理，感谢您的反馈！";
+        LocalDateTime now = LocalDateTime.now();
+        for (Feedback fb : pending) {
+            Feedback upd = new Feedback();
+            upd.setId(fb.getId());
+            upd.setStatus(1);
+            upd.setReply(replyText);
+            upd.setReplyTime(now);
+            updateById(upd);
+        }
+        return pending.size();
+    }
 }

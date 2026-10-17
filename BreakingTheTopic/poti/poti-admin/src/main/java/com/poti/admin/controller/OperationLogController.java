@@ -2,8 +2,12 @@ package com.poti.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.poti.admin.entity.Admin;
 import com.poti.admin.entity.OperationLog;
+import com.poti.admin.entity.Role;
 import com.poti.admin.mapper.OperationLogMapper;
+import com.poti.admin.mapper.RoleMapper;
+import com.poti.admin.service.AdminService;
 import com.poti.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,12 @@ public class OperationLogController {
 
     @Autowired
     private OperationLogMapper operationLogMapper;
+
+    @Autowired
+    private AdminService adminService;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     @GetMapping("/list")
     public R<Page<OperationLog>> list(
@@ -76,11 +86,32 @@ public class OperationLogController {
         }
     }
 
+    /**
+     * 清空全部日志：高危不可恢复操作，仅超级管理员可执行
+     * （role=2 旧超管字段 或 关联角色 code=super 且启用中）
+     */
     @PostMapping("/clear")
-    public R<Void> clear() {
+    public R<Void> clear(@RequestHeader(value = "X-User-Id", required = false) Long userId) {
         try {
+            if (userId == null) {
+                return R.error("未登录");
+            }
+            Admin admin = adminService.getById(userId);
+            if (admin == null) {
+                return R.error("管理员不存在");
+            }
+            boolean superAdmin = admin.getRole() != null && admin.getRole() == 2;
+            if (!superAdmin && admin.getRoleId() != null) {
+                Role role = roleMapper.selectById(admin.getRoleId());
+                superAdmin = role != null && role.getStatus() != null && role.getStatus() == 1
+                        && "super".equals(role.getCode());
+            }
+            if (!superAdmin) {
+                log.warn("非超管管理员 {} 尝试清空操作日志，已拒绝", admin.getUsername());
+                return R.error("仅超级管理员可清空日志");
+            }
             operationLogMapper.delete(new LambdaQueryWrapper<>());
-            log.info("操作日志已清空");
+            log.info("超管 {} 已清空操作日志", admin.getUsername());
             return R.success(null);
         } catch (Exception e) {
             log.error("清空操作日志失败", e);

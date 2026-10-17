@@ -41,7 +41,7 @@
           />
         </el-form-item>
 
-        <el-form-item v-if="isLogin" label="验证码" prop="captchaCode">
+        <el-form-item v-if="isLogin && captchaEnabled" label="验证码" prop="captchaCode">
           <div class="captcha-row">
             <el-input
               v-model="form.captchaCode"
@@ -167,6 +167,21 @@ const uploadUrl = ref('http://localhost:8088/admin/upload/avatar')
 
 const captchaImg = ref('')
 const captchaKey = ref('')
+// 后台「业务开关-登录验证码」：关闭时隐藏验证码输入（后端同步跳过校验）
+const captchaEnabled = ref(true)
+
+const loadCaptchaSwitch = async () => {
+  try {
+    const res = await api.get('/admin/config/value/login_captcha_enabled')
+    const v = res.data?.configValue ?? res.data
+    captchaEnabled.value = String(v) !== 'false'
+  } catch (e) {
+    captchaEnabled.value = true
+  }
+  if (captchaEnabled.value) {
+    loadCaptcha()
+  }
+}
 
 const form = reactive({
   username: '',
@@ -239,7 +254,10 @@ const rules = {
     { min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur' }
   ],
   captchaCode: [
-    { required: true, message: '请输入验证码', trigger: 'blur' }
+    { validator: (rule, value, callback) => {
+        if (!captchaEnabled.value || (value && value.trim())) callback()
+        else callback(new Error('请输入验证码'))
+      }, trigger: 'blur' }
   ],
   confirmPassword: [
     { validator: validateConfirmPassword, trigger: 'blur' }
@@ -257,7 +275,7 @@ const rules = {
 }
 
 onMounted(() => {
-  loadCaptcha()
+  loadCaptchaSwitch()
 })
 
 const toggleMode = () => {

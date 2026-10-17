@@ -138,6 +138,10 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
+// 登录进入主布局后刷新「系统默认分页条数」缓存，供各列表页初始化 pageSize
+import { loadDefaultPageSize } from '../utils/config'
+loadDefaultPageSize()
+
 const isCollapse = ref(false)
 
 // ===== 侧边栏菜单结构 =====

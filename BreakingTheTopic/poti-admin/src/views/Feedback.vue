@@ -23,7 +23,19 @@
     </div>
 
     <div class="table-card">
-      <el-table :data="feedbackList" v-loading="loading" stripe>
+      <div class="batch-bar">
+        <el-button
+          type="primary"
+          :disabled="selectedRows.length === 0"
+          :loading="batchResolving"
+          @click="handleBatchResolve"
+        >
+          批量标记已处理
+        </el-button>
+        <span class="batch-tip" v-if="selectedRows.length > 0">已选 {{ selectedRows.length }} 条，仅待处理记录会被处理</span>
+      </div>
+      <el-table :data="feedbackList" v-loading="loading" stripe @selection-change="onSelectionChange">
+        <el-table-column type="selection" width="45" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="nickname" label="用户" width="120">
           <template #default="{ row }">
@@ -130,14 +142,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
+import { getDefaultPageSize } from '../utils/config'
 
 const loading = ref(false)
 const feedbackList = ref([])
 const pageNum = ref(1)
-const pageSize = ref(10)
+// 每页条数持久化：用户选择优先，其次系统配置默认值
+const pageSize = ref(Number(localStorage.getItem('feedback_page_size')) || getDefaultPageSize())
+watch(pageSize, v => localStorage.setItem('feedback_page_size', String(v)))
 const total = ref(0)
 const filterStatus = ref(null)
 const filterType = ref('')
@@ -146,6 +161,49 @@ const replyDialogVisible = ref(false)
 const currentFeedback = ref(null)
 const replyForm = ref({ reply: '' })
 const submitting = ref(false)
+
+// 批量标记已处理
+const selectedRows = ref([])
+const batchResolving = ref(false)
+
+const onSelectionChange = (rows) => {
+  selectedRows.value = rows
+}
+
+const handleBatchResolve = () => {
+  const ids = selectedRows.value.map(r => r.id)
+  ElMessageBox.prompt(
+    `将选中的 ${ids.length} 条反馈标记为已处理，用户端可见。可填写统一回复话术（留空使用默认话术）`,
+    '批量标记已处理',
+    {
+      confirmButtonText: '确认处理',
+      cancelButtonText: '取消',
+      inputPlaceholder: '默认：已处理，感谢您的反馈！',
+      inputType: 'textarea',
+      inputValidator: (v) => !v || v.length <= 200 || '话术不能超过 200 字'
+    }
+  ).then(async ({ value }) => {
+    batchResolving.value = true
+    try {
+      const res = await axios.post(`${userUrl}/feedback/batch/resolve`, {
+        ids,
+        reply: value || null
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
+      })
+      if (res.data.code === 200) {
+        ElMessage.success(res.data.data || '处理成功')
+        loadFeedbackList()
+      } else {
+        ElMessage.error(res.data.msg || '批量处理失败')
+      }
+    } catch (error) {
+      ElMessage.error('批量处理失败')
+    } finally {
+      batchResolving.value = false
+    }
+  }).catch(() => {})
+}
 
 const userUrl = import.meta.env.VITE_USER_URL || 'http://localhost:8200'
 
@@ -276,6 +334,18 @@ onMounted(() => {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
+}
+
+.batch-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.batch-tip {
+  font-size: 12px;
+  color: #999;
 }
 
 .content-text {

@@ -90,15 +90,18 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../utils/api'
+import { getDefaultPageSize } from '../utils/config'
 
 const today = new Date().toISOString().slice(0, 10)
 const loading = ref(false)
 const list = ref([])
 const total = ref(0)
-const query = reactive({ pageNum: 1, pageSize: 10 })
+const query = reactive({ pageNum: 1, pageSize: Number(localStorage.getItem('daily_page_size')) || getDefaultPageSize() })
+// 每页条数持久化：用户选择优先，其次系统配置默认值
+watch(() => query.pageSize, v => localStorage.setItem('daily_page_size', String(v)))
 
 const dialog = reactive({
   visible: false,

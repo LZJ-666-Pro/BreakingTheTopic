@@ -30,13 +30,21 @@ DELIMITER ;
 CALL add_role_id();
 DROP PROCEDURE IF EXISTS add_role_id;
 
--- 示例角色
+-- 预置角色（幂等：按 code 去重）
 INSERT INTO sys_role (name, code, permissions, remark, status)
 SELECT '超级管理员', 'super', '', '拥有系统全部权限', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'super');
 INSERT INTO sys_role (name, code, permissions, remark, status)
-SELECT '内容运营', 'content_ops', '/dashboard,/content/solution-review,/content/article,/content/notice,/stats', '负责题解审核、文章与公告运营', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'content_ops');
+SELECT '内容运营', 'content_ops', '/dashboard,/content/solution-review,/content/article,/content/notice,/special/manage,/special/daily,/stats', '负责题解审核、文章公告与专题每日一题运营', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'content_ops');
 INSERT INTO sys_role (name, code, permissions, remark, status)
 SELECT '题目审核员', 'question_reviewer', '/dashboard,/question/list,/question/category,/question/tag,/special/manage,/special/daily', '负责题目、分类与专题维护', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'question_reviewer');
+INSERT INTO sys_role (name, code, permissions, remark, status)
+SELECT '题库管理员', 'question_manager', '/dashboard,/question/list,/question/add,/question/category,/question/tag,/special/manage,/special/daily,/ai-tasks', '负责题库建设、批量出题与AI生成任务管理', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'question_manager');
+INSERT INTO sys_role (name, code, permissions, remark, status)
+SELECT '用户客服', 'customer_service', '/dashboard,/user/list,/user/feedback', '负责用户咨询、反馈处理与举报跟进', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'customer_service');
+INSERT INTO sys_role (name, code, permissions, remark, status)
+SELECT '数据分析员', 'data_analyst', '/dashboard,/stats', '负责平台运营数据统计与查看', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'data_analyst');
+INSERT INTO sys_role (name, code, permissions, remark, status)
+SELECT '系统运维', 'sys_ops', '/dashboard,/settings/config,/settings/logs', '负责系统配置维护与操作日志审计（无权限管理）', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'sys_ops');
 
 -- 内置超管账号关联超级管理员角色
 UPDATE sys_admin SET role_id = (SELECT id FROM sys_role WHERE code = 'super' AND deleted = 0 LIMIT 1) WHERE username = 'admin' AND (role_id IS NULL OR role_id = 0);

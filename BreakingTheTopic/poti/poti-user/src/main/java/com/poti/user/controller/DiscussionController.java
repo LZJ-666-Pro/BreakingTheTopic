@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.poti.common.R;
 import com.poti.user.entity.Discussion;
 import com.poti.user.entity.User;
+import com.poti.user.mapper.AdminConfigMapper;
 import com.poti.user.service.DiscussionService;
 import com.poti.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +27,18 @@ public class DiscussionController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AdminConfigMapper adminConfigMapper;
+
     @GetMapping("/list/{questionId}")
     public R<Map<String, Object>> getDiscussions(@PathVariable Long questionId,
                                                   @RequestHeader(value = "X-User-Id", required = false) Long userId) {
         try {
+            // 后台「业务开关-讨论区」关闭时不返回讨论数据（配置缺失视为开启）
+            if (!adminConfigMapper.isEnabled("discussion_enabled")) {
+                return R.success(Map.of("discussions", List.of(), "disabled", true));
+            }
+
             List<Discussion> discussions = discussionService.getDiscussionsByQuestionId(questionId);
             
             Map<String, Object> result = new HashMap<>();
@@ -54,6 +63,11 @@ public class DiscussionController {
     public R<Void> addDiscussion(@RequestHeader("X-User-Id") Long userId,
                                   @RequestBody Map<String, Object> request) {
         try {
+            // 后台「业务开关-讨论区」关闭时禁止发表（配置缺失视为开启）
+            if (!adminConfigMapper.isEnabled("discussion_enabled")) {
+                return R.error("讨论区已关闭");
+            }
+
             Long questionId = Long.parseLong(request.get("questionId").toString());
             String content = request.get("content").toString();
             

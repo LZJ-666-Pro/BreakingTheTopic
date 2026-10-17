@@ -119,6 +119,7 @@ import { reactive, ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Plus } from '@element-plus/icons-vue'
 import api from '../utils/api'
+import { getDefaultPageSize } from '../utils/config'
 
 const groupOptions = ['算法', '数据结构', '语言基础', '框架与中间件', '数据库', '运维部署', '数学基础', '面试场景', '公司真题']
 
@@ -128,7 +129,7 @@ const total = ref(0)
 const PAGE_SIZE_KEY = 'tag_page_size'
 const query = reactive({
   pageNum: 1,
-  pageSize: Number(localStorage.getItem(PAGE_SIZE_KEY)) || 20,
+  pageSize: Number(localStorage.getItem(PAGE_SIZE_KEY)) || getDefaultPageSize(),
   keyword: '',
   groupName: '',
   status: ''

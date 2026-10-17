@@ -154,10 +154,11 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, ArrowDown } from '@element-plus/icons-vue'
 import api from '../utils/api'
+import { getDefaultPageSize } from '../utils/config'
 
 const loading = ref(false)
 const list = ref([])
@@ -166,10 +167,12 @@ const onlyReported = ref(false)
 
 const query = reactive({
   pageNum: 1,
-  pageSize: 10,
+  // 每页条数持久化：用户选择优先，其次系统配置默认值
+  pageSize: Number(localStorage.getItem('solution_review_page_size')) || getDefaultPageSize(),
   status: '0',
   keyword: ''
 })
+watch(() => query.pageSize, v => localStorage.setItem('solution_review_page_size', String(v)))
 
 const rejectDialog = reactive({ visible: false, id: null, reason: '' })
 const detailDialog = reactive({ visible: false, row: null })

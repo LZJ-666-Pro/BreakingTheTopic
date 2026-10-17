@@ -2,10 +2,16 @@
   <div class="page-container">
     <div class="page-header">
       <h2>AI生成任务</h2>
-      <el-button type="primary" @click="refreshTasks" :loading="loading">
-        <el-icon><Refresh /></el-icon>
-        刷新
-      </el-button>
+      <div class="header-actions">
+        <el-button type="primary" @click="openCreate">
+          <el-icon><Plus /></el-icon>
+          新建AI出题任务
+        </el-button>
+        <el-button @click="refreshTasks" :loading="loading">
+          <el-icon><Refresh /></el-icon>
+          刷新
+        </el-button>
+      </div>
     </div>
 
     <el-card class="content-card" shadow="never">
@@ -57,22 +63,31 @@
             <span class="text-muted">{{ formatDate(row.createTime) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120" align="center" fixed="right">
+        <el-table-column label="操作" width="150" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button 
-              v-if="row.status === 1" 
-              type="danger" 
-              link 
-              size="small" 
+            <el-button
+              v-if="row.status === 1"
+              type="danger"
+              link
+              size="small"
               @click="handleCancel(row)"
             >
               取消
             </el-button>
-            <el-button 
-              v-if="row.status === 3" 
-              type="primary" 
-              link 
-              size="small" 
+            <el-button
+              v-if="row.status === 3"
+              type="warning"
+              link
+              size="small"
+              @click="retryCreate(row)"
+            >
+              重新创建
+            </el-button>
+            <el-button
+              v-if="row.status === 3"
+              type="primary"
+              link
+              size="small"
               @click="showError(row)"
             >
               查看错误
@@ -101,22 +116,74 @@
         />
       </div>
     </el-card>
+
+    <!-- 新建 AI 出题任务弹窗 -->
+    <el-dialog v-model="createVisible" title="新建AI出题任务" width="520px" :close-on-click-modal="false">
+      <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="90px">
+        <el-form-item label="所属分类" prop="categoryId">
+          <el-select v-model="createForm.categoryId" placeholder="选择出题分类" filterable style="width: 100%">
+            <el-option v-for="c in categoryOptions" :key="c.id" :label="c.name" :value="c.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="难度" prop="difficulty">
+          <el-radio-group v-model="createForm.difficulty">
+            <el-radio :value="1">简单</el-radio>
+            <el-radio :value="2">中等</el-radio>
+            <el-radio :value="3">困难</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="出题数量" prop="count">
+          <el-input-number v-model="createForm.count" :min="1" :max="50" />
+          <span class="form-tip">单次建议不超过 20 题，生成过快可能触发 AI 限流</span>
+        </el-form-item>
+        <el-form-item label="出题主题" prop="topic">
+          <el-input v-model="createForm.topic" placeholder="选填，如：HashMap 扩容机制、Spring 事务失效场景" maxlength="100" show-word-limit />
+        </el-form-item>
+        <el-form-item label="补充要求" prop="additionalRequirements">
+          <el-input v-model="createForm.additionalRequirements" type="textarea" :rows="3" placeholder="选填，对题目内容的额外要求，如：偏重实际代码场景、包含追问链" maxlength="300" show-word-limit />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="createVisible = false">取消</el-button>
+        <el-button type="primary" :loading="creating" @click="submitCreate">创建任务</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Refresh, Loading } from '@element-plus/icons-vue'
+import { Refresh, Loading, Plus } from '@element-plus/icons-vue'
 import api from '../utils/api'
+import { getDefaultPageSize } from '../utils/config'
 import { formatDate } from '../utils/formatDate'
 
 const loading = ref(false)
 const tasks = ref([])
 const currentPage = ref(1)
-const pageSize = ref(10)
+// 每页条数持久化：用户选择优先，其次系统配置默认值
+const pageSize = ref(Number(localStorage.getItem('aitask_page_size')) || getDefaultPageSize())
+watch(pageSize, v => localStorage.setItem('aitask_page_size', String(v)))
 const total = ref(0)
 let pollingTimer = null
+
+// 创建任务弹窗状态
+const createVisible = ref(false)
+const creating = ref(false)
+const createFormRef = ref(null)
+const categoryOptions = ref([])
+const createForm = reactive({
+  categoryId: null,
+  difficulty: 1,
+  count: 5,
+  topic: '',
+  additionalRequirements: ''
+})
+const createRules = {
+  categoryId: [{ required: true, message: '请选择出题分类', trigger: 'change' }],
+  count: [{ required: true, message: '请填写出题数量', trigger: 'blur' }]
+}
 
 const statusMap = {
   0: { label: '待处理', type: 'info' },
@@ -162,6 +229,74 @@ const loadTasks = async () => {
 
 const refreshTasks = () => {
   loadTasks()
+}
+
+/** 加载分类下拉（全量分类接口） */
+const loadCategories = async () => {
+  if (categoryOptions.value.length > 0) return
+  try {
+    const res = await api.get('/admin/category/list')
+    if (res.code === 200) {
+      categoryOptions.value = res.data || []
+    }
+  } catch (error) {
+    console.error('加载分类失败', error)
+  }
+}
+
+/** 打开创建弹窗（空表单） */
+const openCreate = async () => {
+  createForm.categoryId = null
+  createForm.difficulty = 1
+  createForm.count = 5
+  createForm.topic = ''
+  createForm.additionalRequirements = ''
+  createVisible.value = true
+  await loadCategories()
+}
+
+/** 失败任务重试：按原任务配置预填创建弹窗 */
+const retryCreate = async (task) => {
+  await loadCategories()
+  const diffMap = { '简单': 1, '中等': 2, '困难': 3 }
+  createForm.categoryId = task.categoryId || null
+  createForm.difficulty = diffMap[task.difficulty] || 1
+  createForm.count = task.totalCount || 5
+  createForm.topic = task.topic || ''
+  createForm.additionalRequirements = task.additionalRequirements || ''
+  createVisible.value = true
+}
+
+/** 提交创建：响应 taskId 字段为任务ID */
+const submitCreate = async () => {
+  try {
+    await createFormRef.value.validate()
+  } catch {
+    return
+  }
+  creating.value = true
+  try {
+    const res = await api.post('/admin/question/ai/task/create', {
+      categoryId: createForm.categoryId,
+      categoryName: categoryOptions.value.find(c => c.id === createForm.categoryId)?.name,
+      count: createForm.count,
+      difficulty: createForm.difficulty,
+      topic: createForm.topic || null,
+      additionalRequirements: createForm.additionalRequirements || null
+    })
+    if (res.code === 200 && res.data && res.data.taskId) {
+      ElMessage.success(`任务 #${res.data.taskId} 已创建，正在后台生成`)
+      createVisible.value = false
+      currentPage.value = 1
+      loadTasks()
+    } else {
+      ElMessage.error(res.msg || '创建任务失败')
+    }
+  } catch (error) {
+    ElMessage.error('创建任务失败')
+  } finally {
+    creating.value = false
+  }
 }
 
 const handleCancel = async (task) => {
@@ -236,6 +371,17 @@ onUnmounted(() => {
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.form-tip {
+  margin-left: 12px;
+  font-size: 12px;
+  color: #999;
 }
 
 .content-card {

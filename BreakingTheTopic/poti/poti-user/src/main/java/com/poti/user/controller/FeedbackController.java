@@ -64,12 +64,37 @@ public class FeedbackController {
         if (reply == null || reply.trim().isEmpty()) {
             return R.error("回复内容不能为空");
         }
-        
+
         boolean success = feedbackService.replyFeedback(id, reply);
         if (success) {
             return R.success("回复成功");
         }
         return R.error("回复失败");
+    }
+
+    /** 批量标记已处理（后台管理：status 置 1，可选统一回复话术） */
+    @PostMapping("/batch/resolve")
+    public R<String> batchResolveFeedback(@RequestBody Map<String, Object> body) {
+        Object raw = body.get("ids");
+        if (!(raw instanceof List<?> list) || list.isEmpty()) {
+            return R.error("请选择要处理的反馈");
+        }
+        List<Long> ids = new java.util.ArrayList<>();
+        for (Object o : list) {
+            try {
+                ids.add(Long.parseLong(o.toString()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        if (ids.isEmpty()) {
+            return R.error("请选择要处理的反馈");
+        }
+        String reply = body.get("reply") != null ? body.get("reply").toString() : null;
+        int count = feedbackService.batchMarkResolved(ids, reply);
+        if (count == 0) {
+            return R.error("所选反馈中没有待处理记录");
+        }
+        return R.success("已处理 " + count + " 条反馈");
     }
 
     @DeleteMapping("/delete/{id}")

@@ -194,6 +194,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { getDefaultPageSize } from '../utils/config'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
 import api from '../utils/api'
@@ -210,7 +211,9 @@ const categories = ref([])
 const formRef = ref(null)
 const searchName = ref('')
 
-const pagination = reactive({ page: 1, size: 10, total: 0 })
+// 每页条数持久化：用户选择优先，其次系统配置默认值
+const pagination = reactive({ page: 1, size: Number(localStorage.getItem('category_page_size')) || getDefaultPageSize(), total: 0 })
+watch(() => pagination.size, v => localStorage.setItem('category_page_size', String(v)))
 
 const form = reactive({
   id: null,
@@ -317,7 +320,9 @@ const isGroupEdit = ref(false)
 const groups = ref([])
 const groupFormRef = ref(null)
 
-const groupPagination = reactive({ page: 1, size: 10, total: 0 })
+// 分组列表每页条数持久化
+const groupPagination = reactive({ page: 1, size: Number(localStorage.getItem('category_group_page_size')) || 10, total: 0 })
+watch(() => groupPagination.size, v => localStorage.setItem('category_group_page_size', String(v)))
 
 // 全量分组列表：用于分组标签下拉选项与 key 翻译（分页后 groups 只含当前页数据）
 const groupOptionsList = ref([])

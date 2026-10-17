@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.poti.common.R;
 import com.poti.common.security.JwtUtil;
 import com.poti.user.entity.User;
+import com.poti.user.mapper.AdminConfigMapper;
 import com.poti.user.service.SmsService;
 import com.poti.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +37,9 @@ public class UserController {
 
     @Autowired
     private SmsService smsService;
+
+    @Autowired
+    private AdminConfigMapper adminConfigMapper;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -285,6 +289,11 @@ public class UserController {
     @PostMapping("/register")
     public R<Map<String, Object>> register(@RequestBody Map<String, Object> request) {
         try {
+            // 后台「业务开关-开放注册」关闭时拦截注册（配置缺失视为开放）
+            if (!adminConfigMapper.isEnabled("register_enabled")) {
+                return R.error("当前已关闭新用户注册，请联系管理员");
+            }
+
             String nickname = (String) request.get("nickname");
             String phone = (String) request.get("phone");
             String email = (String) request.get("email");

@@ -127,10 +127,11 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Plus } from '@element-plus/icons-vue'
 import api from '../utils/api'
+import { getDefaultPageSize } from '../utils/config'
 
 const loading = ref(false)
 const list = ref([])
@@ -138,11 +139,13 @@ const total = ref(0)
 
 const query = reactive({
   pageNum: 1,
-  pageSize: 10,
+  // 每页条数持久化：用户选择优先，其次系统配置默认值
+  pageSize: Number(localStorage.getItem('notice_page_size')) || getDefaultPageSize(),
   status: '',
   displayType: '',
   keyword: ''
 })
+watch(() => query.pageSize, v => localStorage.setItem('notice_page_size', String(v)))
 
 const dialog = reactive({
   visible: false,

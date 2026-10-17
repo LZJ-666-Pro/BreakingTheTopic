@@ -39,6 +39,9 @@ public class AdminController {
     @Autowired
     private AdminMapper adminMapper;
 
+    @Autowired
+    private com.poti.admin.service.ConfigService configService;
+
     @GetMapping("/captcha")
     public R<Map<String, Object>> captcha() {
         try {
@@ -66,7 +69,9 @@ public class AdminController {
 
             String captchaKey = request.get("captchaKey");
             String captchaCode = request.get("captchaCode");
-            if (!captchaService.validate(captchaKey, captchaCode)) {
+            // 后台「业务开关-登录验证码」关闭时跳过校验（配置缺失视为开启）
+            boolean captchaEnabled = isSwitchOn("login_captcha_enabled");
+            if (captchaEnabled && !captchaService.validate(captchaKey, captchaCode)) {
                 return R.error("验证码错误或已过期");
             }
 
@@ -502,6 +507,13 @@ public class AdminController {
             return "*";
         }
         return "/dashboard";
+    }
+
+    /** 读取 sys_config 开关：配置缺失/禁用视为开启，显式 false 才算关闭 */
+    private boolean isSwitchOn(String key) {
+        com.poti.admin.entity.Config config = configService.getByKey(key);
+        String v = config != null ? config.getConfigValue() : null;
+        return v == null || !v.trim().equalsIgnoreCase("false");
     }
 
     private String trim(Object value) {

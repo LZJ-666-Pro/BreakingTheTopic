@@ -151,7 +151,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { getDefaultPageSize } from '../utils/config'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../utils/api'
@@ -167,9 +168,11 @@ const searchForm = reactive({
 
 const pagination = reactive({
   page: 1,
-  size: 10,
+  // 每页条数持久化：用户选择优先，其次系统配置默认值
+  size: Number(localStorage.getItem('user_page_size')) || getDefaultPageSize(),
   total: 0
 })
+watch(() => pagination.size, v => localStorage.setItem('user_page_size', String(v)))
 
 const resetSearch = () => {
   searchForm.nickname = ''

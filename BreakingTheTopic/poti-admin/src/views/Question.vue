@@ -330,7 +330,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { getDefaultPageSize } from '../utils/config'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Close, Upload, MagicStick, Check, Loading, CircleCheck, CircleClose } from '@element-plus/icons-vue'
@@ -436,9 +437,11 @@ const searchForm = reactive({
 
 const pagination = reactive({
   page: 1,
-  size: 10,
+  // 每页条数持久化：用户选择优先，其次系统配置默认值
+  size: Number(localStorage.getItem('question_page_size')) || getDefaultPageSize(),
   total: 0
 })
+watch(() => pagination.size, v => localStorage.setItem('question_page_size', String(v)))
 
 const form = reactive({
   id: null,

@@ -48,6 +48,16 @@ spring:
             minimum-idle: 2
             maximum-pool-size: 10
             connection-timeout: 30000
+        # 后台系统配置库（sys_config 行为开关：开放注册/讨论区等）
+        admin:
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_admin?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
             idle-timeout: 600000
             max-lifetime: 1800000
             connection-test-query: SELECT 1

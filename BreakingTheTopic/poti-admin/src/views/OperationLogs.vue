@@ -23,7 +23,7 @@
         <el-button type="primary" @click="search">搜索</el-button>
         <div class="toolbar-right">
           <el-button @click="exportLogs">导出 CSV</el-button>
-          <el-button type="danger" @click="clearLogs">清空日志</el-button>
+          <el-button v-if="isSuperAdmin" type="danger" @click="clearLogs">清空日志</el-button>
         </div>
       </div>
 
@@ -86,9 +86,18 @@
 </template>
 
 <script setup>
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../utils/api'
+import { getDefaultPageSize } from '../utils/config'
+import { useUserStore } from '../stores/user'
+
+const userStore = useUserStore()
+// 清空日志为超管专属：role=2 或权限为全部（super 角色）
+const isSuperAdmin = computed(() => {
+  const info = userStore.userInfo || {}
+  return info.role === 2 || info.permissions === '*'
+})
 
 const modules = ['题目管理', '题库设置', '标签管理', '题库专题', '每日一题', '题解审核', '文章管理', '公告管理', '角色管理', '管理员账号', '用户管理', '反馈与举报', '系统配置', '登录注册', '其他']
 
@@ -102,7 +111,7 @@ const detail = ref(null)
 const query = reactive({
   pageNum: 1,
   // 每页条数持久化到 localStorage，刷新后保持用户选择
-  pageSize: Number(localStorage.getItem('oplog_page_size')) || 20,
+  pageSize: Number(localStorage.getItem('oplog_page_size')) || getDefaultPageSize(),
   adminName: '',
   module: '',
   result: null
@@ -177,11 +186,25 @@ const exportLogs = () => {
 }
 
 const clearLogs = () => {
-  ElMessageBox.confirm('确定清空全部操作日志吗？此操作不可恢复！', '清空确认', { type: 'warning' })
+  ElMessageBox.prompt(
+    '此操作将永久删除全部操作日志且不可恢复！请输入「清空」两字以确认执行',
+    '高危操作确认',
+    {
+      type: 'warning',
+      confirmButtonText: '确认清空',
+      cancelButtonText: '取消',
+      inputPlaceholder: '输入：清空',
+      inputValidator: (v) => (v === '清空' ? true : '请输入「清空」两字以确认')
+    }
+  )
     .then(async () => {
-      await api.post('/admin/log/clear')
-      ElMessage.success('已清空')
-      search()
+      try {
+        await api.post('/admin/log/clear')
+        ElMessage.success('已清空')
+        search()
+      } catch (e) {
+        ElMessage.error(e?.response?.data?.msg || e?.msg || '清空失败，可能无权限')
+      }
     })
     .catch(() => {})
 }

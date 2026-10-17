@@ -2,6 +2,7 @@ package com.poti.admin.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.poti.admin.entity.Config;
+import com.poti.admin.mapper.UserConfigMapper;
 import com.poti.admin.service.ConfigService;
 import com.poti.common.R;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,9 @@ public class ConfigController {
 
     @Autowired
     private ConfigService configService;
+
+    @Autowired
+    private UserConfigMapper userConfigMapper;
 
     @GetMapping("/list")
     public R<List<Config>> list() {
@@ -47,6 +51,18 @@ public class ConfigController {
         }
     }
 
+    /** 只读轻量接口：按 key 取配置值（登录页读取验证码开关用，已在白名单） */
+    @GetMapping("/value/{key}")
+    public R<String> getValue(@PathVariable String key) {
+        try {
+            Config config = configService.getByKey(key);
+            return R.success(config != null ? config.getConfigValue() : null);
+        } catch (Exception e) {
+            log.error("读取配置值失败", e);
+            return R.error("读取配置值失败");
+        }
+    }
+
     @PostMapping("/update")
     public R<Void> update(@RequestBody Map<String, String> request) {
         try {
@@ -64,7 +80,8 @@ public class ConfigController {
             
             config.setConfigValue(configValue);
             configService.updateById(config);
-            
+            syncToUserSide(configKey, configValue);
+
             log.info("配置更新成功: {} = {}", configKey, configValue);
             return R.success(null);
         } catch (Exception e) {
@@ -91,6 +108,7 @@ public class ConfigController {
                         created.setStatus(1);
                         configService.save(created);
                     }
+                    syncToUserSide(config.getConfigKey().trim(), config.getConfigValue());
                 }
             }
 
@@ -99,6 +117,24 @@ public class ConfigController {
         } catch (Exception e) {
             log.error("批量更新配置失败", e);
             return R.error("批量更新配置失败");
+        }
+    }
+
+    /**
+     * 小程序侧消费的配置同步：联系邮箱写到 poti_user.system_config
+     * （小程序「联系我们」页走 GET /config/contact 读取 user 库），失败不阻塞后台保存
+     */
+    private void syncToUserSide(String configKey, String configValue) {
+        if (!"contact_email".equals(configKey) || configValue == null) {
+            return;
+        }
+        try {
+            int updated = userConfigMapper.updateValue("contact_email", configValue);
+            if (updated == 0) {
+                userConfigMapper.insertValue("contact_email", configValue, "官方联系方式（后台同步）");
+            }
+        } catch (Exception ex) {
+            log.warn("同步联系邮箱到小程序侧失败: {}", ex.getMessage());
         }
     }
 
