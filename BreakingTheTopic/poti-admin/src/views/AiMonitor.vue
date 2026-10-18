@@ -99,16 +99,20 @@
     </el-card>
 
     <!-- 对话详情弹窗 -->
-    <el-dialog v-model="msgDialog" :title="`会话对话详情 #${currentSession?.id || ''}`" width="720px">
+    <el-dialog v-model="msgDialog" :title="`会话对话详情 #${currentSession?.id || ''}`" width="760px">
+      <div class="msg-meta" v-if="currentSession">
+        <span>用户 #{{ currentSession.userId }}</span>
+        <span>{{ currentSession.title }}</span>
+      </div>
       <div v-loading="msgLoading" class="msg-list">
-        <div v-for="m in messages" :key="m.id" class="msg-item">
-          <div class="msg-head">
-            <el-tag :type="m.role === 'user' ? 'primary' : 'success'" size="small">
-              {{ m.role === 'user' ? '用户' : '助手' }}
-            </el-tag>
-            <span class="msg-time">{{ fmtTime(m.createTime) }}</span>
+        <div v-for="m in messages" :key="m.id" class="msg-row" :class="m.role === 'user' ? 'is-user' : 'is-ai'">
+          <div class="role-badge" :class="m.role === 'user' ? 'badge-user' : 'badge-ai'">
+            {{ m.role === 'user' ? '用户' : 'AI' }}
           </div>
-          <pre class="msg-content">{{ m.content }}</pre>
+          <div class="msg-bubble">
+            <pre class="msg-content">{{ m.content }}</pre>
+            <div class="msg-time">{{ fmtTime(m.createTime) }}</div>
+          </div>
         </div>
         <el-empty v-if="!msgLoading && messages.length === 0" description="该会话暂无消息" />
       </div>
@@ -267,28 +271,83 @@ onMounted(() => {
   font-size: 12px;
 }
 
-.msg-list {
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-.msg-item {
-  border: 1px solid #ebeef5;
-  border-radius: 6px;
-  padding: 10px 12px;
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #909399;
   margin-bottom: 10px;
 }
 
-.msg-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
+.msg-meta span:first-child::after {
+  content: '·';
+  margin-left: 12px;
+  color: #dcdfe6;
 }
 
-.msg-time {
+.msg-list {
+  max-height: 62vh;
+  overflow-y: auto;
+  background: #fafbfc;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.msg-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.msg-row:last-child {
+  margin-bottom: 0;
+}
+
+.msg-row.is-user {
+  flex-direction: row-reverse;
+}
+
+.role-badge {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 12px;
-  color: #909399;
+}
+
+.badge-ai {
+  background: #ffffff;
+  border: 1px solid #dcdfe6;
+  color: #606266;
+  font-weight: 600;
+}
+
+.badge-user {
+  background: #eaf2fe;
+  border: 1px solid #d8e6fc;
+  color: #4a6fa5;
+}
+
+.msg-bubble {
+  max-width: 78%;
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+
+.is-ai .msg-bubble {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+}
+
+.is-user .msg-bubble {
+  background: #eaf2fe;
+  border: 1px solid #d8e6fc;
 }
 
 .msg-content {
@@ -299,6 +358,13 @@ onMounted(() => {
   color: #303133;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.msg-time {
+  font-size: 11px;
+  color: #c0c4cc;
+  margin-top: 4px;
+  text-align: right;
 }
 
 @media (max-width: 1200px) {
