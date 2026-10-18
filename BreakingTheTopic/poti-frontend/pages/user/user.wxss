@@ -62,10 +62,10 @@ page {
 
 .level-badge {
   padding: 4rpx 16rpx;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
+  background: rgba(108, 71, 224, 0.1);
   border-radius: 20rpx;
   font-size: 22rpx;
-  color: #fff;
+  color: #6C47E0;
   font-weight: 500;
 }
 
@@ -197,6 +197,14 @@ page {
 
 .function-icon.achieve {
   background: rgba(235, 47, 150, 0.1);
+}
+
+.function-icon.competition {
+  background: rgba(41, 121, 255, 0.1);
+}
+
+.function-icon.vip {
+  background: rgba(108, 71, 224, 0.1);
 }
 
 .function-name {

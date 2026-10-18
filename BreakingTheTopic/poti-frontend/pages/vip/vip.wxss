@@ -1,0 +1,199 @@
+.page {
+  min-height: 100vh;
+  background: #F7F8FA;
+}
+
+/* ---------- 标题行：标题 + 延伸细线 ---------- */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin: 30rpx 32rpx 22rpx;
+}
+
+.section-title {
+  font-size: 31rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  flex-shrink: 0;
+}
+
+.section-line {
+  flex: 1;
+  height: 1rpx;
+  background: #E8EAEF;
+}
+
+/* ---------- 权益列表（Vant cell 内部元素） ---------- */
+.benefit-value {
+  font-size: 24rpx;
+  color: #969799;
+  line-height: 1.4;
+}
+
+.benefit-hl {
+  color: #6C47E0;
+  font-weight: 600;
+}
+
+/* ---------- 权益展开对比面板 ---------- */
+.cell-arrow {
+  display: flex;
+  align-items: center;
+  transition: transform 0.25s ease;
+}
+
+.cell-arrow.open {
+  transform: rotate(90deg);
+}
+
+.arrow-icon {
+  color: #C8C9CC !important;
+}
+
+.cell-arrow.open .arrow-icon {
+  color: #6C47E0 !important;
+}
+
+/* 收起/展开用 max-height 过渡，内层承载 padding 避免收起时残留空隙 */
+.benefit-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.benefit-detail.open {
+  max-height: 420rpx;
+}
+
+.detail-inner {
+  margin: 4rpx 16rpx 20rpx;
+  padding: 22rpx 24rpx;
+  background: #F7F8FA;
+  border-radius: 12rpx;
+}
+
+.cmp-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.cmp-row + .cmp-row {
+  margin-top: 18rpx;
+}
+
+.cmp-tag {
+  flex-shrink: 0;
+  font-size: 21rpx;
+  color: #969799;
+  background: #EEF0F3;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  margin-right: 16rpx;
+  line-height: 1.6;
+}
+
+.cmp-tag.after {
+  color: #6C47E0;
+  background: #EFEAFB;
+}
+
+.cmp-text {
+  flex: 1;
+  font-size: 24rpx;
+  color: #646566;
+  line-height: 1.6;
+}
+
+.cmp-text.after {
+  color: #1A1A1A;
+  font-weight: 500;
+}
+
+/* ---------- 套餐选择（黑色价格 + 选中态紫描边） ---------- */
+.plan-list {
+  display: flex;
+  gap: 20rpx;
+  margin: 0 32rpx;
+}
+
+.plan-item {
+  flex: 1;
+  background: #fff;
+  border: 2rpx solid #EBEDF0;
+  border-radius: 20rpx;
+  padding: 34rpx 8rpx 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: visible;
+}
+
+.plan-item.selected {
+  border-color: #6C47E0;
+  background: #F7F4FE;
+}
+
+.plan-top-badge {
+  position: absolute;
+  top: -16rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #6C47E0;
+  color: #fff;
+  font-size: 21rpx;
+  padding: 4rpx 20rpx;
+  border-radius: 999rpx;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+.plan-name {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  margin-top: 14rpx;
+  color: #1A1A1A;
+}
+
+.plan-symbol {
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.plan-num {
+  font-size: 44rpx;
+  font-weight: 800;
+  margin-left: 2rpx;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-sub {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.plan-item.selected .plan-sub {
+  color: #6C47E0;
+  font-weight: 500;
+}
+
+/* ---------- 底部开通按钮（Vant round block） ---------- */
+.purchase-bar {
+  margin: 44rpx 32rpx 0;
+}
+
+.purchase-btn {
+  height: 92rpx !important;
+  font-size: 31rpx !important;
+  font-weight: 600 !important;
+  letter-spacing: 2rpx;
+}

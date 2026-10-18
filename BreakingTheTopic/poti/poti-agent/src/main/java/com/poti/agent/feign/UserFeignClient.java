@@ -21,4 +21,8 @@ public interface UserFeignClient {
     @GetMapping("/user/rank/internal/friends")
     R<Map<String, Object>> getFriendRanking(@RequestParam("userId") Long userId,
                                             @RequestParam(value = "type", defaultValue = "total") String type);
+
+    /** 会员状态（internal 通道）——AI 提问每日限额 VIP 联动（VIP 100 次/普通 20 次） */
+    @GetMapping("/vip/internal/status")
+    R<Map<String, Object>> getVipStatus(@RequestParam("userId") Long userId);
 }

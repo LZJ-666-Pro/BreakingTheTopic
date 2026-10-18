@@ -25,6 +25,12 @@ public class User {
 
     private Integer status;
 
+    /** 会员等级 0普通 1VIP（权益按 vip_expire_time 动态判断，不依赖定时任务） */
+    private Integer vipLevel;
+
+    /** 会员到期时间（NULL=从未开通或已失效） */
+    private LocalDateTime vipExpireTime;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 

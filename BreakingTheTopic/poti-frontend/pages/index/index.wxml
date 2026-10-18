@@ -89,6 +89,10 @@
         <image class="quick-icon" src="/images/contentIcon/agent.png" mode="aspectFit" />
         <text class="quick-name">AI 导师</text>
       </view>
+      <view class="quick-item" bindtap="goToCompetition">
+        <image class="quick-icon" src="/images/contentIcon/competition.png" mode="aspectFit" />
+        <text class="quick-name">竞赛中心</text>
+      </view>
     </view>
 
     <view class="category-section">
@@ -114,6 +118,15 @@
         <text>{{showAllCategories ? '收起' : '展开全部'}}</text>
         <van-icon name="{{showAllCategories ? 'arrow-up' : 'arrow-down'}}" size="14px" color="#666" />
       </view>
+    </view>
+
+    <!-- 广告位（流量主预留：开发期灰色占位，config/ad.js 填入 unitId 并开启后展示真实 Banner） -->
+    <view class="ad-banner" wx:if="{{bannerAd.show}}">
+      <view class="ad-placeholder" wx:if="{{bannerAd.preview}}">
+        <van-icon name="apps-o" size="14px" color="#C8CAD0" />
+        <text>广告位（开发预览 · 流量主达标后启用）</text>
+      </view>
+      <ad wx:else unit-id="{{bannerAd.unitId}}" ad-intervals="60" bindload="onAdLoad" binderror="onAdError"></ad>
     </view>
 
     <view style="height: calc(120rpx + env(safe-area-inset-bottom));"></view>

@@ -1,0 +1,99 @@
+<view class="page">
+  <!-- 状态 Tab -->
+  <view class="tabs">
+    <view
+      class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+      wx:for="{{tabs}}"
+      wx:key="key"
+      bindtap="switchTab"
+      data-key="{{item.key}}"
+    >
+      <text>{{item.name}}</text>
+      <view class="tab-line" wx:if="{{activeTab === item.key}}"></view>
+    </view>
+  </view>
+
+  <!-- 竞赛列表 -->
+  <view class="comp-list">
+    <view class="comp-card" wx:for="{{list}}" wx:key="id">
+      <view class="comp-main">
+        <view class="comp-icon-wrap">
+          <van-icon name="medal-o" custom-class="comp-icon-vant" />
+        </view>
+        <view class="comp-info">
+          <view class="comp-title-row">
+            <text class="comp-title">{{item.title}}</text>
+            <text class="state-tag {{item.stateClass}}">{{item.state}}</text>
+          </view>
+          <view class="comp-countdown" wx:if="{{item.countdownText}}">
+            <van-icon name="clock-o" custom-class="countdown-vicon" />
+            <text class="countdown-text">{{item.countdownText}}</text>
+          </view>
+          <view class="comp-meta">
+            <text class="meta-item">{{item.signupCount}}人已报名</text>
+            <view class="meta-dot"></view>
+            <text class="meta-item">{{item.questionCount}}题</text>
+            <view class="meta-dot"></view>
+            <text class="meta-item">{{item.durationMinutes}}分钟</text>
+          </view>
+        </view>
+      </view>
+      <view class="comp-action">
+        <view
+          class="comp-btn {{item.btnClass}}"
+          wx:if="{{item.btnText}}"
+          bindtap="onBtnTap"
+          data-id="{{item.id}}"
+          data-action="{{item.btnAction}}"
+        >{{item.btnText}}</view>
+      </view>
+    </view>
+
+    <!-- 加载更多提示 -->
+    <view class="load-tip" wx:if="{{list.length > 0 && !finished}}">
+      <text>{{loading ? '加载中...' : '上拉加载更多'}}</text>
+    </view>
+
+    <!-- 空状态（原型：引导语 + 查看历史竞赛） -->
+    <view class="empty-state" wx:if="{{list.length === 0 && !loading}}">
+      <view class="empty-icon-wrap">
+        <van-icon name="medal-o" custom-class="empty-icon-vant" />
+      </view>
+      <text class="empty-text">暂无{{activeTab === 'signup' ? '报名中' : (activeTab === 'ongoing' ? '进行中' : '已结束')}}的竞赛，先看看往期精彩赛事吧</text>
+      <view class="empty-history-btn" wx:if="{{activeTab !== 'ended'}}" bindtap="goHistory">查看历史竞赛 ›</view>
+    </view>
+  </view>
+
+  <!-- 竞赛玩法（原型三图标） -->
+  <view class="play-section">
+    <view class="play-title-row">
+      <text class="play-title">竞赛玩法</text>
+      <view class="play-title-line"></view>
+    </view>
+    <view class="play-card">
+      <view class="play-item">
+        <view class="play-icon-wrap"><van-icon name="clock-o" custom-class="play-icon-vant" /></view>
+        <text class="play-name">限时答题</text>
+      </view>
+      <view class="play-item">
+        <view class="play-icon-wrap"><van-icon name="bar-chart-o" custom-class="play-icon-vant" /></view>
+        <text class="play-name">实时排行</text>
+      </view>
+      <view class="play-item">
+        <view class="play-icon-wrap"><van-icon name="gift-o" custom-class="play-icon-vant" /></view>
+        <text class="play-name">丰厚奖励</text>
+      </view>
+    </view>
+  </view>
+
+  <view style="height: calc(150rpx + env(safe-area-inset-bottom));"></view>
+
+  <!-- 我的成绩（底部通栏：白底描边按钮） -->
+  <view class="my-score-bar">
+    <van-button custom-class="my-score-vbtn" round block plain color="#6C47E0" bind:click="goMyRecords">
+      <van-icon name="medal-o" custom-class="bar-vicon" />
+      <text class="my-score-text">我的成绩</text>
+    </van-button>
+  </view>
+</view>
+

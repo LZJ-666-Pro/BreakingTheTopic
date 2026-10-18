@@ -51,6 +51,18 @@
           </view>
           <text class="function-name">面试特训营</text>
         </view>
+        <view class="function-item" bindtap="goToCompetition">
+          <view class="function-icon competition">
+            <image class="function-icon-img" src="/images/contentIcon/competition.png" mode="aspectFit" />
+          </view>
+          <text class="function-name">竞赛中心</text>
+        </view>
+        <view class="function-item" bindtap="goToVip">
+          <view class="function-icon vip">
+            <image class="function-icon-img" src="/images/contentIcon/vip.png" mode="aspectFit" />
+          </view>
+          <text class="function-name">会员中心</text>
+        </view>
         <view class="function-item" bindtap="goToInterview">
           <view class="function-icon interview">
             <image class="function-icon-img" src="/images/contentIcon/interview.png" mode="aspectFit" />

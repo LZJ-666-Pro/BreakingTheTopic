@@ -22,6 +22,8 @@ public class User {
     private String password;        // 密码
     private String uniqueId;        // 唯一ID，用于搜索添加好友
     private Integer status;         // 状态：0禁用，1正常
+    private Integer vipLevel;       // 会员等级：0普通 1VIP（是否生效按 vipExpireTime 动态判断，不依赖定时任务）
+    private LocalDateTime vipExpireTime;  // 会员到期时间（null 表示从未开通）
     private LocalDateTime lastLoginTime;
 
     @TableField(fill = FieldFill.INSERT)   // 自动填充创建时间（需要配置元对象处理器）

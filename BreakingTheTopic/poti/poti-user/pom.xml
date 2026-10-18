@@ -112,6 +112,13 @@
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 
+		<!-- 微信支付 V3 官方 SDK（JSAPI 下单/回调验签解密/查单） -->
+		<dependency>
+			<groupId>com.github.wechatpay-apiv3</groupId>
+			<artifactId>wechatpay-java</artifactId>
+			<version>0.2.14</version>
+		</dependency>
+
 		<!-- Spring Cloud LoadBalancer -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

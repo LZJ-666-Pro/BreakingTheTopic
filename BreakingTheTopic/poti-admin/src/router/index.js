@@ -103,8 +103,14 @@ const routes = [
       {
         path: 'competition',
         name: 'Competition',
-        component: placeholder,
+        component: () => import('../views/Competition.vue'),
         meta: { title: '竞赛活动', icon: 'Trophy' }
+      },
+      {
+        path: 'competition/records/:id',
+        name: 'CompetitionRecords',
+        component: () => import('../views/CompetitionRecords.vue'),
+        meta: { title: '竞赛成绩', icon: 'Trophy' }
       },
 
       // ===== 内容管理 =====
@@ -138,7 +144,7 @@ const routes = [
       {
         path: 'membership',
         name: 'Membership',
-        component: placeholder,
+        component: () => import('../views/Membership.vue'),
         meta: { title: '会员订单', icon: 'Goods' }
       },
 

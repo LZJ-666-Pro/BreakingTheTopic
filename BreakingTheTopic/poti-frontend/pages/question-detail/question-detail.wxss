@@ -533,3 +533,22 @@
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
 }
+
+/* 广告位（流量主预留：开发期灰色占位，上线后承载真实 Banner 广告） */
+.ad-banner {
+  margin-top: 24rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+.ad-banner .ad-placeholder {
+  height: 100rpx;
+  background: #F7F8FA;
+  border: 1px dashed #E5E6EB;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  font-size: 22rpx;
+  color: #C0C4CC;
+}

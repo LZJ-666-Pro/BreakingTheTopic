@@ -93,4 +93,8 @@ SELECT 'discussion_enabled', 'true', '讨论区开关', '关闭后题目详情�
 INSERT INTO sys_config (config_key, config_value, config_name, description, status)
 SELECT 'checkin_reward_enabled', 'true', '签到奖励开关', '关闭后签到不发放奖励', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'checkin_reward_enabled');
 INSERT INTO sys_config (config_key, config_value, config_name, description, status)
-SELECT 'vip_price', '0', '会员价格(元/月)', '会员每月价格，0为免费', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'vip_price');
+SELECT 'vip_price', '1.99', '会员价格(元/月)', '月卡价格，小程序会员中心实时读取', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'vip_price');
+INSERT INTO sys_config (config_key, config_value, config_name, description, status)
+SELECT 'vip_price_quarter', '4.99', '季卡价格(元)', '会员季卡价格，小程序会员中心实时读取', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'vip_price_quarter');
+INSERT INTO sys_config (config_key, config_value, config_name, description, status)
+SELECT 'vip_price_year', '9.99', '年卡价格(元)', '会员年卡价格，小程序会员中心实时读取', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'vip_price_year');

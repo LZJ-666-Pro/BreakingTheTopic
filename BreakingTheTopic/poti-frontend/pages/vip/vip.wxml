@@ -1,0 +1,68 @@
+<view class="page">
+  <!-- 权益列表（Vant cell：微信原生风格 + 内置字体图标） -->
+  <view class="section-head">
+    <text class="section-title">权益列表</text>
+    <view class="section-line"></view>
+  </view>
+  <van-cell-group inset border="{{ true }}">
+    <block wx:for="{{benefits}}" wx:key="key">
+      <van-cell icon="{{item.icon}}" title="{{item.title}}" bind:click="toggleBenefit" data-key="{{item.key}}">
+        <view class="benefit-value" slot="value">{{item.from}} → <text class="benefit-hl">{{item.to}}</text></view>
+        <view slot="right-icon" class="cell-arrow {{expandedBenefit === item.key ? 'open' : ''}}">
+          <van-icon name="arrow" custom-class="arrow-icon" />
+        </view>
+      </van-cell>
+      <!-- 展开面板：开通前后对比 -->
+      <view class="benefit-detail {{expandedBenefit === item.key ? 'open' : ''}}">
+        <view class="detail-inner">
+          <view class="cmp-row">
+            <text class="cmp-tag">开通前</text>
+            <text class="cmp-text">{{item.before}}</text>
+          </view>
+          <view class="cmp-row">
+            <text class="cmp-tag after">开通后</text>
+            <text class="cmp-text after">{{item.after}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </van-cell-group>
+
+  <!-- 套餐选择 -->
+  <view class="section-head">
+    <text class="section-title">套餐选择</text>
+    <view class="section-line"></view>
+  </view>
+  <view class="plan-list">
+    <view
+      class="plan-item {{selectedPlan === item.months ? 'selected' : ''}}"
+      wx:for="{{plans}}"
+      wx:key="months"
+      bindtap="selectPlan"
+      data-months="{{item.months}}"
+    >
+      <view class="plan-top-badge" wx:if="{{item.topBadge}}">{{item.topBadge}}</view>
+      <text class="plan-name">{{item.name}}</text>
+      <view class="plan-price">
+        <text class="plan-symbol">¥</text>
+        <text class="plan-num">{{item.price}}</text>
+      </view>
+      <text class="plan-sub" wx:if="{{item.sub}}">{{item.sub}}</text>
+    </view>
+  </view>
+
+  <!-- 底部开通按钮（Vant 按钮） -->
+  <view class="purchase-bar">
+    <van-button
+      round
+      block
+      color="#6C47E0"
+      loading="{{purchasing}}"
+      loading-text="{{vip ? '支付中...' : '开通中...'}}"
+      custom-class="purchase-btn"
+      bind:click="handlePurchase"
+    >{{vip ? '立即续费' : '立即开通'}}</van-button>
+  </view>
+
+  <view style="height: calc(40rpx + env(safe-area-inset-bottom));"></view>
+</view>

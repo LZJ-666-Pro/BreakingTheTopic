@@ -12,6 +12,8 @@
       
       <el-tabs v-model="activeTab">
         <el-tab-pane label="网站设置" name="site">
+          <el-alert type="info" :closable="false" show-icon
+            title="保存后展示在小程序「联系我们-关于本站」（名称/描述/版权/备案号）" style="margin-bottom: 16px" />
           <el-form :model="siteForm" label-width="120px">
             <el-form-item label="网站名称">
               <el-input v-model="siteForm.site_name" placeholder="请输入网站名称" />
@@ -37,11 +39,13 @@
         
         <el-tab-pane label="上传设置" name="upload">
           <el-form :model="siteForm" label-width="120px">
+            <el-alert type="info" :closable="false" show-icon
+              title="生效于后台上传接口（管理员头像），保存后即时生效" style="margin-bottom: 16px" />
             <el-form-item label="文件大小限制">
               <el-input-number v-model="siteForm.upload_max_size" :min="1" :max="100" />
               <span style="margin-left: 10px">MB</span>
             </el-form-item>
-            
+
             <el-form-item label="允许的文件类型">
               <el-input v-model="siteForm.upload_allow_types" placeholder="请输入允许的文件类型，用逗号分隔" />
               <div class="form-tip">文件扩展名，用逗号分隔，例如：jpg,jpeg,png,gif,pdf</div>
@@ -62,27 +66,27 @@
 
             <el-form-item label="竞赛功能">
               <el-switch v-model="siteForm.competition_enabled" active-value="true" inactive-value="false" />
+              <span class="form-tip" style="margin-left: 10px">竞赛模块未上线，暂不生效</span>
             </el-form-item>
 
             <el-form-item label="讨论区">
               <el-switch v-model="siteForm.discussion_enabled" active-value="true" inactive-value="false" />
+              <span class="form-tip" style="margin-left: 10px">关闭后题目讨论列表隐藏且禁止发表</span>
             </el-form-item>
 
             <el-form-item label="签到奖励">
               <el-switch v-model="siteForm.checkin_reward_enabled" active-value="true" inactive-value="false" />
+              <span class="form-tip" style="margin-left: 10px">奖励体系（积分/兑换）未上线，暂不生效</span>
             </el-form-item>
 
             <el-form-item label="每日一题更新时间">
               <el-input v-model="siteForm.daily_question_time" placeholder="如 00:00" style="width: 140px" />
+              <span class="form-tip" style="margin-left: 10px">每日一题由后台手动设置，暂不生效</span>
             </el-form-item>
 
             <el-form-item label="默认分页条数">
               <el-input-number v-model="siteForm.default_page_size" :min="5" :max="100" />
-            </el-form-item>
-
-            <el-form-item label="会员价格(元/月)">
-              <el-input-number v-model="siteForm.vip_price" :min="0" :max="999" />
-              <span class="form-tip" style="margin-left: 10px">0 表示免费</span>
+              <span class="form-tip" style="margin-left: 10px">后台各列表页初始每页条数（个人手动选择优先）</span>
             </el-form-item>
 
             <el-form-item label="联系邮箱">
@@ -91,7 +95,30 @@
           </el-form>
         </el-tab-pane>
 
+        <el-tab-pane label="会员设置" name="vip">
+          <el-alert type="success" :closable="false" show-icon
+            title="以下价格保存后实时生效：小程序「会员中心」的套餐列表与开通金额均即时读取" style="margin-bottom: 16px" />
+          <el-form :model="siteForm" label-width="120px">
+            <el-form-item label="月卡价格(元)">
+              <el-input-number v-model="siteForm.vip_price" :min="0.01" :max="9999" :precision="2" :step="1" />
+              <span class="form-tip" style="margin-left: 10px">按月开通，对应配置键 vip_price</span>
+            </el-form-item>
+
+            <el-form-item label="季卡价格(元)">
+              <el-input-number v-model="siteForm.vip_price_quarter" :min="0.01" :max="9999" :precision="2" :step="1" />
+              <span class="form-tip" style="margin-left: 10px">按季开通（3个月），省钱标签按月卡价自动换算</span>
+            </el-form-item>
+
+            <el-form-item label="年卡价格(元)">
+              <el-input-number v-model="siteForm.vip_price_year" :min="0.01" :max="9999" :precision="2" :step="1" />
+              <span class="form-tip" style="margin-left: 10px">按年开通（12个月），省钱标签按月卡价自动换算</span>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+
         <el-tab-pane label="邮件设置" name="email">
+          <el-alert type="warning" :closable="false" show-icon
+            title="项目尚未接入邮件服务商，以下配置仅保存不生效" style="margin-bottom: 16px" />
           <el-form :model="siteForm" label-width="120px">
             <el-form-item label="SMTP服务器">
               <el-input v-model="siteForm.email_smtp_host" placeholder="请输入SMTP服务器地址" />
@@ -112,6 +139,8 @@
         </el-tab-pane>
         
         <el-tab-pane label="短信设置" name="sms">
+          <el-alert type="warning" :closable="false" show-icon
+            title="短信当前为开发模式（验证码打印到服务日志），接入服务商后以下配置才生效" style="margin-bottom: 16px" />
           <el-form :model="siteForm" label-width="120px">
             <el-form-item label="AccessKey">
               <el-input v-model="siteForm.sms_access_key" placeholder="请输入短信服务AccessKey" />
@@ -168,7 +197,9 @@ const siteForm = reactive({
   checkin_reward_enabled: 'true',
   daily_question_time: '00:00',
   default_page_size: 10,
-  vip_price: 0,
+  vip_price: 1.99,
+  vip_price_quarter: 4.99,
+  vip_price_year: 9.99,
   contact_email: ''
 })
 
@@ -183,7 +214,11 @@ const loadConfigs = async () => {
     
     for (const key in configs) {
       if (siteForm.hasOwnProperty(key)) {
-        if (key === 'upload_max_size' || key === 'email_smtp_port' || key === 'default_page_size' || key === 'vip_price') {
+        if (key === 'vip_price' || key === 'vip_price_quarter' || key === 'vip_price_year') {
+          // 价格为小数，用 parseFloat；空/非法时保留表单缺省值
+          const parsed = parseFloat(configs[key])
+          siteForm[key] = isNaN(parsed) ? siteForm[key] : parsed
+        } else if (key === 'upload_max_size' || key === 'email_smtp_port' || key === 'default_page_size') {
           siteForm[key] = parseInt(configs[key]) || siteForm[key]
         } else {
           siteForm[key] = configs[key]

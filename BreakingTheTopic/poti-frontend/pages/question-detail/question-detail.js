@@ -2,6 +2,7 @@ import Toast from '@vant/weapp/toast/toast';
 
 const app = getApp()
 const guestUtils = require('../../utils/guest.js')
+const adUtils = require('../../utils/ad.js')
 
 const typeNames = {
   'java': 'Java',
@@ -25,6 +26,7 @@ Page({
     question: {},
     options: [],
     selectedOption: null,
+    bannerAd: { show: false, preview: false, unitId: '' },
     showAnswer: false,
     isFavorited: false,
     isMarked: false,
@@ -44,6 +46,19 @@ Page({
       this.loadMoreQuestions()
       this.checkMarkedStatus()
     }
+    // 广告位状态（VIP/新用户/每日频次）
+    this.setData({ bannerAd: adUtils.getBannerState() })
+  },
+
+  /** 真实广告拉取失败（低填充率等）时隐藏容器 */
+  onAdError(e) {
+    console.warn('广告拉取失败，隐藏广告位', e.detail)
+    this.setData({ 'bannerAd.show': false })
+  },
+
+  /** 广告加载成功计入每日频次（dailyLimit 红线） */
+  onAdLoad() {
+    adUtils.recordShow()
   },
 
   loadQuestionDetail(questionId) {
@@ -142,9 +157,39 @@ Page({
     })
   },
 
+  // 点击查看答案：会员/未超限直接展示；非会员每日限 5 篇（后端按题去重），超限引导开通会员
   showAnswerHandler() {
-    this.setData({
-      showAnswer: true
+    if (this.data.showAnswer) return
+    wx.request({
+      url: `${app.globalData.questionUrl}/question/solution/view`,
+      method: 'POST',
+      data: { questionId: this.data.questionId },
+      header: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${app.globalData.token}`
+      },
+      success: (res) => {
+        const data = res.data && res.data.data
+        if (res.data && res.data.code === 200 && data && data.allow === false) {
+          wx.showModal({
+            title: '今日题解次数已用完',
+            content: `非会员每天可查看 ${data.limit || 5} 篇官方题解，开通会员可无限查看`,
+            confirmText: '开通会员',
+            cancelText: '暂不需要',
+            success: (r) => {
+              if (r.confirm) {
+                wx.navigateTo({ url: '/pages/vip/vip' })
+              }
+            }
+          })
+        } else {
+          // 会员/未超限/校验链路异常：保持展示（后端异常时已降级放行）
+          this.setData({ showAnswer: true })
+        }
+      },
+      fail: () => {
+        this.setData({ showAnswer: true })
+      }
     })
   },
 

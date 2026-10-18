@@ -1,0 +1,194 @@
+<view class="page">
+  <!-- 加载中 -->
+  <view class="center-tip" wx:if="{{mode === 'loading'}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 无法答题 -->
+  <view class="invalid-view" wx:elif="{{mode === 'invalid'}}">
+    <image class="invalid-icon" src="/images/contentIcon/competition.png" mode="aspectFit" />
+    <text class="invalid-text">{{invalidMsg}}</text>
+    <view class="invalid-btn" bindtap="goBack">返回竞赛中心</view>
+  </view>
+
+  <!-- 答题模式 -->
+  <block wx:elif="{{mode === 'quiz'}}">
+    <view class="quiz-top">
+      <view class="countdown {{timeWarning ? 'warning' : ''}}">
+        <text class="countdown-label">剩余</text>
+        <text class="countdown-time">{{countdownText}}</text>
+      </view>
+      <view class="progress-text">{{currentIndex + 1}} / {{questions.length}}</view>
+    </view>
+    <view class="progress-bar">
+      <view class="progress-inner" style="width: {{questions.length ? (currentIndex + 1) * 100 / questions.length : 0}}%;"></view>
+    </view>
+
+    <scroll-view class="quiz-scroll" scroll-y>
+      <view class="question-card">
+        <view class="q-type-tag">{{currentQuestion.typeText}}</view>
+        <view class="q-title">{{currentQuestion.displayTitle}}</view>
+
+        <!-- 单选 -->
+        <view class="options" wx:if="{{currentQuestion.type === 1}}">
+          <view
+            class="option-item {{opt.selected ? 'selected' : ''}}"
+            wx:for="{{currentQuestion.options}}"
+            wx:for-item="opt"
+            wx:key="letter"
+            bindtap="selectSingle"
+            data-idx="{{index}}"
+          >
+            <view class="option-letter">{{opt.letter}}</view>
+            <text class="option-text">{{opt.text}}</text>
+          </view>
+        </view>
+
+        <!-- 多选 -->
+        <view class="options" wx:elif="{{currentQuestion.type === 2}}">
+          <view class="multi-hint">可多选，按选项字母升序提交</view>
+          <view
+            class="option-item {{opt.selected ? 'selected' : ''}}"
+            wx:for="{{currentQuestion.options}}"
+            wx:for-item="opt"
+            wx:key="letter"
+            bindtap="toggleMulti"
+            data-idx="{{index}}"
+          >
+            <view class="option-letter multi">{{opt.selected ? '✓' : opt.letter}}</view>
+            <text class="option-text">{{opt.text}}</text>
+          </view>
+        </view>
+
+        <!-- 填空 -->
+        <view class="blank-group" wx:elif="{{currentQuestion.type === 3}}">
+          <view class="input-hint">请输入答案，判分时忽略大小写与首尾空格</view>
+          <input
+            class="blank-input"
+            value="{{answers[currentIndex]}}"
+            bindinput="onTextInput"
+            placeholder="请输入答案"
+            placeholder-class="input-placeholder"
+          />
+        </view>
+
+        <!-- 解答（编码题） -->
+        <view class="essay-group" wx:elif="{{currentQuestion.type === 4}}">
+          <view class="input-hint">编写代码或文字解答，交卷后由 AI 智能阅卷</view>
+          <textarea
+            class="essay-input"
+            value="{{answers[currentIndex]}}"
+            bindinput="onTextInput"
+            placeholder="在此编写代码或文字解答..."
+            placeholder-class="input-placeholder"
+            maxlength="-1"
+            disable-default-padding
+          />
+        </view>
+      </view>
+      <view style="height: 40rpx;"></view>
+    </scroll-view>
+
+    <view class="quiz-footer">
+      <view class="nav-btn prev {{currentIndex === 0 ? 'disabled' : ''}}" bindtap="prevQuestion">上一题</view>
+      <view wx:if="{{currentIndex < questions.length - 1}}" class="nav-btn next" bindtap="nextQuestion">下一题</view>
+      <view wx:else class="nav-btn submit {{submitting ? 'disabled' : ''}}" bindtap="handleSubmit">交卷</view>
+    </view>
+  </block>
+
+  <!-- 成绩模式 -->
+  <block wx:elif="{{mode === 'result'}}">
+    <scroll-view class="result-scroll" scroll-y>
+      <view class="result-card">
+        <text class="result-label">我的得分</text>
+        <view class="result-score">{{result.score}}</view>
+        <view class="result-stats">
+          <view class="result-stat">
+            <text class="stat-num">{{result.correctCount}}</text>
+            <text class="stat-name">答对题数</text>
+          </view>
+          <view class="stat-divider"></view>
+          <view class="result-stat">
+            <text class="stat-num">{{result.costText}}</text>
+            <text class="stat-name">用时</text>
+          </view>
+          <view class="stat-divider"></view>
+          <view class="result-stat">
+            <text class="stat-num">{{result.rank || '--'}}</text>
+            <text class="stat-name">排名</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="rank-section">
+        <view class="rank-header">
+          <text class="rank-title">排行榜</text>
+          <text class="rank-sub">前 50 名</text>
+        </view>
+        <view class="rank-item {{item.isMe ? 'me' : ''}}" wx:for="{{rankList}}" wx:key="rank">
+          <view class="rank-no rank-{{item.rank <= 3 ? item.rank : 'normal'}}">{{item.rank}}</view>
+          <image class="rank-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" />
+          <text class="rank-name">{{item.nickname || '匿名用户'}}</text>
+          <view class="me-tag" wx:if="{{item.isMe}}">我</view>
+          <view class="rank-right">
+            <text class="rank-score">{{item.score}}分</text>
+            <text class="rank-cost">{{item.costText}}</text>
+          </view>
+        </view>
+        <view class="empty-state" wx:if="{{rankList.length === 0}}">
+          <text class="empty-text">暂无排行数据</text>
+        </view>
+      </view>
+
+      <!-- 试卷回顾：每题的我的作答 / 参考答案 / 解析 -->
+      <view class="review-section" wx:if="{{reviewList.length > 0}}">
+        <view class="review-head">
+          <text class="review-title">试卷回顾</text>
+          <text class="review-sub">参考答案与解析</text>
+        </view>
+        <view class="review-item" wx:for="{{reviewList}}" wx:key="questionId">
+          <view class="review-q-head">
+            <view class="review-no">{{item.no}}</view>
+            <view class="review-type">{{item.typeText}}</view>
+            <view class="review-flag {{item.correct === true ? 'ok' : (item.correct === false ? 'bad' : 'unknown')}}">{{item.correct === true ? '答对' : (item.correct === false ? '答错' : '未判分')}}</view>
+            <text class="review-score">{{item.score}}分</text>
+          </view>
+          <view class="review-q-title">{{item.displayTitle}}</view>
+
+          <!-- 选择题：选项列表，标出正确项与我的错选 -->
+          <view class="review-options" wx:if="{{item.type === 1 || item.type === 2}}">
+            <view
+              class="review-opt {{opt.isCorrect ? 'correct' : ''}} {{opt.isUser && !opt.isCorrect ? 'wrong' : ''}}"
+              wx:for="{{item.options}}"
+              wx:for-item="opt"
+              wx:key="letter"
+            >
+              <text class="review-opt-letter">{{opt.letter}}</text>
+              <text class="review-opt-text">{{opt.text}}</text>
+              <text class="review-opt-mark" wx:if="{{opt.isUser && !opt.isCorrect}}">我的错选</text>
+            </view>
+          </view>
+
+          <!-- 填空/解答：我的作答与参考答案 -->
+          <view class="review-answer" wx:if="{{item.type !== 1 && item.type !== 2}}">
+            <view class="review-answer-row">
+              <text class="answer-label">我的作答</text>
+              <text class="answer-value {{item.type === 4 ? 'mono' : ''}} {{item.userAnswer ? '' : 'empty'}}">{{item.userAnswer || '未作答'}}</text>
+            </view>
+            <view class="review-answer-row">
+              <text class="answer-label">参考答案</text>
+              <text class="answer-value ref">{{item.correctAnswer || '--'}}</text>
+            </view>
+          </view>
+
+          <!-- 解析 -->
+          <view class="review-analysis" wx:if="{{item.analysis}}">
+            <text class="analysis-label">解析</text>
+            <text class="analysis-text">{{item.analysis}}</text>
+          </view>
+        </view>
+      </view>
+      <view style="height: calc(40rpx + env(safe-area-inset-bottom));"></view>
+    </scroll-view>
+  </block>
+</view>

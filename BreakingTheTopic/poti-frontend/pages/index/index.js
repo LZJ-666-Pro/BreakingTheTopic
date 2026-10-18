@@ -253,6 +253,7 @@ Page({
     wrongCount: 0,
     favoriteCount: 0,
     unreadCount: 0,
+    bannerAd: require('../../utils/ad.js').getBannerState(),
     totalQuestions: 0,
     historyCount: 0,
     accuracy: 0,
@@ -280,12 +281,25 @@ Page({
         selected: 0
       })
     }
+    // 广告位状态刷新（VIP 开通/到期、每日频次变化后回首页自动生效）
+    this.setData({ bannerAd: require('../../utils/ad.js').getBannerState() })
     this.loadUserInfo()
     this.loadStats()
     this.checkUnfinished()
     this.checkTodayCheckIn()
     this.loadUnreadCount()
     this.loadDailyQuestion()
+  },
+
+  /** 真实广告拉取失败（低填充率等）时隐藏容器，避免空白占位 */
+  onAdError(e) {
+    console.warn('广告拉取失败，隐藏广告位', e.detail)
+    this.setData({ 'bannerAd.show': false })
+  },
+
+  /** 广告加载成功计入每日频次（dailyLimit 红线） */
+  onAdLoad() {
+    require('../../utils/ad.js').recordShow()
   },
 
   loadUnreadCount() {
@@ -548,6 +562,12 @@ Page({
   goToAgent() {
     wx.navigateTo({
       url: '/pages/agent/agent'
+    })
+  },
+
+  goToCompetition() {
+    wx.navigateTo({
+      url: '/pages/competition/competition'
     })
   },
 

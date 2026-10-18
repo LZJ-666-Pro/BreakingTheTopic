@@ -1,0 +1,329 @@
+.page {
+  min-height: 100vh;
+  background: #F7F8FA;
+}
+
+/* ---------- Tab（专业风格：细下划线） ---------- */
+.tabs {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid #EEF0F3;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx 0 0;
+  font-size: 29rpx;
+  color: #7A7F88;
+  position: relative;
+}
+
+.tab-item.active {
+  color: #6C47E0;
+  font-weight: 600;
+}
+
+.tab-line {
+  width: 40rpx;
+  height: 5rpx;
+  border-radius: 3rpx;
+  background: #6C47E0;
+  margin-top: 12rpx;
+}
+
+/* ---------- 竞赛卡片（描边卡 + 实色按钮，去渐变去大阴影） ---------- */
+.comp-list {
+  padding: 24rpx 32rpx;
+}
+
+.comp-card {
+  background: #fff;
+  border: 1rpx solid #EEF0F3;
+  border-radius: 18rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+}
+
+.comp-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 22rpx;
+}
+
+.comp-icon-wrap {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+  background: #F5F6F8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.comp-icon-vant {
+  font-size: 44rpx;
+  color: #969799;
+}
+
+.comp-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.comp-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.comp-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 31rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 状态标签：浅底描边小圆角 */
+.state-tag {
+  flex-shrink: 0;
+  font-size: 21rpx;
+  padding: 3rpx 12rpx;
+  border-radius: 8rpx;
+  line-height: 1.5;
+}
+
+/* 状态标签统一中性灰（Vant tag 风格），状态语义由按钮与倒计时表达 */
+.state-tag.signup {
+  color: #969799;
+  background: #F5F6F8;
+}
+
+.state-tag.ongoing {
+  color: #969799;
+  background: #F5F6F8;
+}
+
+.state-tag.ended {
+  color: #969799;
+  background: #F3F4F6;
+}
+
+.comp-countdown {
+  display: flex;
+  align-items: center;
+  margin-top: 10rpx;
+}
+
+.countdown-vicon {
+  font-size: 23rpx;
+  color: #969799;
+  margin-right: 6rpx;
+}
+
+.countdown-text {
+  font-size: 23rpx;
+  color: #969799;
+}
+
+.comp-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 10rpx;
+}
+
+.meta-item {
+  font-size: 23rpx;
+  color: #7A7F88;
+}
+
+.meta-dot {
+  width: 5rpx;
+  height: 5rpx;
+  border-radius: 50%;
+  background: #D2D6DD;
+  margin: 0 14rpx;
+}
+
+.comp-action {
+  flex-shrink: 0;
+}
+
+.comp-btn {
+  font-size: 26rpx;
+  padding: 14rpx 32rpx;
+  border-radius: 12rpx;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.btn-primary {
+  color: #fff;
+  background: #6C47E0;
+  font-weight: 500;
+}
+
+.btn-disabled {
+  color: #9A9FA8;
+  background: #F3F4F6;
+}
+
+.btn-ghost {
+  color: #6C47E0;
+  background: #fff;
+  border: 1rpx solid #C9B8F2;
+}
+
+.load-tip {
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 24rpx;
+  color: #9A9FA8;
+}
+
+/* ---------- 空状态 ---------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 90rpx 0 50rpx;
+}
+
+.empty-icon-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 28rpx;
+  background: #F5F6F8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24rpx;
+}
+
+.empty-icon-vant {
+  font-size: 64rpx;
+  color: #C8C9CC;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  color: #9A9FA8;
+  text-align: center;
+  padding: 0 60rpx;
+  line-height: 1.6;
+}
+
+.empty-history-btn {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  color: #6C47E0;
+  padding: 12rpx 36rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid #C9B8F2;
+  background: #fff;
+}
+
+/* ---------- 竞赛玩法 ---------- */
+.play-section {
+  padding: 8rpx 32rpx 24rpx;
+}
+
+.play-title-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.play-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.play-title-line {
+  flex: 1;
+}
+
+.play-card {
+  background: #fff;
+  border: 1rpx solid #EEF0F3;
+  border-radius: 18rpx;
+  padding: 32rpx 0;
+  display: flex;
+}
+
+.play-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.play-icon-wrap {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 22rpx;
+  background: #F5F6F8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-icon-vant {
+  font-size: 48rpx;
+  color: #646566;
+}
+
+.play-name {
+  font-size: 25rpx;
+  color: #44494F;
+}
+
+/* ---------- 我的成绩底部通栏按钮 ---------- */
+.my-score-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18rpx 32rpx calc(18rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1rpx solid #EEF0F3;
+  z-index: 20;
+}
+
+/* 我的成绩：Vant 描边按钮（白底紫字，弱化大面积实色） */
+.my-score-vbtn {
+  height: 92rpx !important;
+  border-radius: 46rpx !important;
+  font-size: 31rpx !important;
+  font-weight: 600 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bar-vicon {
+  font-size: 34rpx;
+  margin-right: 10rpx;
+}
+
+.my-score-text {
+  line-height: 1;
+}
+

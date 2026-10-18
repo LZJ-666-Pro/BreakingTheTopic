@@ -263,6 +263,24 @@ Page({
     })
   },
 
+  goToCompetition() {
+    if (!guestUtils.requireLogin(null, '竞赛功能需要登录后才能使用')) {
+      return
+    }
+    wx.navigateTo({
+      url: '/pages/competition/competition'
+    })
+  },
+
+  goToVip() {
+    if (!guestUtils.requireLogin(null, '会员功能需要登录后才能使用')) {
+      return
+    }
+    wx.navigateTo({
+      url: '/pages/vip/vip'
+    })
+  },
+
   goToInterview() {
     wx.navigateTo({
       url: '/pages/interview/interview'

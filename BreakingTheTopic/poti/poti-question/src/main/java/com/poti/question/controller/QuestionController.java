@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poti.common.R;
 import com.poti.question.entity.Category;
 import com.poti.question.entity.Question;
+import com.poti.question.client.UserFeignClient;
 import com.poti.question.service.CategoryService;
 import com.poti.question.service.QuestionService;
 import com.poti.question.service.SearchSyncService;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,9 @@ public class QuestionController {
 
     @Autowired(required = false)
     private SearchSyncService searchSyncService;
+
+    @Autowired(required = false)
+    private UserFeignClient userFeignClient;
 
     @GetMapping("/categories")
     @Operation(summary = "获取题目分类列表", description = "获取所有题目分类信息，包含题目数量统计")
@@ -212,6 +218,35 @@ public class QuestionController {
         }
     }
 
+    @PostMapping("/solution/view")
+    @Operation(summary = "官方题解查看校验", description = "会员无限查看；非会员每日限 5 篇（按题去重），超限返回 allow=false 供前端引导开通会员")
+    public R<Map<String, Object>> checkSolutionView(@RequestHeader(value = "X-User-Id", required = false) Long userId,
+                                                    @RequestBody(required = false) Map<String, Object> body) {
+        Map<String, Object> fallback = new HashMap<>();
+        fallback.put("allow", true);
+        // 未登录请求不校验（与历史行为一致，放行）；user 服务不可用时降级放行，不阻断正常刷题
+        if (userId == null || userFeignClient == null) {
+            return R.success(fallback);
+        }
+        Long questionId = null;
+        if (body != null && body.get("questionId") != null) {
+            try {
+                questionId = Long.parseLong(String.valueOf(body.get("questionId")));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        try {
+            R<Map<String, Object>> result = userFeignClient.checkSolutionView(userId, questionId);
+            if (result != null && result.getData() != null) {
+                return R.success(result.getData());
+            }
+            return R.success(fallback);
+        } catch (Exception e) {
+            log.warn("题解查看校验失败，降级放行: userId={}", userId, e);
+            return R.success(fallback);
+        }
+    }
+
     @GetMapping("/{id}")
     public R<Question> getQuestionById(@PathVariable Long id) {
         try {
@@ -305,6 +340,176 @@ public class QuestionController {
             return R.success(result);
         } catch (Exception e) {
             return R.error("获取题目失败");
+        }
+    }
+
+    /**
+     * 内部接口：竞赛随机抽题（供 poti-practice Feign 调用）
+     * 按题型抽取（types 逗号分隔：1单选 2多选 3填空 4解答），剥离 answer/analysis 字段防止作弊
+     */
+    @GetMapping("/internal/random")
+    @Operation(summary = "内部随机抽题", description = "按分类与题型随机抽题（1单选 2多选 3填空 4解答），返回结果不含答案与解析，limit 上限 50")
+    public R<List<Map<String, Object>>> getRandomQuestionsInternal(@RequestParam Long categoryId,
+                                                                   @RequestParam(defaultValue = "10") Integer limit,
+                                                                   @RequestParam(required = false) String types) {
+        try {
+            // limit 上限 50，防止一次抽题过多
+            int safeLimit = (limit == null || limit <= 0) ? 10 : Math.min(limit, 50);
+
+            // 解析题型参数（默认兼容旧调用：1单选 2多选）
+            List<Integer> typeList = new ArrayList<>();
+            if (types != null && !types.trim().isEmpty()) {
+                for (String t : types.split(",")) {
+                    try {
+                        int v = Integer.parseInt(t.trim());
+                        if (v >= 1 && v <= 4) {
+                            typeList.add(v);
+                        }
+                    } catch (NumberFormatException ignore) {
+                    }
+                }
+            }
+            if (typeList.isEmpty()) {
+                typeList.add(1);
+                typeList.add(2);
+            }
+
+            LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Question::getCategoryId, categoryId)
+                   .eq(Question::getDeleted, 0)
+                   .eq(Question::getStatus, 1)
+                   .in(Question::getType, typeList);
+
+            List<Question> questions = questionService.list(wrapper);
+            Collections.shuffle(questions);
+            if (questions.size() > safeLimit) {
+                questions = questions.subList(0, safeLimit);
+            }
+
+            // 仅返回 id/title/content/type/options，剥离 answer/analysis 防作弊
+            List<Map<String, Object>> result = questions.stream().map(q -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", q.getId());
+                map.put("title", q.getTitle());
+                map.put("content", q.getContent());
+                map.put("type", q.getType());
+                if (q.getOptions() != null && !q.getOptions().isEmpty()) {
+                    try {
+                        List<String> options = objectMapper.readValue(q.getOptions(), new TypeReference<List<String>>() {});
+                        map.put("options", options);
+                    } catch (Exception e) {
+                        map.put("options", q.getOptions());
+                    }
+                }
+                return map;
+            }).collect(java.util.stream.Collectors.toList());
+
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("竞赛随机抽题失败", e);
+            return R.error("随机抽题失败");
+        }
+    }
+
+    /**
+     * 内部接口：按 ID 批量取题（供 poti-practice 竞赛断点续答恢复题目快照）
+     * 与 /internal/random 同样剥离 answer/analysis 防作弊
+     */
+    @GetMapping("/internal/batch")
+    @Operation(summary = "内部批量取题", description = "按 ID 列表批量获取题目（ids 逗号分隔），返回结果不含答案与解析")
+    public R<List<Map<String, Object>>> getQuestionsByIdsInternal(@RequestParam String ids) {
+        try {
+            List<Long> idList = new ArrayList<>();
+            for (String s : ids.split(",")) {
+                try {
+                    idList.add(Long.parseLong(s.trim()));
+                } catch (NumberFormatException ignore) {
+                }
+            }
+            if (idList.isEmpty()) {
+                return R.success(Collections.emptyList());
+            }
+            List<Question> questions = questionService.listByIds(idList);
+            Map<Long, Question> qMap = questions.stream()
+                    .collect(java.util.stream.Collectors.toMap(Question::getId, q -> q));
+            // 按传入 ID 顺序还原题目顺序
+            List<Map<String, Object>> result = new ArrayList<>();
+            for (Long qid : idList) {
+                Question q = qMap.get(qid);
+                if (q == null) {
+                    continue;
+                }
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", q.getId());
+                map.put("title", q.getTitle());
+                map.put("content", q.getContent());
+                map.put("type", q.getType());
+                if (q.getOptions() != null && !q.getOptions().isEmpty()) {
+                    try {
+                        List<String> options = objectMapper.readValue(q.getOptions(), new TypeReference<List<String>>() {});
+                        map.put("options", options);
+                    } catch (Exception e) {
+                        map.put("options", q.getOptions());
+                    }
+                }
+                result.add(map);
+            }
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("内部批量取题失败", e);
+            return R.error("批量获取题目失败");
+        }
+    }
+
+    /**
+     * 内部接口：按 ID 批量取题目回顾数据（含答案与解析，仅限交卷后的试卷回顾场景，供 poti-practice 调用）
+     * 注意：该接口返回答案，绝不用于开赛抽题链路
+     */
+    @GetMapping("/internal/review-batch")
+    @Operation(summary = "内部批量取题（含答案解析）", description = "按 ID 列表批量获取题目（ids 逗号分隔），包含 answer/analysis，仅供交卷后试卷回顾使用")
+    public R<List<Map<String, Object>>> getReviewQuestionsInternal(@RequestParam String ids) {
+        try {
+            List<Long> idList = new ArrayList<>();
+            for (String s : ids.split(",")) {
+                try {
+                    idList.add(Long.parseLong(s.trim()));
+                } catch (NumberFormatException ignore) {
+                }
+            }
+            if (idList.isEmpty()) {
+                return R.success(Collections.emptyList());
+            }
+            List<Question> questions = questionService.listByIds(idList);
+            Map<Long, Question> qMap = questions.stream()
+                    .collect(java.util.stream.Collectors.toMap(Question::getId, q -> q));
+            // 按传入 ID 顺序还原题目顺序
+            List<Map<String, Object>> result = new ArrayList<>();
+            for (Long qid : idList) {
+                Question q = qMap.get(qid);
+                if (q == null) {
+                    continue;
+                }
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", q.getId());
+                map.put("title", q.getTitle());
+                map.put("content", q.getContent());
+                map.put("type", q.getType());
+                map.put("answer", q.getAnswer());
+                map.put("analysis", q.getAnalysis());
+                if (q.getOptions() != null && !q.getOptions().isEmpty()) {
+                    try {
+                        List<String> options = objectMapper.readValue(q.getOptions(), new TypeReference<List<String>>() {});
+                        map.put("options", options);
+                    } catch (Exception e) {
+                        map.put("options", q.getOptions());
+                    }
+                }
+                result.add(map);
+            }
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("内部回顾取题失败", e);
+            return R.error("批量获取题目失败");
         }
     }
 

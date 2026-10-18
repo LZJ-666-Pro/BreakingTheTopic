@@ -8,6 +8,9 @@ jwt:
 poti:
   security:
     internal-token: ${INTERNAL_TOKEN:poti-internal-secret-2024}
+    # 微信支付结果回调由微信服务器发起（无 JWT），需免鉴权；签名验证由回调逻辑自行完成
+    exclude-paths:
+      - /vip/pay/notify
 
 spring:
   application:
@@ -96,6 +99,19 @@ avatar:
 wx:
   appid: ${WX_APPID:wx920f3d57f4121af7}
   secret: ${WX_SECRET:1a1df381bfb417d942beee26ef809b09}
+  pay:
+    # 微信支付总开关：false 或商户参数不全时自动降级为模拟支付（点击支付即成功）
+    enabled: ${WX_PAY_ENABLED:false}
+    # 商户号
+    mch-id: ${WX_PAY_MCH_ID:}
+    # 商户 API 证书序列号（商户平台-API安全-API证书管理）
+    mch-serial-no: ${WX_PAY_SERIAL_NO:}
+    # APIv3 密钥（商户平台-账户中心-API安全-APIv3密钥，32位）
+    api-v3-key: ${WX_PAY_APIV3_KEY:}
+    # 商户私钥文件 apiclient_key.pem 的本地绝对路径
+    private-key-path: ${WX_PAY_PRIVATE_KEY_PATH:}
+    # 支付结果回调地址（必须公网 https，微信服务器需能直接访问；本地开发可用内网穿透）
+    notify-url: ${WX_PAY_NOTIFY_URL:}
 
 sms:
   spug:

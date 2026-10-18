@@ -41,7 +41,11 @@
     "pages/special/special",
     "pages/special-detail/special-detail",
     "pages/camp-home/camp-home",
-    "pages/agent/agent"
+    "pages/agent/agent",
+    "pages/competition/competition",
+    "pages/competition-quiz/competition-quiz",
+    "pages/competition-my/competition-my",
+    "pages/vip/vip"
   ],
   "window": {
     "backgroundTextStyle": "light",

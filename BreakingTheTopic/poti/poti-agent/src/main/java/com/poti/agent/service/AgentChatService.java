@@ -7,10 +7,12 @@ import com.poti.agent.dto.AgentAnswer;
 import com.poti.agent.entity.AgentMessage;
 import com.poti.agent.entity.AgentSession;
 import com.poti.agent.entity.AgentToolLog;
+import com.poti.agent.feign.UserFeignClient;
 import com.poti.agent.mapper.AgentMessageMapper;
 import com.poti.agent.mapper.AgentSessionMapper;
 import com.poti.agent.mapper.AgentToolLogMapper;
 import com.poti.agent.service.tools.AgentTools;
+import com.poti.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,11 +32,15 @@ import java.util.Map;
 @Service
 public class AgentChatService {
 
+    /** VIP 用户每日提问上限（会员权益：普通用户 20 次 → VIP 100 次） */
+    private static final int VIP_DAILY_LIMIT = 100;
+
     private final AgentSessionMapper sessionMapper;
     private final AgentMessageMapper messageMapper;
     private final AgentToolLogMapper toolLogMapper;
     private final Assistant assistant;
     private final AgentTools agentTools;
+    private final UserFeignClient userFeignClient;
     private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -46,12 +52,14 @@ public class AgentChatService {
                             AgentToolLogMapper toolLogMapper,
                             Assistant assistant,
                             AgentTools agentTools,
+                            UserFeignClient userFeignClient,
                             JdbcTemplate jdbcTemplate) {
         this.sessionMapper = sessionMapper;
         this.messageMapper = messageMapper;
         this.toolLogMapper = toolLogMapper;
         this.assistant = assistant;
         this.agentTools = agentTools;
+        this.userFeignClient = userFeignClient;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -88,8 +96,11 @@ public class AgentChatService {
                 .eq(AgentMessage::getUserId, userId)
                 .eq(AgentMessage::getRole, "user")
                 .ge(AgentMessage::getCreateTime, todayStart));
-        if (todayCount >= dailyQuestionLimit) {
-            throw new IllegalStateException("今日提问次数已用完（每日 " + dailyQuestionLimit + " 次），明天再来吧");
+        // 2. R-2 每日提问限额（VIP 每日 100 次 / 普通 20 次，会员状态经 Feign 查询）
+        int dailyLimit = resolveDailyLimit(userId);
+        if (todayCount >= dailyLimit) {
+            throw new IllegalStateException("今日提问次数已用完（VIP 每日 " + VIP_DAILY_LIMIT
+                    + " 次 / 普通 " + dailyQuestionLimit + " 次），明天再来吧");
         }
 
         // 3. 用户消息落库
@@ -177,6 +188,23 @@ public class AgentChatService {
     }
 
     // ==================== 内部方法 ====================
+
+    /**
+     * 每日提问上限：VIP 100 次、普通用户按配置（默认 20 次）。
+     * 会员状态经 Feign 查询 poti-user（internal 通道），调用异常时降级按普通用户处理。
+     */
+    private int resolveDailyLimit(Long userId) {
+        try {
+            R<Map<String, Object>> resp = userFeignClient.getVipStatus(userId);
+            if (resp != null && resp.getCode() == 200 && resp.getData() != null
+                    && Boolean.TRUE.equals(resp.getData().get("vip"))) {
+                return VIP_DAILY_LIMIT;
+            }
+        } catch (Exception e) {
+            log.warn("[agent] 查询会员状态失败，按普通用户限额处理: userId={}", userId, e);
+        }
+        return dailyQuestionLimit;
+    }
 
     private AgentAnswer parseAnswer(String raw) {
         AgentAnswer fallback = new AgentAnswer();

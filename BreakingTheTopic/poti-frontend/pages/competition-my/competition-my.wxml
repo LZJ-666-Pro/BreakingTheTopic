@@ -1,0 +1,36 @@
+<view class="page">
+  <view class="page-hint" wx:if="{{records.length > 0}}">共 {{total}} 场参赛成绩，点击卡片查看试卷回顾</view>
+
+  <view class="record-card" wx:for="{{records}}" wx:key="key" bindtap="viewRecord" data-comp="{{item.competitionId}}">
+    <view class="record-top">
+      <view class="record-rank rank-{{item.rank && item.rank <= 3 ? item.rank : 'normal'}}">{{item.rank || '-'}}</view>
+      <text class="record-title">{{item.title || '已结束的竞赛'}}</text>
+      <view class="record-score">
+        <text class="score-num">{{item.score}}</text>
+        <text class="score-unit">分</text>
+      </view>
+    </view>
+    <view class="record-meta">
+      <text>答对 {{item.correctCount}} 题</text>
+      <text class="meta-dot">·</text>
+      <text>用时 {{item.costText}}</text>
+      <text class="meta-dot">·</text>
+      <text>交卷 {{item.submitTimeText}}</text>
+    </view>
+    <view class="record-foot">
+      <text class="foot-hint">查看试卷回顾</text>
+      <text class="foot-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="load-tip" wx:if="{{records.length > 0 && !finished}}">
+    <text>{{loading ? '加载中...' : '上拉加载更多'}}</text>
+  </view>
+
+  <view class="empty-state" wx:if="{{records.length === 0 && !loading}}">
+    <van-icon name="medal-o" size="64rpx" color="#C8C9CC" />
+    <text class="empty-text">暂无参赛成绩，快去报名一场竞赛吧</text>
+  </view>
+
+  <view style="height: calc(40rpx + env(safe-area-inset-bottom));"></view>
+</view>
