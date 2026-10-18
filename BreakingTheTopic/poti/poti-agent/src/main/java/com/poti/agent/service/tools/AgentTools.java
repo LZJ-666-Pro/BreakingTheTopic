@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Agent 工具集：LLM 可调用的业务能力（12 个只读工具，覆盖小程序全部读类业务）。
+ * Agent 工具集：LLM 可调用的业务能力（12 个只读工具 + 4 个低风险写类工具）。
  *
  * 安全设计（对应 02 规范 4.3）：
  * - 工具方法不暴露 userId 形参，一律经 @MemoryId 从会话上下文表取当前登录用户，LLM 无法伪造；
@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * - 每次执行写 agent_tool_log（内联记录，等价 AOP，便于追溯）；
  * - get_question_detail/get_daily_question 剥离 answer 字段（防作弊），search_questions 剥离答案/解析字段，
  *   收藏/每日一题/专题等接口本身不含答案字段；
+ * - 写类工具仅开放低风险操作（收藏/签到/反馈），走各服务 internal 通道（服务间令牌鉴权）；
  * - 单次回答内调度步数超上限后，工具返回收敛提示，引导模型直接总结。
  */
 @Slf4j
@@ -366,6 +367,69 @@ public class AgentTools {
         return item;
     }
 
+    // ==================== 工具 13：收藏题目（写） ====================
+
+    @Tool("把一道题加入当前用户的收藏夹。仅在用户明确表达想收藏该题时调用；重复收藏是幂等的，不会报错")
+    public String add_favorite(@MemoryId Long memoryId,
+                               @P("题目ID") Long questionId,
+                               @P("题目标题（从搜索或详情结果中原样带上）") String title,
+                               @P(value = "分类ID，可为空", required = false) Long categoryId) {
+        return execute(memoryId, "add_favorite", () -> {
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("questionId", questionId);
+            if (title != null && !title.isBlank()) {
+                body.put("title", title.trim());
+            }
+            if (categoryId != null) {
+                body.put("categoryId", categoryId);
+            }
+            R<Void> r = favoriteFeignClient.addFavorite(userIdOf(memoryId), body);
+            return r != null && r.getCode() == 200
+                    ? Map.of("favorited", true, "questionId", questionId)
+                    : null;
+        });
+    }
+
+    // ==================== 工具 14：取消收藏（写） ====================
+
+    @Tool("把一道题从当前用户的收藏夹移除。仅在用户明确表达想取消收藏时调用")
+    public String remove_favorite(@MemoryId Long memoryId, @P("题目ID") Long questionId) {
+        return execute(memoryId, "remove_favorite", () -> {
+            R<Void> r = favoriteFeignClient.removeFavorite(userIdOf(memoryId), questionId);
+            return r != null && r.getCode() == 200
+                    ? Map.of("favorited", false, "questionId", questionId)
+                    : null;
+        });
+    }
+
+    // ==================== 工具 15：今日签到（写） ====================
+
+    @Tool("为当前用户完成今日签到。仅当用户明确要求签到且 get_checkin_status 显示今日未签到时调用；已签到时调用会返回失败说明。成功返回连签天数，达成里程碑时含 rewardDays（赠送会员天数）")
+    public String do_checkin(@MemoryId Long memoryId) {
+        return execute(memoryId, "do_checkin", () -> {
+            R<Map<String, Object>> r = userFeignClient.doCheckin(userIdOf(memoryId));
+            return r != null && r.getCode() == 200 && r.getData() != null
+                    ? r.getData() : null;
+        });
+    }
+
+    // ==================== 工具 16：提交反馈（写） ====================
+
+    @Tool("代替当前用户提交一条产品反馈/建议到运营后台。仅当用户明确表达想提反馈时调用；提交前先向用户复述内容并得到确认")
+    public String submit_feedback(@MemoryId Long memoryId,
+                                  @P("反馈内容，50字以内，整理用户的原意") String content,
+                                  @P(value = "反馈类型：问题反馈/产品建议/其他（默认其他）", required = false) String type) {
+        return execute(memoryId, "submit_feedback", () -> {
+            Map<String, String> body = new LinkedHashMap<>();
+            body.put("content", content);
+            body.put("type", type == null || type.isBlank() ? "其他" : type.trim());
+            R<String> r = userFeignClient.submitFeedback(userIdOf(memoryId), body);
+            return r != null && r.getCode() == 200
+                    ? Map.of("submitted", true, "message", r.getData())
+                    : null;
+        });
+    }
+
     // ==================== 执行骨架 ====================
 
     private interface ToolCall {
@@ -384,7 +448,15 @@ public class AgentTools {
                 result = "{\"ok\":false,\"error\":\"ROUND_LIMIT\",\"hint\":\"已达到单次回答的调度步数上限，请基于已获取的信息直接总结回答\"}";
             } else {
                 Object data = call.run();
-                result = objectMapper.writeValueAsString(Map.of("ok", true, "data", data == null ? Map.of() : data));
+                // data 为 null 表示业务服务返回异常或操作未生效：统一按失败上报（写类工具尤其不能谎报成功）
+                if (data == null) {
+                    success = false;
+                    result = objectMapper.writeValueAsString(Map.of(
+                            "ok", false, "error", "NO_DATA", "message",
+                            "业务服务返回为空或操作未生效，请如实告知用户该操作可能未成功，建议稍后重试或在页面中确认"));
+                } else {
+                    result = objectMapper.writeValueAsString(Map.of("ok", true, "data", data));
+                }
             }
         } catch (Exception e) {
             success = false;

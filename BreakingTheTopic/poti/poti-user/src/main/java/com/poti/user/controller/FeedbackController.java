@@ -3,12 +3,14 @@ package com.poti.user.controller;
 import com.poti.common.R;
 import com.poti.user.entity.Feedback;
 import com.poti.user.service.FeedbackService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/feedback")
 public class FeedbackController {
@@ -32,6 +34,28 @@ public class FeedbackController {
             return R.success("提交成功，感谢您的反馈！");
         }
         return R.error("提交失败，请稍后重试");
+    }
+
+    /** internal 通道（供 AI 助手代当前用户提交反馈，身份由服务间令牌信任链传递） */
+    @PostMapping("/internal/submit")
+    public R<String> submitFeedbackInternal(@RequestParam("userId") Long userId,
+                                            @RequestBody Map<String, String> body) {
+        try {
+            String content = body != null ? body.get("content") : null;
+            if (content == null || content.trim().isEmpty()) {
+                return R.error("反馈内容不能为空");
+            }
+            Feedback feedback = new Feedback();
+            feedback.setUserId(userId);
+            feedback.setType(body.get("type") != null && !body.get("type").isBlank()
+                    ? body.get("type") : "其他");
+            feedback.setContent(content.trim());
+            boolean success = feedbackService.submitFeedback(feedback);
+            return success ? R.success("提交成功，感谢您的反馈！") : R.error("提交失败，请稍后重试");
+        } catch (Exception e) {
+            log.error("internal 提交反馈失败: userId={}", userId, e);
+            return R.error("提交失败，请稍后重试");
+        }
     }
 
     @GetMapping("/list")

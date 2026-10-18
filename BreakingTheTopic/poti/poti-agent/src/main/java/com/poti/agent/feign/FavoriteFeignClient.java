@@ -2,7 +2,11 @@ package com.poti.agent.feign;
 
 import com.poti.common.R;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -19,4 +23,12 @@ public interface FavoriteFeignClient {
     R<List<Map<String, Object>>> getFavoriteList(@RequestParam("userId") Long userId,
                                                  @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                                  @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize);
+
+    /** 收藏题目（internal 通道，body: {questionId, title, categoryId?}） */
+    @PostMapping("/favorite/internal/add")
+    R<Void> addFavorite(@RequestParam("userId") Long userId, @RequestBody Map<String, Object> body);
+
+    /** 取消收藏（internal 通道） */
+    @DeleteMapping("/favorite/internal/remove/{questionId}")
+    R<Void> removeFavorite(@RequestParam("userId") Long userId, @PathVariable("questionId") Long questionId);
 }

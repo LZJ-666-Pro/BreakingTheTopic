@@ -3,6 +3,8 @@ package com.poti.agent.feign;
 import com.poti.common.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
@@ -16,6 +18,14 @@ public interface UserFeignClient {
     /** 签到状态（连续天数）——poti-user 需提供 /checkin/internal/status */
     @GetMapping("/checkin/internal/status")
     R<Map<String, Object>> getCheckinStatus(@RequestParam("userId") Long userId);
+
+    /** 签到（internal 通道，逻辑与用户端 /checkin/do 一致） */
+    @PostMapping("/checkin/internal/do")
+    R<Map<String, Object>> doCheckin(@RequestParam("userId") Long userId);
+
+    /** 提交反馈（internal 通道，body: {type, content}） */
+    @PostMapping("/feedback/internal/submit")
+    R<String> submitFeedback(@RequestParam("userId") Long userId, @RequestBody Map<String, String> body);
 
     /** 好友刷题排行（internal 通道，含用户自己） */
     @GetMapping("/user/rank/internal/friends")

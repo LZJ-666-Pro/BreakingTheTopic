@@ -88,4 +88,28 @@ public class CheckinController {
             return R.error("获取签到状态失败: " + e.getMessage());
         }
     }
+
+    /**
+     * internal：签到（AI 助手 poti-agent 经内部令牌调用）
+     * 逻辑与 /do 完全一致：签到事务提交后再发放里程碑奖励（内部读后台跨库配置，不能进事务）
+     */
+    @PostMapping("/internal/do")
+    public R<Map<String, Object>> doCheckInInternal(@RequestParam("userId") Long userId) {
+        try {
+            Map<String, Object> result = checkinService.doCheckIn(userId);
+
+            if ((Boolean) result.get("alreadyCheckedIn")) {
+                return R.error("今天已经签到过了");
+            }
+
+            Integer rewardDays = checkinService.grantMilestoneReward(userId, (Integer) result.get("streakDays"));
+            if (rewardDays != null) {
+                result.put("rewardDays", rewardDays);
+            }
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("internal 签到失败: userId={}", userId, e);
+            return R.error("签到失败: " + e.getMessage());
+        }
+    }
 }

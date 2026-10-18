@@ -27,30 +27,7 @@ public class FavoriteController {
     public R<Void> addFavorite(@RequestHeader("X-User-Id") Long userId,
                                  @RequestBody Map<String, Object> request) {
         try {
-            Long questionId = Long.parseLong(request.get("questionId").toString());
-            Long categoryId = request.get("categoryId") != null ? Long.parseLong(request.get("categoryId").toString()) : null;
-            String title = request.get("title") != null ? request.get("title").toString() : null;
-            Integer type = request.get("type") != null ? Integer.parseInt(request.get("type").toString()) : null;
-            Integer difficulty = request.get("difficulty") != null ? Integer.parseInt(request.get("difficulty").toString()) : null;
-            
-            Favorite existingFavorite = favoriteMapper.selectByUserAndQuestion(userId, questionId);
-            if (existingFavorite != null) {
-                if (existingFavorite.getDeleted() == 1) {
-                    favoriteMapper.restoreFavorite(userId, questionId, categoryId, title, type, difficulty);
-                }
-                return R.success();
-            }
-            
-            Favorite favorite = new Favorite();
-            favorite.setUserId(userId);
-            favorite.setQuestionId(questionId);
-            favorite.setCategoryId(categoryId);
-            favorite.setTitle(title);
-            favorite.setType(type);
-            favorite.setDifficulty(difficulty);
-            
-            favoriteService.save(favorite);
-            
+            doAddFavorite(userId, request);
             return R.success();
         } catch (Exception e) {
             log.error("添加收藏失败", e);
@@ -58,20 +35,75 @@ public class FavoriteController {
         }
     }
 
+    /** internal 通道（供 AI 助手代当前用户收藏，身份由服务间令牌信任链传递） */
+    @PostMapping("/internal/add")
+    public R<Void> addFavoriteInternal(@RequestParam("userId") Long userId,
+                                       @RequestBody Map<String, Object> request) {
+        try {
+            doAddFavorite(userId, request);
+            return R.success();
+        } catch (Exception e) {
+            log.error("internal 添加收藏失败: userId={}", userId, e);
+            return R.error("添加收藏失败");
+        }
+    }
+
+    private void doAddFavorite(Long userId, Map<String, Object> request) {
+        Long questionId = Long.parseLong(request.get("questionId").toString());
+        Long categoryId = request.get("categoryId") != null ? Long.parseLong(request.get("categoryId").toString()) : null;
+        String title = request.get("title") != null ? request.get("title").toString() : null;
+        Integer type = request.get("type") != null ? Integer.parseInt(request.get("type").toString()) : null;
+        Integer difficulty = request.get("difficulty") != null ? Integer.parseInt(request.get("difficulty").toString()) : null;
+
+        Favorite existingFavorite = favoriteMapper.selectByUserAndQuestion(userId, questionId);
+        if (existingFavorite != null) {
+            if (existingFavorite.getDeleted() == 1) {
+                favoriteMapper.restoreFavorite(userId, questionId, categoryId, title, type, difficulty);
+            }
+            return;
+        }
+
+        Favorite favorite = new Favorite();
+        favorite.setUserId(userId);
+        favorite.setQuestionId(questionId);
+        favorite.setCategoryId(categoryId);
+        favorite.setTitle(title);
+        favorite.setType(type);
+        favorite.setDifficulty(difficulty);
+
+        favoriteService.save(favorite);
+    }
+
     @DeleteMapping("/remove/{questionId}")
     public R<Void> removeFavorite(@RequestHeader("X-User-Id") Long userId,
                                   @PathVariable Long questionId) {
         try {
-            LambdaQueryWrapper<Favorite> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(Favorite::getUserId, userId)
-                   .eq(Favorite::getQuestionId, questionId);
-            
-            favoriteService.remove(wrapper);
+            doRemoveFavorite(userId, questionId);
             return R.success();
         } catch (Exception e) {
             log.error("取消收藏失败", e);
             return R.error("取消收藏失败");
         }
+    }
+
+    /** internal 通道（供 AI 助手代当前用户取消收藏） */
+    @DeleteMapping("/internal/remove/{questionId}")
+    public R<Void> removeFavoriteInternal(@RequestParam("userId") Long userId,
+                                          @PathVariable Long questionId) {
+        try {
+            doRemoveFavorite(userId, questionId);
+            return R.success();
+        } catch (Exception e) {
+            log.error("internal 取消收藏失败: userId={}, questionId={}", userId, questionId, e);
+            return R.error("取消收藏失败");
+        }
+    }
+
+    private void doRemoveFavorite(Long userId, Long questionId) {
+        LambdaQueryWrapper<Favorite> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Favorite::getUserId, userId)
+               .eq(Favorite::getQuestionId, questionId);
+        favoriteService.remove(wrapper);
     }
 
     @GetMapping("/list")
