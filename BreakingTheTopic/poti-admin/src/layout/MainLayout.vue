@@ -131,7 +131,8 @@ import {
   Goods,
   DataAnalysis,
   Key,
-  Tickets
+  Tickets,
+  Monitor
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -189,6 +190,7 @@ const menus = [
   },
   { index: '/membership', title: '会员订单', icon: markRaw(Goods) },
   { index: '/stats', title: '数据统计', icon: markRaw(DataAnalysis) },
+  { index: '/ai-monitor', title: 'AI助手监控', icon: markRaw(Monitor) },
   { index: '/ai-tasks', title: 'AI任务', icon: markRaw(MagicStick) },
   {
     index: '/settings',
