@@ -3,7 +3,9 @@ package com.poti.agent.config;
 import com.poti.agent.service.Assistant;
 import com.poti.agent.service.tools.AgentTools;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,12 +51,29 @@ public class LangChainConfig {
                 .build();
     }
 
+    /** 真流式模型：与同步模型同端点同参数，TokenStream 版 AiServices 必需 */
+    @Bean
+    public StreamingChatLanguageModel streamingChatLanguageModel() {
+        return OpenAiStreamingChatModel.builder()
+                .apiKey(apiKey)
+                .baseUrl(baseUrl)
+                .modelName(model)
+                .temperature(temperature)
+                .maxTokens(maxTokens)
+                .timeout(Duration.ofSeconds(60))
+                .logRequests(false)
+                .logResponses(false)
+                .build();
+    }
+
     @Bean
     public Assistant assistant(ChatLanguageModel chatLanguageModel,
+                               StreamingChatLanguageModel streamingChatLanguageModel,
                                ChatMemoryStore chatMemoryStore,
                                AgentTools agentTools) {
         return AiServices.builder(Assistant.class)
                 .chatLanguageModel(chatLanguageModel)
+                .streamingChatLanguageModel(streamingChatLanguageModel)
                 .chatMemoryProvider(sessionId -> dev.langchain4j.memory.chat.MessageWindowChatMemory.builder()
                         .id(sessionId)
                         .maxMessages(24)

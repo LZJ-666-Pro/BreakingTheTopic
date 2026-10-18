@@ -210,6 +210,174 @@ Page({
     })
     this.scrollBottom()
 
+    this.streamChat(question)
+  },
+
+  /** 真流式：enableChunked 接收 SSE，逐段渲染；异常时降级同步接口 */
+  streamChat(question) {
+    this._streamBuf = ''
+    this._pendingBytes = []
+    this._pendingDelta = ''
+    this._gotMeta = false
+    this._streamQuestion = question
+
+    const doFallback = () => {
+      if (this._gotMeta) return
+      this.fallbackSync(question)
+    }
+
+    const task = wx.request({
+      url: `${app.globalData.agentUrl}/agent/chat/stream`,
+      method: 'POST',
+      enableChunked: true,
+      header: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${app.globalData.token}`,
+        'X-User-Id': app.globalData.userId
+      },
+      data: {
+        sessionId: this.data.sessionId,
+        message: question
+      },
+      timeout: 130000,
+      success: (res) => {
+        if (res.statusCode === 401) {
+          this.markFailed('登录已过期，请重新登录')
+          app._handleUnauthorized()
+          return
+        }
+        if (res.statusCode !== 200) {
+          // 业务拒绝（限额/会话不存在等）后端返回 R 结构
+          const msg = (res.data && (res.data.msg || res.data.message)) || '助手开小差了，请稍后再试'
+          this.markFailed(msg)
+          return
+        }
+        if (this._gotMeta) return
+        // 部分环境不支持分块回调：整个响应体在 success 一次性返回（完整 SSE 文本），补解析
+        if (typeof res.data === 'string' && res.data.indexOf('data:') >= 0) {
+          this.consumeSseText(res.data)
+        }
+        if (!this._gotMeta) {
+          // 没有任何有效流数据，降级同步接口
+          doFallback()
+        }
+      },
+      fail: () => {
+        if (!this._gotMeta) this.markFailed('网络错误，请检查网络后重试')
+      }
+    })
+
+    task.onChunkReceived((res) => {
+      const text = this.decodeChunk(res.data)
+      if (!text) return
+      this.consumeSseText(text)
+    })
+  },
+
+  /** 解析 SSE 文本：按空行分帧，取 data: 行 JSON 信封 */
+  consumeSseText(text) {
+    this._streamBuf = (this._streamBuf || '') + text
+    const frames = this._streamBuf.split('\n\n')
+    this._streamBuf = frames.pop() || ''
+    for (const frame of frames) {
+      const dataLine = frame.split('\n').find(l => l.indexOf('data:') === 0)
+      if (!dataLine) continue
+      let payload
+      try {
+        payload = JSON.parse(dataLine.slice(5).trim())
+      } catch (e) {
+        continue
+      }
+      this.handleStreamEvent(payload)
+    }
+  },
+
+  handleStreamEvent(payload) {
+    if (!payload || !payload.t) return
+    const idx = this.data.messages.length - 1
+    if (idx < 0 || !this.data.messages[idx] || !this.data.messages[idx].loading) {
+      return // 用户已切换会话/气泡已被清理，丢弃迟到事件
+    }
+    if (payload.t === 'delta') {
+      this.appendDelta(payload.d || '')
+    } else if (payload.t === 'meta') {
+      this._gotMeta = true
+      this.flushDelta()
+      if (payload.sessionId) this.setData({ sessionId: payload.sessionId })
+      this.setData({
+        [`messages[${idx}].loading`]: false,
+        [`messages[${idx}].sources`]: payload.sources || [],
+        [`messages[${idx}].actions`]: payload.actions || [],
+        sending: false
+      })
+      this.scrollBottom()
+    } else if (payload.t === 'error') {
+      this._gotMeta = true
+      this.markFailed(payload.m || '助手开小差了，请稍后再试')
+    }
+  },
+
+  /** 增量 UTF-8 解码：处理多字节字符与 SSE 帧跨 chunk 边界 */
+  decodeChunk(arrayBuffer) {
+    const incoming = Array.from(new Uint8Array(arrayBuffer))
+    const all = (this._pendingBytes || []).concat(incoming)
+    this._pendingBytes = []
+    let out = ''
+    let i = 0
+    while (i < all.length) {
+      const b = all[i]
+      let charLen = 1
+      if (b >= 0xF0) charLen = 4
+      else if (b >= 0xE0) charLen = 3
+      else if (b >= 0xC0) charLen = 2
+      if (i + charLen > all.length) {
+        this._pendingBytes = all.slice(i)
+        break
+      }
+      if (charLen === 1) {
+        out += String.fromCharCode(b)
+      } else {
+        let code = 0
+        if (charLen === 2) {
+          code = ((b & 0x1F) << 6) | (all[i + 1] & 0x3F)
+        } else if (charLen === 3) {
+          code = ((b & 0x0F) << 12) | ((all[i + 1] & 0x3F) << 6) | (all[i + 2] & 0x3F)
+        } else {
+          code = ((b & 0x07) << 18) | ((all[i + 1] & 0x3F) << 12) | ((all[i + 2] & 0x3F) << 6) | (all[i + 3] & 0x3F)
+        }
+        out += String.fromCodePoint(code)
+        i += charLen
+        continue
+      }
+      i++
+    }
+    return out
+  },
+
+  /** delta 节流渲染：50ms 合并一次 setData，避免逐 token 刷屏 */
+  appendDelta(text) {
+    this._pendingDelta = (this._pendingDelta || '') + text
+    if (this._deltaTimer) return
+    this._deltaTimer = setTimeout(() => this.flushDelta(), 50)
+  },
+
+  flushDelta() {
+    if (this._deltaTimer) {
+      clearTimeout(this._deltaTimer)
+      this._deltaTimer = null
+    }
+    const chunk = this._pendingDelta || ''
+    this._pendingDelta = ''
+    if (!chunk) return
+    const idx = this.data.messages.length - 1
+    if (idx < 0) return
+    const cur = this.data.messages[idx].text || ''
+    this.setData({ [`messages[${idx}].text`]: cur + chunk })
+    this.scrollBottom()
+  },
+
+  /** 降级：同步整体返回 + 打字机渲染（流式链路异常时使用） */
+  fallbackSync(question) {
     wx.request({
       url: `${app.globalData.agentUrl}/agent/chat`,
       method: 'POST',
@@ -227,7 +395,6 @@ Page({
         if (res.data.code === 200) {
           const data = res.data.data
           this.setData({ sessionId: data.sessionId })
-          // 打字机效果渲染回答
           this.typeOut(data.messageId || 'a', data.text || '', data.sources || [], data.actions || [])
         } else if (res.data.code === 401) {
           this.markFailed('登录已过期，请重新登录')

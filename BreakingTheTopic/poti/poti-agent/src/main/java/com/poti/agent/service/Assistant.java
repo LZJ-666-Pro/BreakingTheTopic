@@ -2,6 +2,7 @@ package com.poti.agent.service;
 
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.UserMessage;
 
 /**
@@ -39,4 +40,8 @@ public interface Assistant {
 
     @SystemMessage(SYSTEM_PROMPT)
     String chat(@MemoryId Long sessionId, @UserMessage String message);
+
+    /** 真流式版本：与 chat 同一系统提示词与工具集，逐 token 推送 */
+    @SystemMessage(SYSTEM_PROMPT)
+    TokenStream chatStream(@MemoryId Long sessionId, @UserMessage String message);
 }

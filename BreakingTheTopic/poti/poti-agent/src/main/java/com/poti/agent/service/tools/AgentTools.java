@@ -13,6 +13,7 @@ import com.poti.agent.mapper.AgentToolLogMapper;
 import com.poti.common.R;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.service.MemoryId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,12 +24,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Agent 工具集：LLM 可调用的业务能力（12 个只读工具，覆盖小程序全部读类业务）。
  *
  * 安全设计（对应 02 规范 4.3）：
- * - 工具方法不暴露 userId 形参，一律从 ThreadLocal 注入当前登录用户，LLM 无法伪造；
+ * - 工具方法不暴露 userId 形参，一律经 @MemoryId 从会话上下文表取当前登录用户，LLM 无法伪造；
+ * - 上下文按 memoryId(sessionId) 存于 ConcurrentHashMap（非 ThreadLocal）：同步调用与
+ *   TokenStream 真流式下工具均在框架异步线程执行，会话键是唯一稳定锚点；
  * - 每次执行写 agent_tool_log（内联记录，等价 AOP，便于追溯）；
  * - get_question_detail/get_daily_question 剥离 answer 字段（防作弊），search_questions 剥离答案/解析字段，
  *   收藏/每日一题/专题等接口本身不含答案字段；
@@ -51,11 +55,22 @@ public class AgentTools {
     @Value("${agent.limits.max-rounds:5}")
     private int maxRounds;
 
-    /** 当前请求的登录用户（AgentChatService 每次调用前设置，finally 清理） */
-    private final ThreadLocal<Long> currentUser = new ThreadLocal<>();
-    /** 当前请求内工具执行计数（软性轮数上限） */
-    private final ThreadLocal<Integer> roundCounter = ThreadLocal.withInitial(() -> 0);
-    private final ThreadLocal<Long> currentSession = new ThreadLocal<>();
+    /** 会话级上下文：userId + 工具轮数计数（键 = memoryId = sessionId） */
+    private final ConcurrentHashMap<Long, SessionContext> contexts = new ConcurrentHashMap<>();
+
+    /** 单个会话的一次提问期间的执行上下文 */
+    private static final class SessionContext {
+        final Long userId;
+        int round;
+
+        SessionContext(Long userId) {
+            this.userId = userId;
+        }
+
+        synchronized int nextRound() {
+            return ++round;
+        }
+    }
 
     public AgentTools(UserFeignClient userFeignClient,
                       PracticeFeignClient practiceFeignClient,
@@ -75,25 +90,38 @@ public class AgentTools {
         this.toolLogMapper = toolLogMapper;
     }
 
-    /** 每次助手调用前由 AgentChatService 重置上下文 */
+    /** 每次助手调用前由 AgentChatService 重置上下文（键为 sessionId） */
     public void bindContext(Long userId, Long sessionId) {
-        currentUser.set(userId);
-        currentSession.set(sessionId);
-        roundCounter.set(0);
+        contexts.put(sessionId, new SessionContext(userId));
     }
 
-    public void clearContext() {
-        currentUser.remove();
-        currentSession.remove();
-        roundCounter.remove();
+    /** 回答结束（完成/出错/连接断开）后清理，防止 map 泄漏 */
+    public void clearContext(Long sessionId) {
+        contexts.remove(sessionId);
+    }
+
+    private Long userIdOf(Long memoryId) {
+        SessionContext ctx = contexts.get(memoryId);
+        if (ctx == null) {
+            throw new IllegalStateException("工具上下文未绑定用户: memoryId=" + memoryId);
+        }
+        return ctx.userId;
+    }
+
+    private SessionContext ctxOf(Long memoryId) {
+        SessionContext ctx = contexts.get(memoryId);
+        if (ctx == null) {
+            throw new IllegalStateException("工具上下文未绑定会话: memoryId=" + memoryId);
+        }
+        return ctx;
     }
 
     // ==================== 工具 1：学习统计 ====================
 
     @Tool("查询当前用户的刷题学习统计，包括累计刷题数、答对答错数、正确率、今日刷题数等")
-    public String get_study_statistics() {
-        return execute("get_study_statistics", () -> {
-            R<Map<String, Object>> r = practiceFeignClient.getStatistics(currentUserId());
+    public String get_study_statistics(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_study_statistics", () -> {
+            R<Map<String, Object>> r = practiceFeignClient.getStatistics(userIdOf(memoryId));
             return r != null && r.getCode() == 200 && r.getData() != null
                     ? r.getData() : null;
         });
@@ -102,9 +130,9 @@ public class AgentTools {
     // ==================== 工具 2：签到状态 ====================
 
     @Tool("查询当前用户的连续签到天数和今日是否已签到")
-    public String get_checkin_status() {
-        return execute("get_checkin_status", () -> {
-            R<Map<String, Object>> r = userFeignClient.getCheckinStatus(currentUserId());
+    public String get_checkin_status(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_checkin_status", () -> {
+            R<Map<String, Object>> r = userFeignClient.getCheckinStatus(userIdOf(memoryId));
             return r != null && r.getCode() == 200 && r.getData() != null
                     ? r.getData() : null;
         });
@@ -113,9 +141,9 @@ public class AgentTools {
     // ==================== 工具 3：错题概览 ====================
 
     @Tool("查询当前用户的错题本情况：错题总数、按分类的错题分布、按难度分布、最近错题样例")
-    public String get_wrongbook_summary() {
-        return execute("get_wrongbook_summary", () -> {
-            Long userId = currentUserId();
+    public String get_wrongbook_summary(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_wrongbook_summary", () -> {
+            Long userId = userIdOf(memoryId);
             Map<String, Object> data = new LinkedHashMap<>();
             R<Integer> countR = wrongbookFeignClient.getWrongCount(userId);
             data.put("wrongCount", countR != null && countR.getCode() == 200 ? countR.getData() : 0);
@@ -130,10 +158,11 @@ public class AgentTools {
     // ==================== 工具 4：搜题 ====================
 
     @Tool("按关键字搜索题库中的题目，可按分类ID和难度过滤。返回题目列表（不含答案）。难度：1简单 2中等 3困难")
-    public String search_questions(@P("搜索关键字") String keyword,
+    public String search_questions(@MemoryId Long memoryId,
+                                   @P("搜索关键字") String keyword,
                                    @P(value = "分类ID，可为空", required = false) Long categoryId,
                                    @P(value = "难度：1简单 2中等 3困难，可为空", required = false) Integer difficulty) {
-        return execute("search_questions", () -> {
+        return execute(memoryId, "search_questions", () -> {
             R<Map<String, Object>> r = searchFeignClient.searchQuestions(keyword, categoryId, difficulty, 1, 8);
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("list", List.of(), "total", 0);
@@ -164,8 +193,8 @@ public class AgentTools {
     // ==================== 工具 5：题目详情 ====================
 
     @Tool("按题目ID查询题目详情：题干、题型、分类、难度、解题思路。不包含标准答案（作答前不可泄露答案）")
-    public String get_question_detail(@P("题目ID") Long questionId) {
-        return execute("get_question_detail", () -> {
+    public String get_question_detail(@MemoryId Long memoryId, @P("题目ID") Long questionId) {
+        return execute(memoryId, "get_question_detail", () -> {
             R<Map<String, Object>> r = questionFeignClient.getQuestion(questionId);
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("error", "题目不存在");
@@ -179,8 +208,8 @@ public class AgentTools {
     // ==================== 工具 6：分类列表 ====================
 
     @Tool("查询题库所有题库分组与分类（分类ID、分类名、所属分组、题目数量），用于回答有哪些可刷的分类或推荐刷题方向")
-    public String get_category_list() {
-        return execute("get_category_list", () -> {
+    public String get_category_list(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_category_list", () -> {
             R<Map<String, Object>> r = questionFeignClient.getCategoryGroups();
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("categories", List.of());
@@ -217,8 +246,8 @@ public class AgentTools {
     // ==================== 工具 7：每日一题 ====================
 
     @Tool("查询今天的每日一题：日期、题干、题型分类、难度、出题理由、提示。不包含标准答案（作答前不可泄露答案）")
-    public String get_daily_question() {
-        return execute("get_daily_question", () -> {
+    public String get_daily_question(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_daily_question", () -> {
             R<Map<String, Object>> r = questionFeignClient.getDailyQuestion();
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("error", "今日暂无每日一题");
@@ -232,8 +261,8 @@ public class AgentTools {
     // ==================== 工具 8：刷题专题列表 ====================
 
     @Tool("查询刷题专题列表（专题ID、名称、简介、难度、预计天数、题目数量），用于回答有哪些专题可刷或推荐学习计划")
-    public String get_special_list() {
-        return execute("get_special_list", () -> {
+    public String get_special_list(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_special_list", () -> {
             R<List<Map<String, Object>>> r = questionFeignClient.getSpecialList();
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("specials", List.of());
@@ -256,8 +285,8 @@ public class AgentTools {
     // ==================== 工具 9：热搜词 ====================
 
     @Tool("查询当前热搜的搜索关键词列表，用于回答大家都在搜什么、帮助用户发现热门题目方向")
-    public String get_hot_searches() {
-        return execute("get_hot_searches", () -> {
+    public String get_hot_searches(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_hot_searches", () -> {
             R<Set<Object>> r = searchFeignClient.getHotSearches(10);
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("hotSearches", List.of());
@@ -269,9 +298,9 @@ public class AgentTools {
     // ==================== 工具 10：收藏列表 ====================
 
     @Tool("查询当前用户收藏的题目列表（题目ID、题干、分类、难度、题型），用于回答用户收藏了哪些题")
-    public String get_favorite_list() {
-        return execute("get_favorite_list", () -> {
-            R<List<Map<String, Object>>> r = favoriteFeignClient.getFavoriteList(currentUserId(), 1, 50);
+    public String get_favorite_list(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_favorite_list", () -> {
+            R<List<Map<String, Object>>> r = favoriteFeignClient.getFavoriteList(userIdOf(memoryId), 1, 50);
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("favorites", List.of(), "total", 0);
             }
@@ -292,9 +321,9 @@ public class AgentTools {
     // ==================== 工具 11：面试特训营列表 ====================
 
     @Tool("查询面试特训营列表（营名、方向、周期、人数、当前用户是否已加入），用于推荐特训营或回答用户打卡情况")
-    public String get_interview_camps() {
-        return execute("get_interview_camps", () -> {
-            R<List<Map<String, Object>>> r = interviewFeignClient.getCampList(currentUserId());
+    public String get_interview_camps(@MemoryId Long memoryId) {
+        return execute(memoryId, "get_interview_camps", () -> {
+            R<List<Map<String, Object>>> r = interviewFeignClient.getCampList(userIdOf(memoryId));
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("camps", List.of());
             }
@@ -305,10 +334,11 @@ public class AgentTools {
     // ==================== 工具 12：好友刷题排行 ====================
 
     @Tool("查询当前用户与好友的刷题排行榜（名次、昵称、刷题量或连续天数），用于回答好友排行、自己排第几")
-    public String get_friend_ranking(@P(value = "排行类型：total按累计刷题量（默认），streak按连续刷题天数", required = false) String type) {
+    public String get_friend_ranking(@MemoryId Long memoryId,
+                                     @P(value = "排行类型：total按累计刷题量（默认），streak按连续刷题天数", required = false) String type) {
         String rankType = (type == null || type.isBlank()) ? "total" : type.trim();
-        return execute("get_friend_ranking", () -> {
-            R<Map<String, Object>> r = userFeignClient.getFriendRanking(currentUserId(), rankType);
+        return execute(memoryId, "get_friend_ranking", () -> {
+            R<Map<String, Object>> r = userFeignClient.getFriendRanking(userIdOf(memoryId), rankType);
             if (r == null || r.getCode() != 200 || r.getData() == null) {
                 return Map.of("rankList", List.of());
             }
@@ -342,10 +372,10 @@ public class AgentTools {
         Object run() throws Exception;
     }
 
-    private String execute(String toolName, ToolCall call) {
+    private String execute(Long memoryId, String toolName, ToolCall call) {
+        SessionContext ctx = ctxOf(memoryId);
         long start = System.currentTimeMillis();
-        int round = roundCounter.get() + 1;
-        roundCounter.set(round);
+        int round = ctx.nextRound();
         boolean success = true;
         String result;
         try {
@@ -368,8 +398,8 @@ public class AgentTools {
         long cost = System.currentTimeMillis() - start;
         try {
             AgentToolLog toolLog = new AgentToolLog();
-            toolLog.setUserId(currentUser.get());
-            toolLog.setSessionId(currentSession.get());
+            toolLog.setUserId(ctx.userId);
+            toolLog.setSessionId(memoryId);
             toolLog.setToolName(toolName);
             toolLog.setCostMs((int) cost);
             toolLog.setRoundNo(round);
@@ -380,13 +410,5 @@ public class AgentTools {
             log.warn("[agent] 工具日志写入失败", e);
         }
         return result;
-    }
-
-    private Long currentUserId() {
-        Long userId = currentUser.get();
-        if (userId == null) {
-            throw new IllegalStateException("工具上下文未绑定用户");
-        }
-        return userId;
     }
 }

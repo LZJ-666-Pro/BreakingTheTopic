@@ -4,6 +4,7 @@ import com.poti.agent.entity.AgentSession;
 import com.poti.agent.service.AgentChatService;
 import com.poti.common.R;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,19 @@ public class AgentController {
             log.error("助手回答失败", e);
             return R.error("助手开小差了，请稍后再试");
         }
+    }
+
+    /** 提问（真流式 SSE：data 行 JSON 信封 delta/meta/error；前端 enableChunked 解析，失败可降级 /chat） */
+    @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter chatStream(@RequestHeader("X-User-Id") Long userId,
+                                 @RequestBody ChatRequest request) {
+        // 校验失败直接抛异常：SseEmitter 返回前异常走 Spring 默认错误响应（前端按非 200 降级同步接口）
+        if (request == null || request.getMessage() == null || request.getMessage().isBlank()) {
+            SseEmitter emitter = new SseEmitter(0L);
+            emitter.completeWithError(new IllegalArgumentException("提问内容不能为空"));
+            return emitter;
+        }
+        return chatService.chatStream(userId, request.getSessionId(), request.getMessage().trim());
     }
 
     /** 用户全部会话 */
