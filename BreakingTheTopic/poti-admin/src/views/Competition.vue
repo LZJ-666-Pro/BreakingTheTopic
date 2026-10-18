@@ -3,7 +3,7 @@
     <div class="page-header">
       <h2>竞赛活动</h2>
       <div class="header-actions">
-        <el-button type="primary" @click="openCreate">
+        <el-button type="primary" @click="goEdit()">
           <el-icon><Plus /></el-icon>
           新建竞赛
         </el-button>
@@ -64,7 +64,7 @@
         <el-table-column prop="submitCount" label="交卷数" width="75" align="center" />
         <el-table-column label="操作" width="180" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button v-if="row.state === 'draft'" type="primary" link size="small" @click="openEdit(row)">编辑</el-button>
+            <el-button v-if="row.state === 'draft'" type="primary" link size="small" @click="goEdit(row)">编辑</el-button>
             <el-button v-if="row.state === 'draft'" type="primary" link size="small" @click="handlePublish(row)">发布</el-button>
             <el-button
               v-if="row.state !== 'draft'"
@@ -101,56 +101,7 @@
       </div>
     </el-card>
 
-    <!-- 新建 / 编辑竞赛弹窗 -->
-    <el-dialog v-model="formVisible" :title="editId ? '编辑竞赛' : '新建竞赛'" width="560px" :close-on-click-modal="false">
-      <el-form ref="formRef" :model="form" :rules="formRules" label-width="100px">
-        <el-form-item label="竞赛名称" prop="title">
-          <el-input v-model="form.title" placeholder="请输入竞赛名称" maxlength="100" show-word-limit />
-        </el-form-item>
-        <el-form-item label="竞赛说明" prop="description">
-          <el-input v-model="form.description" type="textarea" :rows="3" placeholder="选填，向用户展示的竞赛介绍" maxlength="500" show-word-limit />
-        </el-form-item>
-        <el-form-item label="题库分类" prop="categoryId">
-          <el-select v-model="form.categoryId" placeholder="选择题库分类（抽题范围）" filterable style="width: 100%">
-            <el-option v-for="c in categoryOptions" :key="c.id" :label="c.name" :value="c.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="题目数量" prop="questionCount">
-          <el-input-number v-model="form.questionCount" :min="1" :max="50" />
-          <span class="form-tip">1-50 题，开赛时按分类随机抽题</span>
-        </el-form-item>
-        <el-form-item label="答题时长" prop="durationMinutes">
-          <el-input-number v-model="form.durationMinutes" :min="1" :max="180" />
-          <span class="form-tip">单位：分钟，1-180</span>
-        </el-form-item>
-        <el-form-item label="开赛时间" prop="startTime">
-          <el-date-picker
-            v-model="form.startTime"
-            type="datetime"
-            placeholder="选择开赛时间"
-            value-format="YYYY-MM-DD HH:mm:ss"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="结束时间" prop="endTime">
-          <el-date-picker
-            v-model="form.endTime"
-            type="datetime"
-            placeholder="选择结束时间"
-            value-format="YYYY-MM-DD HH:mm:ss"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="每题分值" prop="scorePerQuestion">
-          <el-input-number v-model="form.scorePerQuestion" :min="1" :max="100" />
-          <span class="form-tip">总分 = 题目数 × 每题分值</span>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="formVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="submitForm">保存</el-button>
-      </template>
-    </el-dialog>
+    <!-- 编辑/新建改为独立页面：/competition/edit/:id? -->
 
     <!-- 成绩改为独立页面：/competition/records/:id -->
   </div>
@@ -244,105 +195,9 @@ const loadCategories = async () => {
   }
 }
 
-// ===== 新建 / 编辑 =====
-const formVisible = ref(false)
-const saving = ref(false)
-const formRef = ref(null)
-const editId = ref(null)
-const form = reactive({
-  title: '',
-  description: '',
-  categoryId: null,
-  questionCount: 10,
-  durationMinutes: 30,
-  startTime: '',
-  endTime: '',
-  scorePerQuestion: 10
-})
-
-// 结束时间晚于开赛时间校验
-const validateEndTime = (rule, value, callback) => {
-  if (!value) return callback(new Error('请选择结束时间'))
-  if (form.startTime && new Date(value.replace(' ', 'T')) <= new Date(form.startTime.replace(' ', 'T'))) {
-    return callback(new Error('结束时间必须晚于开赛时间'))
-  }
-  callback()
-}
-
-const formRules = {
-  title: [
-    { required: true, message: '请输入竞赛名称', trigger: 'blur' },
-    { max: 100, message: '竞赛名称不能超过100字', trigger: 'blur' }
-  ],
-  categoryId: [{ required: true, message: '请选择题库分类', trigger: 'change' }],
-  questionCount: [{ required: true, message: '请填写题目数量', trigger: 'blur' }],
-  durationMinutes: [{ required: true, message: '请填写答题时长', trigger: 'blur' }],
-  startTime: [{ required: true, message: '请选择开赛时间', trigger: 'change' }],
-  endTime: [{ required: true, validator: validateEndTime, trigger: 'change' }],
-  scorePerQuestion: [{ required: true, message: '请填写每题分值', trigger: 'blur' }]
-}
-
-const openCreate = async () => {
-  editId.value = null
-  Object.assign(form, {
-    title: '',
-    description: '',
-    categoryId: null,
-    questionCount: 10,
-    durationMinutes: 30,
-    startTime: '',
-    endTime: '',
-    scorePerQuestion: 10
-  })
-  formVisible.value = true
-  await loadCategories()
-}
-
-const openEdit = async (row) => {
-  editId.value = row.id
-  Object.assign(form, {
-    title: row.title,
-    description: row.description || '',
-    categoryId: row.categoryId,
-    questionCount: row.questionCount,
-    durationMinutes: row.durationMinutes,
-    startTime: formatTime(row.startTime),
-    endTime: formatTime(row.endTime),
-    scorePerQuestion: row.scorePerQuestion
-  })
-  formVisible.value = true
-  await loadCategories()
-}
-
-const submitForm = async () => {
-  try {
-    await formRef.value.validate()
-  } catch {
-    return
-  }
-  saving.value = true
-  try {
-    const res = await api.post('/admin/competition/save', {
-      id: editId.value || undefined,
-      title: form.title.trim(),
-      description: form.description || '',
-      categoryId: form.categoryId,
-      questionCount: form.questionCount,
-      durationMinutes: form.durationMinutes,
-      startTime: form.startTime,
-      endTime: form.endTime,
-      scorePerQuestion: form.scorePerQuestion
-    })
-    if (res.code === 200) {
-      ElMessage.success(editId.value ? '竞赛已保存' : '竞赛草稿已创建')
-      formVisible.value = false
-      searchList()
-    }
-  } catch (error) {
-    console.error('保存竞赛失败', error)
-  } finally {
-    saving.value = false
-  }
+// ===== 新建 / 编辑：跳转独立编辑页 =====
+const goEdit = (row) => {
+  router.push(row ? `/competition/edit/${row.id}` : '/competition/edit')
 }
 
 // ===== 发布 / 删除 =====
@@ -420,12 +275,6 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
-}
-
-.form-tip {
-  margin-left: 12px;
-  font-size: 12px;
-  color: #999;
 }
 
 .time-cell {

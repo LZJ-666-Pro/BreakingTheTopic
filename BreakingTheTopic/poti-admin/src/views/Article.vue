@@ -21,7 +21,7 @@
           />
           <el-button type="primary" :icon="Search" @click="search">搜索</el-button>
         </div>
-        <el-button type="primary" :icon="Plus" @click="openCreate">新增文章</el-button>
+        <el-button type="primary" :icon="Plus" @click="goEdit()">新增文章</el-button>
       </div>
 
       <el-table :data="list" v-loading="loading" stripe>
@@ -56,7 +56,7 @@
           <template #default="{ row }">
             <el-button v-if="row.status !== 1" link type="primary" @click="changeStatus(row, 1)">发布</el-button>
             <el-button v-if="row.status === 1" link type="danger" @click="changeStatus(row, 2)">下架</el-button>
-            <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
+            <el-button link type="primary" @click="goEdit(row)">编辑</el-button>
             <el-button link type="danger" @click="remove(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -74,65 +74,18 @@
         />
       </div>
     </el-card>
-
-    <!-- 新增/编辑弹窗 -->
-    <el-dialog v-model="dialog.visible" :title="dialog.id ? '编辑文章' : '新增文章'" width="760px" top="4vh">
-      <el-form label-width="90px">
-        <el-form-item label="标题" required>
-          <el-input v-model="dialog.form.title" maxlength="200" placeholder="文章标题" />
-        </el-form-item>
-        <el-form-item label="分类">
-          <el-select v-model="dialog.form.category" placeholder="选择分类" style="width: 200px">
-            <el-option v-for="c in categories" :key="c" :label="c" :value="c" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="标签">
-          <el-input v-model="dialog.form.tags" placeholder="多个标签用英文逗号分隔，如：Java,面试" />
-        </el-form-item>
-        <el-form-item label="封面URL">
-          <el-input v-model="dialog.form.cover" placeholder="封面图地址（可选）" />
-        </el-form-item>
-        <el-form-item label="摘要">
-          <el-input v-model="dialog.form.summary" type="textarea" :rows="2" maxlength="500" show-word-limit />
-        </el-form-item>
-        <el-form-item label="正文" required>
-          <el-input
-            v-model="dialog.form.content"
-            type="textarea"
-            :rows="16"
-            placeholder="支持 Markdown 语法"
-          />
-        </el-form-item>
-        <el-form-item label="作者">
-          <el-input v-model="dialog.form.authorName" style="width: 200px" />
-        </el-form-item>
-        <el-form-item label="发布状态">
-          <el-radio-group v-model="dialog.form.status">
-            <el-radio :value="0">草稿</el-radio>
-            <el-radio :value="1">发布</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="置顶">
-          <el-switch v-model="dialog.form.pinned" :active-value="1" :inactive-value="0" />
-        </el-form-item>
-        <el-form-item label="推荐">
-          <el-switch v-model="dialog.form.recommended" :active-value="1" :inactive-value="0" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="dialog.saving" @click="save">保存</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Plus } from '@element-plus/icons-vue'
 import api from '../utils/api'
 import { getDefaultPageSize } from '../utils/config'
+
+const router = useRouter()
 
 const categories = ['学习路线', '面试经验', '刷题技巧', '面经', '技术科普']
 
@@ -149,28 +102,6 @@ const query = reactive({
   keyword: ''
 })
 watch(() => query.pageSize, v => localStorage.setItem('article_page_size', String(v)))
-
-const dialog = reactive({
-  visible: false,
-  saving: false,
-  id: null,
-  form: emptyForm()
-})
-
-function emptyForm() {
-  return {
-    title: '',
-    category: '',
-    cover: '',
-    tags: '',
-    summary: '',
-    content: '',
-    authorName: '官方',
-    pinned: 0,
-    recommended: 0,
-    status: 0
-  }
-}
 
 onMounted(load)
 
@@ -198,51 +129,8 @@ function search() {
   load()
 }
 
-function openCreate() {
-  dialog.id = null
-  dialog.form = emptyForm()
-  dialog.visible = true
-}
-
-function openEdit(row) {
-  dialog.id = row.id
-  dialog.form = {
-    title: row.title,
-    category: row.category,
-    cover: row.cover,
-    tags: row.tags,
-    summary: row.summary,
-    content: row.content,
-    authorName: row.authorName,
-    pinned: row.pinned,
-    recommended: row.recommended,
-    status: row.status === 2 ? 0 : row.status
-  }
-  dialog.visible = true
-}
-
-async function save() {
-  if (!dialog.form.title.trim()) {
-    ElMessage.warning('请填写文章标题')
-    return
-  }
-  if (!dialog.form.content.trim()) {
-    ElMessage.warning('请填写文章正文')
-    return
-  }
-  dialog.saving = true
-  try {
-    if (dialog.id) {
-      await api.put('/admin/article', { id: dialog.id, ...dialog.form })
-    } else {
-      await api.post('/admin/article', dialog.form)
-    }
-    ElMessage.success('保存成功')
-    dialog.visible = false
-    load()
-  } finally {
-    dialog.saving = false
-  }
+function goEdit(row) {
+  router.push(row ? `/content/article/edit/${row.id}` : '/content/article/edit')
 }
 
 function changeStatus(row, status) {

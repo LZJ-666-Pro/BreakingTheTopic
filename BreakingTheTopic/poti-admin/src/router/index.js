@@ -60,8 +60,14 @@ const routes = [
           {
             path: 'add',
             name: 'QuestionAdd',
-            component: () => import('../views/Question.vue'),
+            component: () => import('../views/QuestionEdit.vue'),
             meta: { title: '新增题目', icon: 'Plus' }
+          },
+          {
+            path: 'edit/:id?',
+            name: 'QuestionEdit',
+            component: () => import('../views/QuestionEdit.vue'),
+            meta: { title: '编辑题目', icon: 'Document' }
           },
           {
             path: 'category',
@@ -118,6 +124,12 @@ const routes = [
         component: () => import('../views/CompetitionRecords.vue'),
         meta: { title: '竞赛成绩', icon: 'Trophy' }
       },
+      {
+        path: 'competition/edit/:id?',
+        name: 'CompetitionEdit',
+        component: () => import('../views/CompetitionEdit.vue'),
+        meta: { title: '编辑竞赛', icon: 'Trophy' }
+      },
 
       // ===== 内容管理 =====
       {
@@ -132,10 +144,22 @@ const routes = [
             meta: { title: '题解审核', icon: 'Notebook' }
           },
           {
+            path: 'solution-review/edit/:id',
+            name: 'SolutionReviewEdit',
+            component: () => import('../views/SolutionReviewEdit.vue'),
+            meta: { title: '编辑题解', icon: 'Notebook' }
+          },
+          {
             path: 'article',
             name: 'Article',
             component: () => import('../views/Article.vue'),
             meta: { title: '文章管理', icon: 'Memo' }
+          },
+          {
+            path: 'article/edit/:id?',
+            name: 'ArticleEdit',
+            component: () => import('../views/ArticleEdit.vue'),
+            meta: { title: '编辑文章', icon: 'Memo' }
           },
           {
             path: 'notice',

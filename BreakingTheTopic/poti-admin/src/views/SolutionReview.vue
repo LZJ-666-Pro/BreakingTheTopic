@@ -66,7 +66,7 @@
               <el-button link type="primary" @click="review(row, 1)">通过</el-button>
               <el-button link type="danger" @click="review(row, 2)">拒绝</el-button>
             </template>
-            <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
+            <el-button link type="primary" @click="goEdit(row)">编辑</el-button>
             <el-dropdown trigger="click" class="more-dropdown" @command="(cmd) => handleCommand(cmd, row)">
               <el-button link type="primary">更多<el-icon class="more-icon"><arrow-down /></el-icon></el-button>
               <template #dropdown>
@@ -123,42 +123,18 @@
         <pre class="md-preview">{{ detailDialog.row.content }}</pre>
       </div>
     </el-dialog>
-
-    <!-- 编辑弹窗 -->
-    <el-dialog v-model="editDialog.visible" title="编辑题解" width="680px">
-      <el-form label-width="80px">
-        <el-form-item label="标题">
-          <el-input v-model="editDialog.form.title" maxlength="200" />
-        </el-form-item>
-        <el-form-item label="内容">
-          <el-input
-            v-model="editDialog.form.content"
-            type="textarea"
-            :rows="14"
-            placeholder="支持 Markdown 语法"
-          />
-        </el-form-item>
-        <el-form-item label="优质">
-          <el-switch v-model="editDialog.form.quality" :active-value="1" :inactive-value="0" />
-        </el-form-item>
-        <el-form-item label="置顶">
-          <el-switch v-model="editDialog.form.pinned" :active-value="1" :inactive-value="0" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="editDialog.visible = false">取消</el-button>
-        <el-button type="primary" :loading="editDialog.saving" @click="saveEdit">保存</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, ArrowDown } from '@element-plus/icons-vue'
 import api from '../utils/api'
 import { getDefaultPageSize } from '../utils/config'
+
+const router = useRouter()
 
 const loading = ref(false)
 const list = ref([])
@@ -176,7 +152,6 @@ watch(() => query.pageSize, v => localStorage.setItem('solution_review_page_size
 
 const rejectDialog = reactive({ visible: false, id: null, reason: '' })
 const detailDialog = reactive({ visible: false, row: null })
-const editDialog = reactive({ visible: false, saving: false, id: null, form: { title: '', content: '', quality: 0, pinned: 0 } })
 
 onMounted(load)
 
@@ -230,31 +205,8 @@ async function confirmReject() {
   load()
 }
 
-function openEdit(row) {
-  editDialog.id = row.id
-  editDialog.form = {
-    title: row.title,
-    content: row.content,
-    quality: row.quality,
-    pinned: row.pinned
-  }
-  editDialog.visible = true
-}
-
-async function saveEdit() {
-  if (!editDialog.form.title.trim()) {
-    ElMessage.warning('标题不能为空')
-    return
-  }
-  editDialog.saving = true
-  try {
-    await api.put('/admin/solution', { id: editDialog.id, ...editDialog.form })
-    ElMessage.success('保存成功')
-    editDialog.visible = false
-    load()
-  } finally {
-    editDialog.saving = false
-  }
+function goEdit(row) {
+  router.push(`/content/solution-review/edit/${row.id}`)
 }
 
 function handleCommand(cmd, row) {
