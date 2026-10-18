@@ -163,6 +163,12 @@ const routes = [
         component: () => import('../views/AiMonitor.vue'),
         meta: { title: 'AI助手监控', icon: 'Monitor' }
       },
+      {
+        path: 'ai-monitor/session/:id',
+        name: 'AiSessionDetail',
+        component: () => import('../views/AiSessionDetail.vue'),
+        meta: { title: '会话详情', icon: 'Monitor' }
+      },
 
       // ===== AI 任务（独立） =====
       {
