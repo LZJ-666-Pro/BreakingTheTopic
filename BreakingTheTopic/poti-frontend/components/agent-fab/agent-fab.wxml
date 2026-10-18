@@ -1,4 +1,6 @@
 <view wx:if="{{visible}}" class="fab-wrap">
   <view class="fab-close" catch:tap="onClose">×</view>
-  <view class="fab-ball" bind:tap="onTap">AI</view>
+  <view class="fab-ball" bind:tap="onTap">
+    <image class="fab-icon" src="/images/contentIcon/agent.png" mode="aspectFit" />
+  </view>
 </view>
