@@ -31,6 +31,13 @@
 			<artifactId>mybatis-plus-boot-starter</artifactId>
 		</dependency>
 
+		<!-- 多数据源（竞赛排行榜跨库查询 poti_user.user 表） -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+			<version>3.6.1</version>
+		</dependency>
+
 		<!-- MySQL 驱动 -->
 		<dependency>
 			<groupId>mysql</groupId>

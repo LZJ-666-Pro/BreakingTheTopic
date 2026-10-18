@@ -5,6 +5,12 @@ jwt:
   secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
   expire: 86400000
 
+# AI 配置：解答题判分，沿用项目统一的智谱端点与环境变量约定（与批量出题共用 AI_API_KEY）
+ai:
+  api-key: ${AI_API_KEY:2794361da43a4a71ac28781fe1916910.TTvqqqy9O8Jha82e}
+  base-url: ${AI_BASE_URL:https://open.bigmodel.cn/api/paas/v4}
+  model: ${AI_MODEL:glm-4-flash}
+
 poti:
   security:
     internal-token: ${INTERNAL_TOKEN:poti-internal-secret-2024}
@@ -33,17 +39,34 @@ spring:
         max-idle: 10
         min-idle: 5
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_practice?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:123456}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      connection-test-query: SELECT 1
+    dynamic:
+      primary: practice
+      strict: false
+      datasource:
+        practice:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_practice?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 5
+            maximum-pool-size: 20
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
+        user:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_user?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
 
 mybatis-plus:
   configuration:
