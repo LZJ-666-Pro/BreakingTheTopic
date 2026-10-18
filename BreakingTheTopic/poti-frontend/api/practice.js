@@ -71,6 +71,10 @@ const practiceApi = {
     return get('/practice/history', { page, size })
   },
 
+  getStatistics() {
+    return get('/practice/statistics')
+  },
+
   deleteRecord(recordId) {
     return del(`/practice/record/${recordId}`)
   },

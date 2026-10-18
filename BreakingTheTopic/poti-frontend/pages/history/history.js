@@ -82,27 +82,32 @@ Page({
 
   loadStatistics() {
     const app = getApp()
-    wx.request({
-      url: `${app.globalData.practiceUrl}/practice/internal/statistics`,
-      method: 'GET',
-      header: {
-        'X-User-Id': app.globalData.userId || 1
-      },
-      success: (res) => {
-        if (res.data.code === 200) {
-          const stats = res.data.data
-          const correctRate = stats.totalQuestionCount > 0 
-            ? Math.round((stats.correctCount / stats.totalQuestionCount) * 100) 
-            : 0
-          
-          this.setData({
-            statistics: {
-              ...stats,
-              correctRate
-            }
-          })
-        }
+    // 学习统计需要用户认证：走 api 封装携带 Bearer token（internal 接口仅限服务间调用，直调必 401）
+    const token = app.globalData.token || wx.getStorageSync('token')
+    const userId = wx.getStorageSync('userId')
+    if (!token || !userId) {
+      return
+    }
+    practiceApi.getStatistics().then(res => {
+      if (res.code === 401) {
+        app._handleUnauthorized()
+        return
       }
+      if (res.code === 200) {
+        const stats = res.data
+        const correctRate = stats.totalQuestionCount > 0
+          ? Math.round((stats.correctCount / stats.totalQuestionCount) * 100)
+          : 0
+
+        this.setData({
+          statistics: {
+            ...stats,
+            correctRate
+          }
+        })
+      }
+    }).catch(err => {
+      console.error('加载学习统计失败', err)
     })
   },
 

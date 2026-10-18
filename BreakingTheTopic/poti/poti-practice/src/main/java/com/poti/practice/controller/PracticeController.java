@@ -64,6 +64,17 @@ public class PracticeController {
         }
     }
 
+    /** 学习统计（小程序历史页调用；internal 版本仅供服务间调用，前端直调会被 401） */
+    @GetMapping("/statistics")
+    public R<Map<String, Object>> getStatistics(@RequestHeader("X-User-Id") Long userId) {
+        try {
+            return R.success(practiceService.getStatistics(userId));
+        } catch (Exception e) {
+            log.error("获取学习统计失败", e);
+            return R.error("获取学习统计失败");
+        }
+    }
+
     @PostMapping("/internal/statistics/batch")
     public R<Map<Long, Map<String, Object>>> getStatisticsBatchInternal(@RequestBody List<Long> userIds) {
         try {
