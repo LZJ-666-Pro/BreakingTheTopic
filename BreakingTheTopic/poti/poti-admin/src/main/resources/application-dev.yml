@@ -117,6 +117,18 @@ spring:
             idle-timeout: 600000
             max-lifetime: 1800000
             connection-test-query: SELECT 1
+        agent:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
   cloud:
     nacos:
       discovery:

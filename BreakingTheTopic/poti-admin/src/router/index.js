@@ -156,6 +156,14 @@ const routes = [
         meta: { title: '数据统计', icon: 'DataAnalysis' }
       },
 
+      // ===== AI 助手监控 =====
+      {
+        path: 'ai-monitor',
+        name: 'AiMonitor',
+        component: () => import('../views/AiMonitor.vue'),
+        meta: { title: 'AI助手监控', icon: 'Monitor' }
+      },
+
       // ===== AI 任务（独立） =====
       {
         path: 'ai-tasks',
