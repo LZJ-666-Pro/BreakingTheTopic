@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -163,43 +165,24 @@ public class CheckinServiceImpl extends ServiceImpl<CheckInMapper, CheckIn> impl
     
     private int calculateStreakDays(Long userId) {
         LocalDate today = LocalDate.now();
-        int streak = 0;
-        
-        LambdaQueryWrapper<CheckIn> todayQuery = new LambdaQueryWrapper<>();
-        todayQuery.eq(CheckIn::getUserId, userId)
-                  .eq(CheckIn::getCheckinDate, today);
-        
-        boolean hasTodayRecord = this.count(todayQuery) > 0;
-        
-        if (hasTodayRecord) {
-            for (int i = 0; i < 365; i++) {
-                LocalDate checkDate = today.minusDays(i);
-                
-                LambdaQueryWrapper<CheckIn> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.eq(CheckIn::getUserId, userId)
-                            .eq(CheckIn::getCheckinDate, checkDate);
-                
-                if (this.count(queryWrapper) > 0) {
-                    streak++;
-                } else {
-                    break;
-                }
-            }
-        } else {
-            for (int i = 1; i < 366; i++) {
-                LocalDate checkDate = today.minusDays(i);
-                
-                LambdaQueryWrapper<CheckIn> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.eq(CheckIn::getUserId, userId)
-                            .eq(CheckIn::getCheckinDate, checkDate);
-                
-                if (this.count(queryWrapper) > 0) {
-                    streak++;
-                } else {
-                    break;
-                }
-            }
 
+        // 单次查询近 365 天签到日期后内存判连续（替代逐日 count 循环查询，签到高峰期减少数百次 DB 往返）
+        LambdaQueryWrapper<CheckIn> rangeQuery = new LambdaQueryWrapper<>();
+        rangeQuery.eq(CheckIn::getUserId, userId)
+                  .ge(CheckIn::getCheckinDate, today.minusDays(364))
+                  .select(CheckIn::getCheckinDate);
+        Set<LocalDate> dates = this.list(rangeQuery).stream()
+                .map(CheckIn::getCheckinDate)
+                .collect(Collectors.toSet());
+
+        // 今天已有记录从今天往回数；否则从昨天往回数（今天的签到本次落库后计入，断签即从这里断开）
+        LocalDate cursor = dates.contains(today) ? today : today.minusDays(1);
+        int streak = 0;
+        while (dates.contains(cursor)) {
+            streak++;
+            cursor = cursor.minusDays(1);
+        }
+        if (!dates.contains(today)) {
             streak++;
         }
 

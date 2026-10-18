@@ -1,6 +1,7 @@
 package com.poti.question.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poti.common.R;
@@ -122,6 +123,47 @@ public class QuestionController {
             
             return R.success(result);
         } catch (Exception e) {
+            return R.error("获取题目列表失败");
+        }
+    }
+
+    /**
+     * 分页获取题目列表（轻量字段：不含 content/answer/analysis/options，列表页无需这些大字段，
+     * 万级题库下全量返回响应体过大且答案字段随列表下发存在泄露面）。
+     * 前端题目列表页配合 onReachBottom 无限滚动。
+     */
+    @GetMapping("/page")
+    @Operation(summary = "分页获取题目列表", description = "按分类分页获取题目（轻量字段），返回 {list, total}")
+    public R<Map<String, Object>> getQuestionPage(@RequestParam Long categoryId,
+                                                  @RequestParam(defaultValue = "1") Integer page,
+                                                  @RequestParam(defaultValue = "20") Integer pageSize) {
+        try {
+            pageSize = Math.min(Math.max(pageSize, 1), 50);
+            Page<Question> pager = new Page<>(page, pageSize);
+            LambdaQueryWrapper<Question> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Question::getCategoryId, categoryId)
+                   .eq(Question::getDeleted, 0)
+                   .eq(Question::getStatus, 1)
+                   .orderByAsc(Question::getId);
+            Page<Question> result = questionService.page(pager, wrapper);
+
+            List<Map<String, Object>> list = result.getRecords().stream().map(q -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", q.getId());
+                map.put("title", q.getTitle());
+                map.put("type", q.getType());
+                map.put("difficulty", q.getDifficulty());
+                map.put("viewCount", q.getViewCount());
+                map.put("favoriteCount", q.getFavoriteCount());
+                return map;
+            }).collect(java.util.stream.Collectors.toList());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("list", list);
+            data.put("total", result.getTotal());
+            return R.success(data);
+        } catch (Exception e) {
+            log.error("分页获取题目列表失败: categoryId={}", categoryId, e);
             return R.error("获取题目列表失败");
         }
     }

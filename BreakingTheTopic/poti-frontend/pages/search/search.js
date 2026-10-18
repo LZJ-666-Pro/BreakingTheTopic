@@ -49,6 +49,9 @@ Page({
         if (res.data.code === 200 && Array.isArray(res.data.data)) {
           this.setData({ categoryList: res.data.data })
         }
+      },
+      fail: (err) => {
+        console.error('加载分类列表失败', err)
       }
     })
   },
@@ -94,6 +97,9 @@ Page({
           }))
           that.setData({ hotQuestions })
         }
+      },
+      fail: (err) => {
+        console.error('加载热门题目失败', err)
       }
     })
   },

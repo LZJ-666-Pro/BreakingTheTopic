@@ -1,30 +1,34 @@
 const { getCategoryIcon } = require('../../utils/categoryLogo.js')
 
+const PAGE_SIZE = 20
+
 Page({
   data: {
     categoryId: null,
     categoryName: '',
     categoryIcon: '/images/questionLogo/default.png',
     questions: [],
+    total: 0,
+    page: 1,
+    hasMore: false,
     loading: true,
-    showAll: false,
-    displayQuestions: []
+    loadingMore: false
   },
 
   onLoad(options) {
     const categoryId = options.categoryId
     const categoryName = options.name ? decodeURIComponent(options.name) : ''
-    
+
     this.setData({
       categoryId: categoryId,
       categoryName: categoryName,
       categoryIcon: getCategoryIcon(categoryName)
     })
-    
+
     if (categoryId) {
       this.loadQuestions(categoryId)
     }
-    
+
     wx.setNavigationBarTitle({
       title: categoryName || '题目列表'
     })
@@ -33,32 +37,25 @@ Page({
   loadQuestions(categoryId) {
     const app = getApp()
     const that = this
-    
+
     wx.request({
-      url: `${app.globalData.questionUrl}/question/list?categoryId=${categoryId}`,
+      url: `${app.globalData.questionUrl}/question/page?categoryId=${categoryId}&page=1&pageSize=${PAGE_SIZE}`,
       method: 'GET',
       header: {
         'Authorization': `Bearer ${app.globalData.token}`
       },
       success: function(res) {
         if (res.data.code === 200 && res.data.data) {
-          const questions = res.data.data.map(function(q, index) {
-            return {
-              id: q.id,
-              title: q.title || `题目 ${index + 1}`,
-              type: that.getQuestionType(q.type),
-              difficulty: that.getDifficultyText(q.difficulty),
-              difficultyClass: that.getDifficultyClass(q.difficulty),
-              viewCount: q.viewCount || 0,
-              favoriteCount: q.favoriteCount || 0
-            }
+          const questions = (res.data.data.list || []).map(function(q) {
+            return that.formatQuestion(q)
           })
-          
-          const displayQuestions = questions.slice(0, 20)
-          
+          const total = res.data.data.total || 0
+
           that.setData({
             questions: questions,
-            displayQuestions: displayQuestions,
+            total: total,
+            page: 1,
+            hasMore: questions.length < total,
             loading: false
           })
         } else {
@@ -71,6 +68,59 @@ Page({
           title: '加载失败',
           icon: 'none'
         })
+      }
+    })
+  },
+
+  formatQuestion(q) {
+    return {
+      id: q.id,
+      title: q.title || '题目',
+      type: this.getQuestionType(q.type),
+      difficulty: this.getDifficultyText(q.difficulty),
+      difficultyClass: this.getDifficultyClass(q.difficulty),
+      viewCount: q.viewCount || 0,
+      favoriteCount: q.favoriteCount || 0
+    }
+  },
+
+  // 上拉触底加载下一页（后端分页，替代原全量拉取前端截断 20 条）
+  onReachBottom() {
+    if (this.data.loading || this.data.loadingMore || !this.data.hasMore) {
+      return
+    }
+    const app = getApp()
+    const that = this
+    const nextPage = this.data.page + 1
+
+    this.setData({ loadingMore: true })
+    wx.request({
+      url: `${app.globalData.questionUrl}/question/page?categoryId=${this.data.categoryId}&page=${nextPage}&pageSize=${PAGE_SIZE}`,
+      method: 'GET',
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`
+      },
+      success: function(res) {
+        if (res.data.code === 200 && res.data.data) {
+          const more = (res.data.data.list || []).map(function(q) {
+            return that.formatQuestion(q)
+          })
+          const questions = that.data.questions.concat(more)
+          that.setData({
+            questions: questions,
+            page: nextPage,
+            hasMore: questions.length < (res.data.data.total || 0)
+          })
+        }
+      },
+      fail: function() {
+        wx.showToast({
+          title: '加载失败',
+          icon: 'none'
+        })
+      },
+      complete: function() {
+        that.setData({ loadingMore: false })
       }
     })
   },
@@ -102,21 +152,6 @@ Page({
       3: 'hard'
     }
     return map[difficulty] || 'medium'
-  },
-
-  toggleShowAll() {
-    const { questions, showAll } = this.data
-    if (showAll) {
-      this.setData({
-        showAll: false,
-        displayQuestions: questions.slice(0, 20)
-      })
-    } else {
-      this.setData({
-        showAll: true,
-        displayQuestions: questions
-      })
-    }
   },
 
   goToQuestion(e) {
