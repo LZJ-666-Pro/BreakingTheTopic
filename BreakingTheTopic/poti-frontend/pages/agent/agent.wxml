@@ -19,6 +19,7 @@
       <!-- 用户消息 -->
       <view class="row row-user" wx:if="{{item.role === 'user'}}">
         <view class="bubble bubble-user">{{item.text}}</view>
+        <image class="user-avatar" src="{{userAvatar}}" mode="aspectFill" />
       </view>
 
       <!-- 助手消息 -->

@@ -207,6 +207,17 @@ page {
 
 .row-user {
   justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.user-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  margin-left: 16rpx;
+  flex-shrink: 0;
+  margin-top: 6rpx;
+  border-radius: 50%;
+  background: #E8ECF5;
 }
 
 .row-ai {

@@ -3,6 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/poti/poti-admin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/poti/poti-admin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/poti/poti-agent/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/poti/poti-agent/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/poti/poti-auth/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/poti/poti-auth/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/poti/poti-common/poti-common-core/src/main/java" charset="UTF-8" />

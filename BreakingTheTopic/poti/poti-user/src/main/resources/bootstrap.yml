@@ -6,6 +6,11 @@ spring:
   cloud:
     nacos:
       server-addr: 127.0.0.1:8848
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 全部服务同机部署：注册 IP 固定 127.0.0.1，避免校园网 IP 变更后
+        # Nacos 残留旧 IP 导致网关/服务间转发超时
+        ip: 127.0.0.1
       config:
         file-extension: yaml
         import-check:

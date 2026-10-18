@@ -35,6 +35,9 @@ Page({
       })
       return
     }
+    // 用户头像（未设置头像时用默认图）
+    const info = wx.getStorageSync('userInfo') || {}
+    this.setData({ userAvatar: info.avatarUrl || '/images/default-avatar.png' })
     // 悬浮球带入的题目问题：开新会话自动提问（不混入最近会话上下文）
     const prefill = options && options.prefill ? decodeURIComponent(options.prefill) : ''
     if (prefill) {

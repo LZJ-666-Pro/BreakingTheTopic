@@ -144,7 +144,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import axios from 'axios'
+import api from '../utils/api'
 import { getDefaultPageSize } from '../utils/config'
 
 const loading = ref(false)
@@ -185,27 +185,19 @@ const handleBatchResolve = () => {
   ).then(async ({ value }) => {
     batchResolving.value = true
     try {
-      const res = await axios.post(`${userUrl}/feedback/batch/resolve`, {
+      const res = await api.post('/feedback/batch/resolve', {
         ids,
         reply: value || null
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
       })
-      if (res.data.code === 200) {
-        ElMessage.success(res.data.data || '处理成功')
-        loadFeedbackList()
-      } else {
-        ElMessage.error(res.data.msg || '批量处理失败')
-      }
+      ElMessage.success(res.data || '处理成功')
+      loadFeedbackList()
     } catch (error) {
-      ElMessage.error('批量处理失败')
+      // 统一拦截器已提示错误
     } finally {
       batchResolving.value = false
     }
   }).catch(() => {})
 }
-
-const userUrl = import.meta.env.VITE_USER_URL || 'http://localhost:8200'
 
 const loadFeedbackList = async () => {
   loading.value = true
@@ -218,18 +210,13 @@ const loadFeedbackList = async () => {
       params.status = filterStatus.value
     }
     
-    const res = await axios.get(`${userUrl}/feedback/page`, {
-      params,
-      headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
-    })
-    if (res.data.code === 200) {
-      let list = res.data.data.records || []
-      if (filterType.value) {
-        list = list.filter(item => item.type === filterType.value)
-      }
-      feedbackList.value = list
-      total.value = res.data.data.total || 0
+    const res = await api.get('/feedback/page', { params })
+    let list = res.data.records || []
+    if (filterType.value) {
+      list = list.filter(item => item.type === filterType.value)
     }
+    feedbackList.value = list
+    total.value = res.data.total || 0
   } catch (error) {
     console.error('加载反馈列表失败', error)
   } finally {
@@ -251,20 +238,14 @@ const submitReply = async () => {
   
   submitting.value = true
   try {
-    const res = await axios.post(`${userUrl}/feedback/reply/${currentFeedback.value.id}`, {
+    await api.post(`/feedback/reply/${currentFeedback.value.id}`, {
       reply: replyForm.value.reply
-    }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
     })
-    if (res.data.code === 200) {
-      ElMessage.success('回复成功')
-      replyDialogVisible.value = false
-      loadFeedbackList()
-    } else {
-      ElMessage.error(res.data.msg || '回复失败')
-    }
+    ElMessage.success('回复成功')
+    replyDialogVisible.value = false
+    loadFeedbackList()
   } catch (error) {
-    ElMessage.error('回复失败')
+    // 统一拦截器已提示错误
   } finally {
     submitting.value = false
   }
@@ -275,17 +256,11 @@ const handleDelete = (row) => {
     type: 'warning'
   }).then(async () => {
     try {
-      const res = await axios.delete(`${userUrl}/feedback/delete/${row.id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token') || ''}` }
-      })
-      if (res.data.code === 200) {
-        ElMessage.success('删除成功')
-        loadFeedbackList()
-      } else {
-        ElMessage.error(res.data.msg || '删除失败')
-      }
+      await api.delete(`/feedback/delete/${row.id}`)
+      ElMessage.success('删除成功')
+      loadFeedbackList()
     } catch (error) {
-      ElMessage.error('删除失败')
+      // 统一拦截器已提示错误
     }
   }).catch(() => {})
 }

@@ -40,7 +40,11 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('admin_token')
       localStorage.removeItem('admin_user')
-      window.location.href = '/login'
+      // 死循环防护：登录页自身的白名单请求（如验证码开关）401 时不跳转，
+      // 否则 window.location 跳登录 → 页面重载 → 再 401 → 无限刷新
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
     }
     ElMessage.error(error.response?.data?.msg || '网络错误')
     return Promise.reject(error)

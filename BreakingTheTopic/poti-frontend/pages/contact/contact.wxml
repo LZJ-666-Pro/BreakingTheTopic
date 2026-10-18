@@ -48,4 +48,17 @@
       <text class="work-tip">其他时间留言，看到后会尽快回复</text>
     </view>
   </view>
+
+  <!-- 后台「网站设置」下发的站点信息 -->
+  <view class="section" wx:if="{{siteInfo.name || siteInfo.description || siteInfo.icp || siteInfo.copyright}}">
+    <view class="section-title">关于本站</view>
+    <view class="about-box">
+      <view class="about-name" wx:if="{{siteInfo.name}}">{{siteInfo.name}}</view>
+      <view class="about-desc" wx:if="{{siteInfo.description}}">{{siteInfo.description}}</view>
+      <view class="about-footer">
+        <text wx:if="{{siteInfo.copyright}}">{{siteInfo.copyright}}</text>
+        <text wx:if="{{siteInfo.icp}}">{{siteInfo.icp}}</text>
+      </view>
+    </view>
+  </view>
 </view>

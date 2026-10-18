@@ -9,6 +9,13 @@ Page({
       weibo: '',
       workTime: ''
     },
+    // 后台「网站设置」跨库下发（site_name/site_description/site_icp/site_copyright）
+    siteInfo: {
+      name: '',
+      description: '',
+      icp: '',
+      copyright: ''
+    },
     isAllEmpty: false
   },
 
@@ -30,10 +37,16 @@ Page({
             weibo: config.contact_weibo || '',
             workTime: config.contact_work_time || ''
           }
+          const siteInfo = {
+            name: config.site_name || '',
+            description: config.site_description || '',
+            icp: config.site_icp || '',
+            copyright: config.site_copyright || ''
+          }
           // 全部为空时展示空状态引导
           const isAllEmpty = !contactInfo.wechat && !contactInfo.qq &&
             !contactInfo.email && !contactInfo.weibo
-          this.setData({ contactInfo, isAllEmpty })
+          this.setData({ contactInfo, siteInfo, isAllEmpty })
         }
       }
     })

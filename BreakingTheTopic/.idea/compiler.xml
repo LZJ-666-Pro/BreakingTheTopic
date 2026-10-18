@@ -19,6 +19,7 @@
         <module name="poti-favorite" />
         <module name="poti-search" />
         <module name="poti-wrongbook" />
+        <module name="poti-agent" />
         <module name="poti-common-swagger" />
         <module name="poti-auth" />
         <module name="poti-question" />

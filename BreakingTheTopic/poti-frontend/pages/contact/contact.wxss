@@ -72,6 +72,33 @@
   margin-bottom: 20rpx;
 }
 
+/* 关于本站（后台网站设置下发） */
+.about-box {
+  padding: 8rpx 0;
+}
+
+.about-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.about-desc {
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.about-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  font-size: 22rpx;
+  color: #b0b0b0;
+}
+
 .contact-list {
   
 }

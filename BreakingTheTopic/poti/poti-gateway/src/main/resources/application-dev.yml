@@ -32,6 +32,11 @@ spring:
           predicates:
             - Path=/user/**
 
+        - id: poti-feedback
+          uri: lb://poti-user
+          predicates:
+            - Path=/feedback/**
+
         - id: poti-sms
           uri: lb://poti-user
           predicates:
