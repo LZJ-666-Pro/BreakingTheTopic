@@ -42,6 +42,11 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
+		<!-- Feign 按服务名负载均衡必需（Spring Cloud 2021 起不含 Ribbon） -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.poti</groupId>
 			<artifactId>poti-common-core</artifactId>
