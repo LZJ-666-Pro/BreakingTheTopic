@@ -81,7 +81,9 @@ SELECT 'register_enabled', 'true', '开放注册', '关闭后小程序端无法�
 INSERT INTO sys_config (config_key, config_value, config_name, description, status)
 SELECT 'login_captcha_enabled', 'true', '登录验证码开关', '控制后台登录是否需要验证码', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'login_captcha_enabled');
 INSERT INTO sys_config (config_key, config_value, config_name, description, status)
-SELECT 'daily_question_time', '00:00', '每日一题更新时间', '每天自动切换每日一题的时间点', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'daily_question_time');
+SELECT 'daily_question_auto', 'false', '每日一题自动发布', '开启后每天按 daily_question_time 自动随机抽题发布每日一题（排除近 30 天已用题目）；关闭后停止自动发布', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'daily_question_auto');
+INSERT INTO sys_config (config_key, config_value, config_name, description, status)
+SELECT 'daily_question_time', '08:00', '每日一题更新时间', '自动发布开关开启时，每天到该时间点自动抽题发布每日一题', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'daily_question_time');
 INSERT INTO sys_config (config_key, config_value, config_name, description, status)
 SELECT 'default_page_size', '10', '默认分页条数', '列表页默认每页条数', 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_config WHERE config_key = 'default_page_size');
 INSERT INTO sys_config (config_key, config_value, config_name, description, status)

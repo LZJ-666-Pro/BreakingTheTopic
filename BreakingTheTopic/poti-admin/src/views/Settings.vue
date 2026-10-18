@@ -79,9 +79,14 @@
               <span class="form-tip" style="margin-left: 10px">奖励体系（积分/兑换）未上线，暂不生效</span>
             </el-form-item>
 
+            <el-form-item label="每日一题自动发布">
+              <el-switch v-model="siteForm.daily_question_auto" active-value="true" inactive-value="false" />
+              <span class="form-tip" style="margin-left: 10px">开启后按下方时间自动随机抽题发布（排除近 30 天已用题目）；关闭即停止自动发布，手动配置不受影响</span>
+            </el-form-item>
+
             <el-form-item label="每日一题更新时间">
-              <el-input v-model="siteForm.daily_question_time" placeholder="如 00:00" style="width: 140px" />
-              <span class="form-tip" style="margin-left: 10px">每日一题由后台手动设置，暂不生效</span>
+              <el-input v-model="siteForm.daily_question_time" placeholder="如 08:00" style="width: 140px" />
+              <span class="form-tip" style="margin-left: 10px">自动发布开关开启时，每天到该时间点自动抽题发布</span>
             </el-form-item>
 
             <el-form-item label="默认分页条数">
@@ -195,7 +200,8 @@ const siteForm = reactive({
   competition_enabled: 'false',
   discussion_enabled: 'true',
   checkin_reward_enabled: 'true',
-  daily_question_time: '00:00',
+  daily_question_auto: 'false',
+  daily_question_time: '08:00',
   default_page_size: 10,
   vip_price: 1.99,
   vip_price_quarter: 4.99,

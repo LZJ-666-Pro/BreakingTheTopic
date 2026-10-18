@@ -129,16 +129,20 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeMapper, Practice> i
         int wrongCount = totalCount - correctCount;
 
         LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        int todayCount = 0;
-        int todayCorrectCount = 0;
+        // 今日刷题按题目去重：同一题刷多次只算 1 道，对错取该题最后一次作答结果
+        Map<Long, Practice> latestToday = new HashMap<>();
         for (Practice p : practices) {
-            if (p.getPracticeTime() != null && p.getPracticeTime().isAfter(todayStart)) {
-                todayCount++;
-                if (Boolean.TRUE.equals(p.getIsCorrect())) {
-                    todayCorrectCount++;
-                }
+            if (p.getPracticeTime() == null || !p.getPracticeTime().isAfter(todayStart) || p.getQuestionId() == null) {
+                continue;
+            }
+            Practice cur = latestToday.get(p.getQuestionId());
+            if (cur == null || p.getPracticeTime().isAfter(cur.getPracticeTime())) {
+                latestToday.put(p.getQuestionId(), p);
             }
         }
+        int todayCount = latestToday.size();
+        int todayCorrectCount = (int) latestToday.values().stream()
+                .filter(p -> Boolean.TRUE.equals(p.getIsCorrect())).count();
         int todayWrongCount = todayCount - todayCorrectCount;
 
         statistics.put("totalQuestionCount", totalCount);
@@ -179,8 +183,8 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeMapper, Practice> i
         for (Long userId : userIds) {
             int totalCount = 0;
             int correctCount = 0;
-            int todayCount = 0;
-            int todayCorrectCount = 0;
+            // 今日按题目去重（同题多次只算 1 道），对错取最后一次作答结果
+            Map<Long, Practice> latestToday = new HashMap<>();
             for (Practice p : allPractices) {
                 if (!userId.equals(p.getUserId())) {
                     continue;
@@ -190,13 +194,16 @@ public class PracticeServiceImpl extends ServiceImpl<PracticeMapper, Practice> i
                 if (correct) {
                     correctCount++;
                 }
-                if (p.getPracticeTime() != null && p.getPracticeTime().isAfter(todayStart)) {
-                    todayCount++;
-                    if (correct) {
-                        todayCorrectCount++;
+                if (p.getPracticeTime() != null && p.getPracticeTime().isAfter(todayStart) && p.getQuestionId() != null) {
+                    Practice cur = latestToday.get(p.getQuestionId());
+                    if (cur == null || p.getPracticeTime().isAfter(cur.getPracticeTime())) {
+                        latestToday.put(p.getQuestionId(), p);
                     }
                 }
             }
+            int todayCount = latestToday.size();
+            int todayCorrectCount = (int) latestToday.values().stream()
+                    .filter(p -> Boolean.TRUE.equals(p.getIsCorrect())).count();
 
             Map<String, Object> statistics = new HashMap<>();
             statistics.put("totalQuestionCount", totalCount);

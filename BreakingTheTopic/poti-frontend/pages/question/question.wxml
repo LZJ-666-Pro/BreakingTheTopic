@@ -6,12 +6,19 @@
     </view>
   </view>
 
-  <view class="special-banner" bindtap="goSpecial">
-    <view class="special-banner-left">
-      <text class="special-banner-title">🎯 刷题专题</text>
-      <text class="special-banner-desc">系统学习路线，按专题逐个击破</text>
+  <view class="special-banner-wrap">
+    <view class="special-banner" bindtap="goSpecial">
+      <view class="special-banner-left">
+        <view class="special-banner-icon">
+          <van-icon name="bookmark-o" size="20px" color="#6C47E0" />
+        </view>
+        <view class="special-banner-texts">
+          <text class="special-banner-title">刷题专题</text>
+          <text class="special-banner-desc">系统学习路线，按专题逐个击破</text>
+        </view>
+      </view>
+      <van-icon name="arrow" size="14px" color="#C8C9CC" />
     </view>
-    <van-icon name="arrow" size="14px" color="#fff" />
   </view>
 
   <view class="category-section">

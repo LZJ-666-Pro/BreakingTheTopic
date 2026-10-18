@@ -249,6 +249,7 @@ Page({
   data: {
     userInfo: {},
     dailyQuestion: null,
+    dailyAnswered: false,
     todayCount: 0,
     wrongCount: 0,
     favoriteCount: 0,
@@ -285,10 +286,10 @@ Page({
     this.setData({ bannerAd: require('../../utils/ad.js').getBannerState() })
     this.loadUserInfo()
     this.loadStats()
+    this.loadDailyQuestion()
     this.checkUnfinished()
     this.checkTodayCheckIn()
     this.loadUnreadCount()
-    this.loadDailyQuestion()
   },
 
   /** 真实广告拉取失败（低填充率等）时隐藏容器，避免空白占位 */
@@ -574,16 +575,21 @@ Page({
   loadDailyQuestion() {
     const app = getApp()
     const token = app.globalData.token
+    // 登录用户带 userId：后端返回 hasAnswered，当天已作答则不再展示入口
+    const uid = token ? app.globalData.userId : null
     wx.request({
-      url: `${app.globalData.questionUrl}/question/daily/today`,
+      url: `${app.globalData.questionUrl}/question/daily/today${uid ? `?userId=${uid}` : ''}`,
       method: 'GET',
       header: token ? { Authorization: `Bearer ${token}` } : {},
       success: (res) => {
         const d = (res.data && res.data.data) || null
         if (d && d.questionId) {
-          this.setData({ dailyQuestion: d })
+          this.setData({
+            dailyQuestion: d,
+            dailyAnswered: d.hasAnswered === true
+          })
         } else {
-          this.setData({ dailyQuestion: null })
+          this.setData({ dailyQuestion: null, dailyAnswered: false })
         }
       }
     })
@@ -592,7 +598,8 @@ Page({
   goDailyQuestion() {
     const qid = this.data.dailyQuestion && this.data.dailyQuestion.questionId
     if (qid) {
-      wx.navigateTo({ url: `/pages/question-detail/question-detail?id=${qid}` })
+      // 走答题页作答（判分+记录），from=daily 标记用于「答完不再展示」上报
+      wx.navigateTo({ url: `/pages/answer/answer?questionId=${qid}&from=daily` })
     }
   },
 

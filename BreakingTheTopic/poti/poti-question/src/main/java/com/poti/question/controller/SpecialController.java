@@ -2,10 +2,12 @@ package com.poti.question.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.poti.common.R;
+import com.poti.question.entity.DailyAnswer;
 import com.poti.question.entity.DailyQuestion;
 import com.poti.question.entity.Question;
 import com.poti.question.entity.SpecialQuestion;
 import com.poti.question.entity.SpecialTopic;
+import com.poti.question.mapper.DailyAnswerMapper;
 import com.poti.question.mapper.DailyQuestionMapper;
 import com.poti.question.mapper.QuestionMapper;
 import com.poti.question.mapper.SpecialQuestionMapper;
@@ -34,6 +36,8 @@ public class SpecialController {
     private QuestionMapper questionMapper;
     @Autowired
     private DailyQuestionMapper dailyQuestionMapper;
+    @Autowired
+    private DailyAnswerMapper dailyAnswerMapper;
 
     // ==================== 专题 ====================
 
@@ -107,14 +111,62 @@ public class SpecialController {
 
     // ==================== 每日一题 ====================
 
-    /** 今日一题（未配置时返回空数据） */
+    /**
+     * 今日一题（未配置时返回空数据）。
+     * 登录用户传 userId 时额外返回 hasAnswered——当天已作答则小程序端不再展示入口。
+     */
     @GetMapping("/daily/today")
-    public R<Map<String, Object>> today() {
+    public R<Map<String, Object>> today(@RequestParam(required = false) Long userId) {
         try {
-            return R.success(buildDaily(LocalDate.now()));
+            Map<String, Object> data = buildDaily(LocalDate.now());
+            if (userId != null) {
+                data.put("hasAnswered", hasAnswered(userId, LocalDate.now()));
+            }
+            return R.success(data);
         } catch (Exception e) {
             return R.error("获取今日一题失败");
         }
+    }
+
+    /** 上报每日一题作答完成：用户维度一天一条，答对答错都算「已答」 */
+    @PostMapping("/daily/submit")
+    public R<Void> submitDailyAnswer(@RequestBody Map<String, Object> body) {
+        try {
+            Object uid = body.get("userId");
+            Object qid = body.get("questionId");
+            if (uid == null || qid == null) {
+                return R.error("参数不完整");
+            }
+            Long userId = Long.valueOf(String.valueOf(uid));
+            Long questionId = Long.valueOf(String.valueOf(qid));
+            boolean correct = Boolean.parseBoolean(String.valueOf(body.get("isCorrect")));
+
+            LocalDate today = LocalDate.now();
+            DailyAnswer answer = new DailyAnswer();
+            answer.setUserId(userId);
+            answer.setQuestionId(questionId);
+            answer.setAnswerDate(today);
+            answer.setIsCorrect(correct ? 1 : 0);
+            try {
+                dailyAnswerMapper.insert(answer);
+            } catch (org.springframework.dao.DuplicateKeyException e) {
+                // 当天已上报过：仅更新对错结果（幂等，重复提交不报错）
+                DailyAnswer update = new DailyAnswer();
+                update.setIsCorrect(correct ? 1 : 0);
+                dailyAnswerMapper.update(update, new LambdaQueryWrapper<DailyAnswer>()
+                        .eq(DailyAnswer::getUserId, userId)
+                        .eq(DailyAnswer::getAnswerDate, today));
+            }
+            return R.success(null);
+        } catch (Exception e) {
+            return R.error("上报每日一题作答失败");
+        }
+    }
+
+    private boolean hasAnswered(Long userId, LocalDate date) {
+        return dailyAnswerMapper.selectCount(new LambdaQueryWrapper<DailyAnswer>()
+                .eq(DailyAnswer::getUserId, userId)
+                .eq(DailyAnswer::getAnswerDate, date)) > 0;
     }
 
     /** 历史每日一题（最近 limit 天，按日期倒序） */

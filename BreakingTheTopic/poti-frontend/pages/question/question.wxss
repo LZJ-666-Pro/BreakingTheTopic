@@ -31,11 +31,15 @@ page {
   box-sizing: border-box;
 }
 
+.special-banner-wrap {
+  background: #fff;
+  padding: 16rpx 20rpx;
+}
+
 .special-banner {
-  margin: 16rpx 28rpx 0;
-  padding: 22rpx 28rpx;
-  border-radius: 20rpx;
-  background: linear-gradient(135deg, #2979ff, #6f6fff);
+  padding: 24rpx 28rpx;
+  border-radius: 16rpx;
+  background: #F5F6F8;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -43,19 +47,36 @@ page {
 
 .special-banner-left {
   display: flex;
+  align-items: center;
+}
+
+.special-banner-icon {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 14rpx;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.special-banner-texts {
+  display: flex;
   flex-direction: column;
 }
 
 .special-banner-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #fff;
+  color: #323233;
   margin-bottom: 4rpx;
 }
 
 .special-banner-desc {
   font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.85);
+  color: #969799;
 }
 
 .search-placeholder {

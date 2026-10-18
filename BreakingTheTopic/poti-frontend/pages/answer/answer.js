@@ -84,7 +84,12 @@ Page({
     }
     
     this.loadSettings()
-    
+
+    // 每日一题入口：from=daily 时提交作答后上报 question 服务，首页据此隐藏当日入口
+    if (options.from === 'daily') {
+      this.setData({ fromDaily: true })
+    }
+
     if (options.questionId) {
       this.loadSingleQuestion(options.questionId)
     } else if (options.mode === 'random' && options.questionIds) {
@@ -551,7 +556,25 @@ Page({
     })
     
     this.submitToBackend(currentQuestion.id, selectedOption, isCorrect)
-    
+
+    // 每日一题：作答完成即上报（答对答错都算已答），首页「答完不再展示」
+    if (this.data.fromDaily) {
+      const app = getApp()
+      if (app.globalData.userId) {
+        wx.request({
+          url: `${app.globalData.questionUrl}/question/daily/submit`,
+          method: 'POST',
+          data: {
+            userId: app.globalData.userId,
+            questionId: currentQuestion.id,
+            isCorrect: isCorrect
+          },
+          header: { 'Content-Type': 'application/json' },
+          fail: (err) => console.error('每日一题作答上报失败', err)
+        })
+      }
+    }
+
     if (!isCorrect) {
       this.addToWrongbook()
     } else {

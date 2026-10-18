@@ -55,7 +55,7 @@
       </view>
     </view>
 
-    <view class="daily-card" wx:if="{{dailyQuestion}}" bindtap="goDailyQuestion">
+    <view class="daily-card" wx:if="{{dailyQuestion && !dailyAnswered}}" bindtap="goDailyQuestion">
       <view class="daily-left">
         <view class="daily-tag">每日一题 · {{dailyQuestion.date}}</view>
         <text class="daily-title">{{dailyQuestion.content || '今日题目暂未配置'}}</text>
