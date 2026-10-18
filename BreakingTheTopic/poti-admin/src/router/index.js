@@ -95,6 +95,12 @@ const routes = [
             name: 'SpecialDaily',
             component: () => import('../views/Daily.vue'),
             meta: { title: '每日一题', icon: 'AlarmClock' }
+          },
+          {
+            path: 'edit/:id?',
+            name: 'SpecialEdit',
+            component: () => import('../views/SpecialEdit.vue'),
+            meta: { title: '编辑专题', icon: 'Collection' }
           }
         ]
       },
