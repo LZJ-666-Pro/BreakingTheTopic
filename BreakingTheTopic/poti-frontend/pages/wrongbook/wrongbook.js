@@ -1,4 +1,5 @@
 const practiceApi = require('../../api/practice.js')
+const wrongbookApi = require('../../api/wrongbook.js')
 const guestUtils = require('../../utils/guest.js')
 
 Page({
@@ -69,32 +70,39 @@ Page({
 
   loadWrongbook() {
     const app = getApp()
-    wx.request({
-      url: `${app.globalData.wrongbookUrl}/wrongbook/list`,
-      method: 'GET',
-      header: {
-        'X-User-Id': app.globalData.userId || 1
-      },
-      success: (res) => {
-        if (res.data.code === 200) {
-          const typeMap = { 1: '单选', 2: '多选', 3: '判断' }
-          const difficultyMap = { 1: '简单', 2: '中等', 3: '困难' }
-          const difficultyLevelMap = { 1: 'easy', 2: 'medium', 3: 'hard' }
-          const wrongList = (res.data.data || []).map(item => ({
-            ...item,
-            typeText: typeMap[item.type] || '单选',
-            difficultyText: difficultyMap[item.difficulty] || '中等',
-            difficultyLevel: difficultyLevelMap[item.difficulty] || 'medium',
-            isPassed: item.mastered === 1,
-            userAnswer: item.userAnswer || 'A',
-            correctAnswer: item.correctAnswer || 'B',
-            categoryName: item.categoryName || '综合',
-            knowledgePoints: item.knowledgePoints || ['基础知识']
-          }))
-          this.setData({ wrongList })
-          this.applyFilter()
-        }
+    // 错题列表需要用户认证：JWT 必须放在 Authorization 头（仅 X-User-Id 会被服务端过滤器 401 拒绝）
+    const token = app.globalData.token || wx.getStorageSync('token')
+    const userId = wx.getStorageSync('userId')
+    if (!token || !userId) {
+      this.setData({ wrongList: [] })
+      return
+    }
+    // 走 api 封装统一携带 Bearer token
+    wrongbookApi.getWrongbookList().then(res => {
+      if (res.code === 401) {
+        app._handleUnauthorized()
+        return
       }
+      if (res.code === 200 && !this._isDestroyed) {
+        const typeMap = { 1: '单选', 2: '多选', 3: '判断' }
+        const difficultyMap = { 1: '简单', 2: '中等', 3: '困难' }
+        const difficultyLevelMap = { 1: 'easy', 2: 'medium', 3: 'hard' }
+        const wrongList = (res.data || []).map(item => ({
+          ...item,
+          typeText: typeMap[item.type] || '单选',
+          difficultyText: difficultyMap[item.difficulty] || '中等',
+          difficultyLevel: difficultyLevelMap[item.difficulty] || 'medium',
+          isPassed: item.mastered === 1,
+          userAnswer: item.userAnswer || 'A',
+          correctAnswer: item.correctAnswer || 'B',
+          categoryName: item.categoryName || '综合',
+          knowledgePoints: item.knowledgePoints || ['基础知识']
+        }))
+        this.setData({ wrongList })
+        this.applyFilter()
+      }
+    }).catch(err => {
+      console.error('加载错题本失败', err)
     })
   },
 
@@ -181,13 +189,24 @@ Page({
 
   loadInterviewWrong() {
     const app = getApp()
+    // 面试错题同样需要 JWT；未登录不发请求
+    const token = app.globalData.token || wx.getStorageSync('token')
+    const userId = wx.getStorageSync('userId')
+    if (!token || !userId) {
+      this.setData({ interviewWrongList: [] })
+      return
+    }
     wx.request({
       url: `${app.globalData.interviewUrl}/interview/wrong`,
       method: 'GET',
       header: {
-        'X-User-Id': app.globalData.userId || 1
+        'Authorization': `Bearer ${token}`
       },
       success: (res) => {
+        if (res.statusCode === 401 || (res.data && res.data.code === 401)) {
+          app._handleUnauthorized()
+          return
+        }
         if (res.data.code === 200 && !this._isDestroyed) {
           const interviewWrongList = (res.data.data || []).map(item => {
             let correctAnswerContent = item.correctAnswer || item.referenceAnswer || '参考答案'
@@ -292,28 +311,26 @@ Page({
 
   removeWrong(e) {
     const questionId = e.currentTarget.dataset.id
-    const app = getApp()
-    
+
     wx.showModal({
       title: '提示',
       content: '确定要从错题本中移除吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.request({
-            url: `${app.globalData.wrongbookUrl}/wrongbook/${questionId}`,
-            method: 'DELETE',
-            header: {
-              'X-User-Id': app.globalData.userId || 1
-            },
-            success: (res) => {
-              if (res.data.code === 200) {
-                wx.showToast({
-                  title: '移除成功',
-                  icon: 'success'
-                })
-                this.loadWrongbook()
-              }
+          // 走 api 封装携带 Bearer token
+          wrongbookApi.removeWrongbook(questionId).then(res => {
+            if (res.code === 200) {
+              wx.showToast({
+                title: '移除成功',
+                icon: 'success'
+              })
+              this.loadWrongbook()
             }
+          }).catch(() => {
+            wx.showToast({
+              title: '移除失败',
+              icon: 'none'
+            })
           })
         }
       }
@@ -323,17 +340,18 @@ Page({
   removeInterviewWrong(e) {
     const id = e.currentTarget.dataset.id
     const app = getApp()
-    
+
     wx.showModal({
       title: '提示',
       content: '确定要从面试错题中移除吗？',
       success: (res) => {
         if (res.confirm) {
+          const token = app.globalData.token || wx.getStorageSync('token')
           wx.request({
             url: `${app.globalData.interviewUrl}/interview/wrong/${id}`,
             method: 'DELETE',
             header: {
-              'X-User-Id': app.globalData.userId || 1
+              'Authorization': `Bearer ${token}`
             },
             success: (res) => {
               if (res.data.code === 200) {
@@ -514,36 +532,28 @@ Page({
       confirmColor: '#ff4d4f',
       success: (res) => {
         if (res.confirm) {
-          const app = getApp()
-          wx.request({
-            url: `${app.globalData.wrongbookUrl}/wrongbook/clear`,
-            method: 'DELETE',
-            header: {
-              'X-User-Id': app.globalData.userId || 1
-            },
-            success: (response) => {
-              if (response.data.code === 200) {
-                wx.showToast({
-                  title: '清空成功',
-                  icon: 'success'
-                })
-                this.setData({ 
-                  wrongList: [],
-                  filteredList: []
-                })
-              } else {
-                wx.showToast({
-                  title: response.data.msg || '清空失败',
-                  icon: 'none'
-                })
-              }
-            },
-            fail: () => {
+          // 走 api 封装携带 Bearer token
+          wrongbookApi.clearAllWrongbook().then(response => {
+            if (response.code === 200) {
               wx.showToast({
-                title: '清空失败',
+                title: '清空成功',
+                icon: 'success'
+              })
+              this.setData({
+                wrongList: [],
+                filteredList: []
+              })
+            } else {
+              wx.showToast({
+                title: response.msg || '清空失败',
                 icon: 'none'
               })
             }
+          }).catch(() => {
+            wx.showToast({
+              title: '清空失败',
+              icon: 'none'
+            })
           })
         }
       }
@@ -559,11 +569,12 @@ Page({
       success: (res) => {
         if (res.confirm) {
           const app = getApp()
+          const token = app.globalData.token || wx.getStorageSync('token')
           wx.request({
             url: `${app.globalData.interviewUrl}/interview/wrong/clear`,
             method: 'DELETE',
             header: {
-              'X-User-Id': app.globalData.userId || 1
+              'Authorization': `Bearer ${token}`
             },
             success: (response) => {
               if (response.data.code === 200) {
