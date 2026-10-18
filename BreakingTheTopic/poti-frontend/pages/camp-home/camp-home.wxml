@@ -56,7 +56,7 @@
         <view class="task-name">{{item.name}}</view>
         <view class="task-desc">{{item.desc}}</view>
       </view>
-      <view class="task-btn" data-type="{{item.linkType}}" bindtap="goTask">去完成</view>
+      <view class="task-btn" data-type="{{item.linkType}}" data-param="{{item.linkParam}}" bindtap="goTask">去完成</view>
     </view>
 
     <view class="checkin-btn {{camp.todayChecked ? 'disabled' : ''}}" bindtap="checkin">

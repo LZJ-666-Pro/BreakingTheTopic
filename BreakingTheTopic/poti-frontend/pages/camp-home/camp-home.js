@@ -134,6 +134,11 @@ Page({
       task = () => wx.navigateTo({ url: '/pages/interview/interview' })
     } else if (type === 'wrongbook') {
       task = () => wx.navigateTo({ url: '/pages/wrongbook/wrongbook' })
+    } else if (type === 'agent') {
+      // 知识点学习：跳 AI 导师自动开讲该知识点（复用悬浮球的 prefill 自动提问机制）
+      const topic = e.currentTarget.dataset.param || ''
+      const q = `请讲解面试知识点：「${topic}」，先做要点梳理，再给出常见面试问法与参考回答思路`
+      task = () => wx.navigateTo({ url: `/pages/agent/agent?prefill=${encodeURIComponent(q)}` })
     }
     if (!task) {
       wx.showToast({ title: '任务入口暂未开放', icon: 'none' })

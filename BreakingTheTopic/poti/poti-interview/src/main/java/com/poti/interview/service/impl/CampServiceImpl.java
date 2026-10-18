@@ -387,7 +387,9 @@ public class CampServiceImpl implements CampService {
         study.put("icon", "📖");
         study.put("name", "知识点学习");
         study.put("desc", "「" + topic + "」要点梳理与精讲");
-        study.put("linkType", "question");
+        // 跳 AI 导师自动讲解该知识点（应用内无独立知识点内容页，AI 精讲即最贴切落点）
+        study.put("linkType", "agent");
+        study.put("linkParam", topic);
         tasks.add(study);
 
         Map<String, Object> practice = new HashMap<>();
