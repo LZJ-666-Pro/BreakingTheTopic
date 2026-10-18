@@ -37,16 +37,17 @@
             </el-table-column>
           </el-table>
 
-          <el-pagination
-            v-model:current-page="sessionQuery.pageNum"
-            v-model:page-size="sessionQuery.pageSize"
-            :total="sessionTotal"
-            :page-sizes="[10, 20, 50]"
-            layout="total, sizes, prev, pager, next, jumper"
-            class="pagination"
-            @size-change="searchSessions"
-            @current-change="loadSessions"
-          />
+          <div class="pagination-wrapper">
+            <el-pagination
+              v-model:current-page="sessionQuery.pageNum"
+              v-model:page-size="sessionQuery.pageSize"
+              :total="sessionTotal"
+              :page-sizes="[10, 20, 50]"
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="searchSessions"
+              @current-change="loadSessions"
+            />
+          </div>
         </el-tab-pane>
 
         <!-- 工具调用日志 -->
@@ -82,16 +83,17 @@
             </el-table-column>
           </el-table>
 
-          <el-pagination
-            v-model:current-page="logQuery.pageNum"
-            v-model:page-size="logQuery.pageSize"
-            :total="logTotal"
-            :page-sizes="[10, 20, 50]"
-            layout="total, sizes, prev, pager, next, jumper"
-            class="pagination"
-            @size-change="searchLogs"
-            @current-change="loadLogs"
-          />
+          <div class="pagination-wrapper">
+            <el-pagination
+              v-model:current-page="logQuery.pageNum"
+              v-model:page-size="logQuery.pageSize"
+              :total="logTotal"
+              :page-sizes="[10, 20, 50]"
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="searchLogs"
+              @current-change="loadLogs"
+            />
+          </div>
         </el-tab-pane>
       </el-tabs>
     </el-card>
@@ -115,7 +117,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import api from '../utils/api'
 import { getDefaultPageSize } from '../utils/config'
 
@@ -123,12 +125,23 @@ const activeTab = ref('sessions')
 const overviewLoading = ref(false)
 const overview = ref({})
 
-const sessionQuery = reactive({ pageNum: 1, pageSize: getDefaultPageSize(20), keyword: '' })
+const sessionQuery = reactive({
+  pageNum: 1,
+  pageSize: Number(localStorage.getItem('agent_session_page_size')) || getDefaultPageSize(),
+  keyword: ''
+})
+watch(() => sessionQuery.pageSize, v => localStorage.setItem('agent_session_page_size', String(v)))
 const sessions = ref([])
 const sessionTotal = ref(0)
 const sessionsLoading = ref(false)
 
-const logQuery = reactive({ pageNum: 1, pageSize: getDefaultPageSize(20), toolName: '', success: null })
+const logQuery = reactive({
+  pageNum: 1,
+  pageSize: Number(localStorage.getItem('agent_toollog_page_size')) || getDefaultPageSize(),
+  toolName: '',
+  success: null
+})
+watch(() => logQuery.pageSize, v => localStorage.setItem('agent_toollog_page_size', String(v)))
 const logs = ref([])
 const logTotal = ref(0)
 const logsLoading = ref(false)
@@ -292,5 +305,13 @@ onMounted(() => {
   .overview-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
 }
 </style>
