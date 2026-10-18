@@ -32,6 +32,13 @@ public class CheckinController {
                 return R.error("今天已经签到过了");
             }
 
+            // 里程碑奖励在签到事务提交后发放（内部读后台跨库配置，不能进事务）；
+            // 发放失败不影响签到结果，仅响应中无 rewardDays 字段
+            Integer rewardDays = checkinService.grantMilestoneReward(userId, (Integer) result.get("streakDays"));
+            if (rewardDays != null) {
+                result.put("rewardDays", rewardDays);
+            }
+
             return R.success(result);
         } catch (Exception e) {
             log.error("签到失败", e);
@@ -48,6 +55,12 @@ public class CheckinController {
             Map<String, Object> result = new HashMap<>();
             result.put("hasCheckedIn", hasCheckedIn);
             result.put("streakDays", streakDays);
+
+            // 下一个连签奖励提示（开关关闭/全部达成时无该字段）
+            Map<String, Object> nextReward = checkinService.getRewardHint(streakDays);
+            if (nextReward != null) {
+                result.put("nextReward", nextReward);
+            }
 
             return R.success(result);
         } catch (Exception e) {

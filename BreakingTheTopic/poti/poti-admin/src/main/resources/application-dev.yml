@@ -2,20 +2,14 @@
   port: 8088
 
 # 本地开发：AI任务接口免鉴权（批量补题脚本直连使用；外网请求仍受网关JWT保护）
+# 注意：additional-exclude-paths 是增量白名单，与 common 默认白名单合并生效；
+# 不要改用 exclude-paths，那会整体覆盖默认白名单（曾导致 /admin/refresh 等接口 401）
 poti:
   security:
-    exclude-paths:
-      - /auth/login
-      - /admin/login
-      - /admin/register
-      - /admin/captcha
+    additional-exclude-paths:
       # 登录页未登录时读取验证码开关（只暴露 value 只读接口）
       - /admin/config/value/**
       - /admin/question/ai/task/**
-      - /actuator/**
-      - /error
-      - /uploads/**
-      - /avatars/**
 
 jwt:
   secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}

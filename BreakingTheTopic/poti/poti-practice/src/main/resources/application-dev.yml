@@ -67,6 +67,19 @@ spring:
             idle-timeout: 600000
             max-lifetime: 1800000
             connection-test-query: SELECT 1
+        # 跨库读取 poti_admin.sys_config（业务开关：竞赛功能等），与 poti-user 同模式
+        admin:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/poti_admin?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:123456}
+          hikari:
+            minimum-idle: 2
+            maximum-pool-size: 10
+            connection-timeout: 30000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+            connection-test-query: SELECT 1
 
 mybatis-plus:
   configuration:

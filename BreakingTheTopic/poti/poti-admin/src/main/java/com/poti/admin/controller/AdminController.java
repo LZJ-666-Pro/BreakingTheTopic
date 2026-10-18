@@ -42,6 +42,9 @@ public class AdminController {
     @Autowired
     private com.poti.admin.service.ConfigService configService;
 
+    @Autowired
+    private com.poti.admin.service.PasswordResetService passwordResetService;
+
     @GetMapping("/captcha")
     public R<Map<String, Object>> captcha() {
         try {
@@ -49,6 +52,82 @@ public class AdminController {
         } catch (Exception e) {
             log.error("生成验证码失败", e);
             return R.error("获取验证码失败");
+        }
+    }
+
+    /**
+     * JWT 无感刷新（滑动续期）：旧 token 仍有效时换发新 token，后台操作期间不掉线；
+     * 已过期则拒绝，需重新登录。前端在请求拦截器按剩余有效期节流调用。
+     */
+    @PostMapping("/refresh")
+    public R<Map<String, Object>> refreshToken(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return R.error("未登录");
+            }
+            String oldToken = authHeader.substring(7);
+            if (!jwtUtil.validateToken(oldToken)) {
+                return R.error("登录已过期，请重新登录");
+            }
+            Long adminId = jwtUtil.getUserIdFromToken(oldToken);
+            if (adminService.getById(adminId) == null) {
+                return R.error("账号不存在，请重新登录");
+            }
+            String newToken = jwtUtil.refreshToken(oldToken);
+            if (newToken == null) {
+                return R.error("刷新失败，请重新登录");
+            }
+            Map<String, Object> result = new HashMap<>();
+            result.put("token", newToken);
+            log.info("管理员 token 无感刷新成功: {}", adminId);
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("管理员 token 刷新失败", e);
+            return R.error("刷新失败，请重新登录");
+        }
+    }
+
+    /**
+     * 忘记密码第一步：发送邮箱验证码（未登录可用，白名单放行；接口内部校验账号与绑定邮箱）
+     */
+    @PostMapping("/password/forgot")
+    public R<Map<String, Object>> forgotPassword(@RequestBody Map<String, String> request) {
+        try {
+            String username = request.get("username");
+            if (username == null || username.trim().isEmpty()) {
+                return R.error("请输入用户名");
+            }
+            String emailMasked = passwordResetService.sendCode(username.trim());
+            Map<String, Object> result = new HashMap<>();
+            result.put("emailMasked", emailMasked);
+            return R.success(result);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return R.error(e.getMessage());
+        } catch (Exception e) {
+            log.error("发送密码重置验证码失败", e);
+            return R.error("发送失败，请稍后重试");
+        }
+    }
+
+    /**
+     * 忘记密码第二步：验证码校验 + 重置密码（未登录可用，白名单放行）
+     */
+    @PostMapping("/password/reset")
+    public R<Void> resetPassword(@RequestBody Map<String, String> request) {
+        try {
+            String username = request.get("username");
+            String code = request.get("code");
+            String newPassword = request.get("newPassword");
+            if (username == null || username.trim().isEmpty() || code == null || code.trim().isEmpty()) {
+                return R.error("请输入用户名和验证码");
+            }
+            passwordResetService.reset(username.trim(), code.trim(), newPassword);
+            return R.success(null);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return R.error(e.getMessage());
+        } catch (Exception e) {
+            log.error("重置密码失败", e);
+            return R.error("重置失败，请稍后重试");
         }
     }
 
@@ -111,17 +190,14 @@ public class AdminController {
     @PostMapping("/register")
     public R<Void> register(@RequestBody Map<String, String> request) {
         try {
-            log.info("收到管理员注册请求，请求数据：{}", request);
-            
             String username = request.get("username");
             String password = request.get("password");
             String nickname = request.get("nickname");
             String email = request.get("email");
             String phone = request.get("phone");
             String avatar = request.get("avatar");
-            
-            log.info("解析后的字段 - username: {}, nickname: {}, email: {}, phone: {}, avatar: {}", 
-                username, nickname, email, phone, avatar);
+
+            log.info("收到管理员注册请求: username={}", username);
             
             if (username == null || username.trim().isEmpty()) {
                 return R.error("用户名不能为空");

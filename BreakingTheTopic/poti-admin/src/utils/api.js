@@ -6,17 +6,63 @@ const api = axios.create({
   timeout: 120000
 })
 
+// 解析 JWT payload 的过期时间戳（秒）
+function getJwtExp(token) {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return payload.exp || null
+  } catch (e) {
+    return null
+  }
+}
+
+// JWT 无感刷新（滑动续期）：剩余有效期不足 12h 时换发新 token，后台操作期间不掉线；
+// 已过期则刷新被拒，返回旧 token 让业务请求自然收到 401 走统一登出流程。
+// 共享 Promise 防止并发请求触发多次刷新；用原生 axios 避免再次经过本文件拦截器。
+let refreshingPromise = null
+async function ensureFreshToken() {
+  const token = localStorage.getItem('admin_token')
+  if (!token) return null
+
+  const exp = getJwtExp(token)
+  if (!exp) return token
+
+  const remainMs = exp * 1000 - Date.now()
+  if (remainMs > 12 * 3600 * 1000) return token
+
+  if (!refreshingPromise) {
+    refreshingPromise = axios
+      .post('/api/admin/refresh', null, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        const data = res.data
+        if (data && data.code === 200 && data.data && data.data.token) {
+          localStorage.setItem('admin_token', data.data.token)
+          return data.data.token
+        }
+        return token
+      })
+      .catch(() => token)
+      .finally(() => {
+        refreshingPromise = null
+      })
+  }
+  return refreshingPromise
+}
+
 api.interceptors.request.use(
-  (config) => {
-    console.log('发送请求：', config.url, config.data)
-    const token = localStorage.getItem('admin_token')
+  async (config) => {
+    const token = await ensureFreshToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
   (error) => {
-    console.error('请求错误：', error)
+    console.error('请求构造失败：', error)
     return Promise.reject(error)
   }
 )
@@ -27,7 +73,6 @@ api.interceptors.response.use(
     if (response.config.responseType === 'blob') {
       return response
     }
-    console.log('收到响应：', response.config.url, response.data)
     const res = response.data
     if (res.code !== 200) {
       ElMessage.error(res.msg || '请求失败')

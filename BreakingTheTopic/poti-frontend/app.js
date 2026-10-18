@@ -10,6 +10,7 @@ App({
 
   onShow() {
     console.log('小程序显示')
+    this.ensureFreshToken()
   },
 
   onHide() {
@@ -27,6 +28,71 @@ App({
       this.globalData.userId = wx.getStorageSync('userId')
       this.globalData.userInfo = wx.getStorageSync('userInfo')
     }
+  },
+
+  // 解析 JWT payload（小程序无 atob，用 wx.base64ToArrayBuffer）
+  _decodeJwtPayload(token) {
+    try {
+      const parts = token.split('.')
+      if (parts.length !== 3) return null
+      let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+      while (base64.length % 4 !== 0) {
+        base64 += '='
+      }
+      const bytes = new Uint8Array(wx.base64ToArrayBuffer(base64))
+      let str = ''
+      for (let i = 0; i < bytes.length; i++) {
+        str += String.fromCharCode(bytes[i])
+      }
+      return JSON.parse(str)
+    } catch (e) {
+      return null
+    }
+  },
+
+  // JWT 无感刷新（滑动续期）：剩余有效期不足 12h 时换发新 token，活跃用户不掉线；
+  // 已过期则刷新被拒，走原有 401 踢登录兜底。onShow 节流 1 小时检查一次。
+  ensureFreshToken() {
+    const token = this.globalData.token || wx.getStorageSync('token')
+    if (!token || this.globalData._isLoggingOut) return
+
+    const now = Date.now()
+    if (now - (this._lastTokenCheck || 0) < 3600 * 1000) return
+    this._lastTokenCheck = now
+
+    const payload = this._decodeJwtPayload(token)
+    if (!payload || !payload.exp) return
+
+    const remainMs = payload.exp * 1000 - now
+    if (remainMs > 12 * 3600 * 1000) return
+
+    if (this._refreshingToken) return
+    this._refreshingToken = true
+
+    wx.request({
+      url: `${this.globalData.userUrl}/user/refresh`,
+      method: 'POST',
+      header: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      success: (res) => {
+        const data = res.data
+        if (data && data.code === 200 && data.data && data.data.token) {
+          wx.setStorageSync('token', data.data.token)
+          this.globalData.token = data.data.token
+          console.log('Token 已无感续期')
+        } else {
+          console.log('Token 续期被拒（可能已过期），将走重新登录流程')
+        }
+      },
+      fail: (err) => {
+        console.error('Token 续期请求失败', err)
+      },
+      complete: () => {
+        this._refreshingToken = false
+      }
+    })
   },
 
   request(options) {

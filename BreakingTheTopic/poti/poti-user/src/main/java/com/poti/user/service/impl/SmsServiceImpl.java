@@ -1,6 +1,7 @@
 package com.poti.user.service.impl;
 
 import com.poti.common.redis.service.RedisService;
+import com.poti.user.mapper.AdminConfigMapper;
 import com.poti.user.service.SmsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,11 @@ public class SmsServiceImpl implements SmsService {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private AdminConfigMapper adminConfigMapper;
+
     @Value("${sms.spug.template-id:}")
     private String spugTemplateId;
-
-    @Value("${sms.spug.app-name:破题刷题}")
-    private String spugAppName;
 
     @Value("${sms.verify.code.expire:300}")
     private long codeExpireSeconds;
@@ -41,7 +42,8 @@ public class SmsServiceImpl implements SmsService {
     private static final String CODE_PREFIX = "sms:code:";
     private static final String COOLDOWN_PREFIX = "sms:cooldown:";
     private static final String COUNT_PREFIX = "sms:count:";
-    private static final String SPUG_URL = "https://push.spug.cc/send/";
+    // Spug 推送助手「短信验证码」接口（控制台-短信验证码页的调用URL前缀）
+    private static final String SPUG_SMS_URL = "https://push.spug.cc/sms/";
 
     @Override
     public boolean sendVerifyCode(String phone) {
@@ -52,10 +54,11 @@ public class SmsServiceImpl implements SmsService {
 
         String code = generateCode();
 
-        if (spugTemplateId == null || spugTemplateId.isEmpty()) {
+        String templateId = resolveTemplateId();
+        if (templateId == null || templateId.isEmpty()) {
             log.info("【开发模式】手机号 {} 的验证码为: {}", phone, code);
         } else {
-            boolean sent = sendViaSpug(phone, code);
+            boolean sent = sendViaSpug(phone, code, templateId);
             if (!sent) {
                 return false;
             }
@@ -90,7 +93,8 @@ public class SmsServiceImpl implements SmsService {
         if (valid) {
             log.info("手机号 {} 验证码验证成功", phone);
         } else {
-            log.warn("手机号 {} 验证码验证失败，输入: {}, 正确: {}", phone, code, storedCode);
+            // 不打印验证码明文，防止故意输错后从日志窃取正确验证码
+            log.warn("手机号 {} 验证码验证失败", phone);
         }
 
         return valid;
@@ -133,23 +137,41 @@ public class SmsServiceImpl implements SmsService {
         return String.valueOf(code);
     }
 
-    private boolean sendViaSpug(String phone, String code) {
+    /**
+     * 模板 ID 解析：后台「系统设置-短信设置」的 sms_template_code 优先（实时读取、改完即生效），
+     * 未配置时回退本地 yml 的 sms.spug.template-id；两者都为空则走开发模式（验证码打印日志）。
+     */
+    private String resolveTemplateId() {
+        try {
+            String configValue = adminConfigMapper.selectValueByKey("sms_template_code");
+            if (configValue != null && !configValue.trim().isEmpty()) {
+                return configValue.trim();
+            }
+        } catch (Exception e) {
+            log.warn("读取后台短信模板配置失败，回退本地配置", e);
+        }
+        return spugTemplateId;
+    }
+
+    private boolean sendViaSpug(String phone, String code, String templateId) {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            
+
+            // Spug 短信验证码接口参数：to=手机号、code=验证码、number=有效期分钟数
             Map<String, Object> body = new HashMap<>();
-            body.put("name", spugAppName);
+            body.put("to", phone);
             body.put("code", code);
-            body.put("targets", phone);
-            
+            body.put("number", String.valueOf(Math.max(1, codeExpireSeconds / 60)));
+
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-            
-            String url = SPUG_URL + spugTemplateId;
+
+            // 兼容完整调用URL（https://push.spug.cc/sms/xxx）与纯编码两种填写方式
+            String url = templateId.startsWith("http") ? templateId : SPUG_SMS_URL + templateId;
             String response = restTemplate.postForObject(url, request, String.class);
-            log.info("Spug 推送响应: {}", response);
+            log.info("Spug 短信响应: {}", response);
             
             if (response == null) {
                 log.error("Spug 推送响应为空");

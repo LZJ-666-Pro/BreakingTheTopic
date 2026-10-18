@@ -260,6 +260,7 @@ Page({
     accuracy: 0,
     streakDays: 0,
     hasCheckedIn: false,
+    nextReward: null,
     todayGoal: 10,
     progressPercent: 0,
     hasUnfinished: false,
@@ -433,7 +434,8 @@ Page({
         if (res.data.code === 200) {
           this.setData({
             hasCheckedIn: res.data.data.hasCheckedIn,
-            streakDays: res.data.data.streakDays
+            streakDays: res.data.data.streakDays,
+            nextReward: res.data.data.nextReward || null
           })
         }
       }
@@ -729,14 +731,27 @@ Page({
       header: { 'Authorization': `Bearer ${app.globalData.token || wx.getStorageSync('token')}` },
       success: (res) => {
         if (res.data.code === 200) {
+          const streakDays = res.data.data.streakDays
+          const rewardDays = res.data.data.rewardDays
           this.setData({
             hasCheckedIn: true,
-            streakDays: res.data.data.streakDays
+            streakDays: streakDays
           })
-          wx.showToast({
-            title: `签到成功！连续${res.data.data.streakDays}天`,
-            icon: 'success'
-          })
+          if (rewardDays) {
+            // 连签里程碑达成：明确告知会员奖励，引导感知
+            wx.showToast({
+              title: `连签${streakDays}天，送${rewardDays}天会员`,
+              icon: 'none',
+              duration: 2500
+            })
+          } else {
+            wx.showToast({
+              title: `签到成功！连续${streakDays}天`,
+              icon: 'success'
+            })
+          }
+          // 刷新下一个连签奖励提示
+          this.checkTodayCheckIn()
         } else {
           wx.showToast({
             title: res.data.message || '签到失败',

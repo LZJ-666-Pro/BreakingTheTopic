@@ -120,8 +120,7 @@ Page({
       success: (res) => {
         if (res.data.code === 200) {
           const questionData = res.data.data
-          console.log('题目详情数据：', questionData)
-          
+
           let options = []
           if (Array.isArray(questionData.options)) {
             options = questionData.options.map((text, index) => ({
@@ -142,9 +141,7 @@ Page({
             answer: this.getAnswerIndex(questionData.answer),
             analysis: questionData.analysis
           }
-          
-          console.log('处理后的题目：', question)
-          
+
           this.setData({
             questions: [question],
             categoryName: questionData.categoryName || '题目详情',
@@ -279,10 +276,8 @@ Page({
   loadQuestionSet(options) {
     const type = options.type || 'java'
     const categoryId = options.categoryId || categoryMap[type]?.id || 1
-    
-    console.log('loadQuestionSet - type:', type, 'categoryId:', categoryId)
-    
-    this.setData({ 
+
+    this.setData({
       type, 
       categoryName: '加载中...',
       loading: true,
@@ -313,8 +308,7 @@ Page({
     })
     
     const url = `${app.globalData.questionUrl}/question/list?categoryId=${categoryId}`
-    console.log('请求URL:', url)
-    
+
     wx.request({
       url: url,
       method: 'GET',
@@ -322,11 +316,7 @@ Page({
         'Authorization': `Bearer ${app.globalData.token}`
       },
       success: (res) => {
-        console.log('API返回数据:', res.data)
-        
         if (res.data.code === 200 && res.data.data) {
-          console.log('题目数量:', res.data.data.length)
-          
           if (res.data.data.length === 0) {
             this.setData({ loading: false })
             wx.showModal({
@@ -388,9 +378,8 @@ Page({
           
           const shuffledQuestions = this.shuffleArray(questions)
           const limitedQuestions = shuffledQuestions.slice(0, 10)
-          console.log('处理后的题目数量:', limitedQuestions.length)
-          
-          this.setData({ 
+
+          this.setData({
             questions: limitedQuestions,
             loading: false
           })
@@ -586,9 +575,7 @@ Page({
     const { currentQuestion } = this.data
     if (!currentQuestion?.id) return
     
-    wrongbookApi.markAsMastered(currentQuestion.id).then(() => {
-      console.log('已标记为已掌握')
-    }).catch(err => {
+    wrongbookApi.markAsMastered(currentQuestion.id).catch(err => {
       console.error('标记已掌握失败', err)
     })
   },

@@ -43,6 +43,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/auth/refresh",
             "/user/login",
             "/user/register",
+            "/user/refresh",
             "/user/password/reset",
             "/user/avatar/upload",
             "/user/internal/",
@@ -61,6 +62,10 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/admin/login",
             "/admin/register",
             "/admin/captcha",
+            "/admin/refresh",
+            // 忘记密码邮箱找回（未登录时调用，服务端接口内部校验）
+            "/admin/password/forgot",
+            "/admin/password/reset",
             // 登录页未登录时读取验证码开关（只读接口，服务端已同步放行）
             "/admin/config/value",
             "/admin/upload/",

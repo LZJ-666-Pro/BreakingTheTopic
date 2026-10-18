@@ -1,4 +1,4 @@
-﻿server:
+server:
   port: 8200
 
 jwt:
@@ -9,7 +9,9 @@ poti:
   security:
     internal-token: ${INTERNAL_TOKEN:poti-internal-secret-2024}
     # 微信支付结果回调由微信服务器发起（无 JWT），需免鉴权；签名验证由回调逻辑自行完成
-    exclude-paths:
+    # 注意：additional-exclude-paths 是增量白名单，与 common 默认白名单合并生效；
+    # 不要改用 exclude-paths，那会整体覆盖默认白名单（曾导致 /avatars/** 等静态资源 401）
+    additional-exclude-paths:
       - /vip/pay/notify
 
 spring:

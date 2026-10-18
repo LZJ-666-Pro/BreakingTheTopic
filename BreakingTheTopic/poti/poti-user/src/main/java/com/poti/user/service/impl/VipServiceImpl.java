@@ -269,6 +269,11 @@ public class VipServiceImpl implements VipService {
     }
 
     @Override
+    public void extendMembership(Long userId, int days) {
+        applyMembership(userId, days);
+    }
+
+    @Override
     public Map<String, Object> internalStatus(Long userId) {
         User user = userMapper.selectById(userId);
         Map<String, Object> result = new HashMap<>();

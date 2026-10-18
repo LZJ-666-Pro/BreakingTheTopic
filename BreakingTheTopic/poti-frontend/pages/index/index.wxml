@@ -52,6 +52,7 @@
       <view class="stats-item checkin-item {{hasCheckedIn ? 'checked' : ''}}" bindtap="handleCheckIn">
         <text class="stats-num">{{streakDays}}</text>
         <text class="stats-label">{{hasCheckedIn ? '已签到' : '签到'}}</text>
+        <text class="reward-hint" wx:if="{{nextReward}}">再签{{nextReward.remainDays}}天得{{nextReward.rewardDays}}天会员</text>
       </view>
     </view>
 

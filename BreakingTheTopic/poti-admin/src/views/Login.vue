@@ -141,6 +141,70 @@
       </div>
     </div>
 
+    <!-- 忘记密码：邮箱验证码重置 -->
+    <el-dialog v-model="fpDialog" width="400px" :show-close="true" :close-on-click-modal="false"
+      append-to-body class="fp-dialog">
+      <template #header>
+        <div class="fp-header">
+          <div class="fp-header-icon">
+            <el-icon :size="20"><Lock /></el-icon>
+          </div>
+          <div>
+            <h3 class="fp-title">找回密码</h3>
+            <p class="fp-subtitle">通过账号绑定邮箱验证身份后重置</p>
+          </div>
+        </div>
+        <div class="fp-steps">
+          <div class="fp-step" :class="{ active: fpStep >= 1, done: fpStep > 1 }">
+            <span class="fp-step-dot">{{ fpStep > 1 ? '✓' : '1' }}</span>
+            <span class="fp-step-label">验证身份</span>
+          </div>
+          <span class="fp-step-line" :class="{ done: fpStep > 1 }"></span>
+          <div class="fp-step" :class="{ active: fpStep >= 2 }">
+            <span class="fp-step-dot">2</span>
+            <span class="fp-step-label">设置新密码</span>
+          </div>
+        </div>
+      </template>
+
+      <el-form v-if="fpStep === 1" label-position="top" @submit.prevent="fpSendCode">
+        <el-form-item label="管理员用户名">
+          <el-input v-model="fpForm.username" placeholder="请输入账号绑定的用户名" size="large"
+            :prefix-icon="User" @keyup.enter="fpSendCode" />
+        </el-form-item>
+        <p class="fp-tip">
+          <el-icon :size="12" style="vertical-align: -2px"><InfoFilled /></el-icon>
+          验证码将发送至该账号绑定的邮箱，10 分钟内有效
+        </p>
+      </el-form>
+
+      <el-form v-else label-position="top" @submit.prevent="fpSubmit">
+        <el-form-item label="邮箱验证码">
+          <div class="captcha-row">
+            <el-input v-model="fpForm.code" placeholder="6位验证码" size="large" :prefix-icon="Message"
+              maxlength="6" @keyup.enter="fpSubmit" />
+            <el-button type="primary" plain :disabled="fpCountdown > 0" :loading="fpSending"
+              @click="fpSendCode" class="fp-send-btn">
+              {{ fpCountdown > 0 ? fpCountdown + 's' : '重新发送' }}
+            </el-button>
+          </div>
+          <p class="fp-tip">验证码已发送至 {{ fpEmailMasked }}，请查收（注意垃圾邮件箱）</p>
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="fpForm.newPassword" type="password" placeholder="6-20位新密码" size="large"
+            :prefix-icon="Lock" show-password autocomplete="new-password" @keyup.enter="fpSubmit" />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <div class="fp-footer">
+          <el-button @click="fpDialog = false">取消</el-button>
+          <el-button v-if="fpStep === 1" type="primary" :loading="fpSending" @click="fpSendCode">发送验证码</el-button>
+          <el-button v-else type="primary" :loading="fpLoading" @click="fpSubmit">重置密码</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 卡外版权 -->
     <p class="login-footer">
       <el-icon :size="12"><Lock /></el-icon>
@@ -153,7 +217,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { User, Lock, UserFilled, Message, Phone, Plus, Key } from '@element-plus/icons-vue'
+import { User, Lock, UserFilled, Message, Phone, Plus, Key, InfoFilled } from '@element-plus/icons-vue'
 import { useUserStore } from '../stores/user'
 import api from '../utils/api'
 
@@ -283,8 +347,78 @@ const toggleMode = () => {
   formRef.value?.resetFields()
 }
 
+// ===== 忘记密码（邮箱验证码重置） =====
+const fpDialog = ref(false)
+const fpStep = ref(1)
+const fpSending = ref(false)
+const fpLoading = ref(false)
+const fpEmailMasked = ref('')
+const fpCountdown = ref(0)
+let fpTimer = null
+const fpForm = reactive({ username: '', code: '', newPassword: '' })
+
 const handleForgot = () => {
-  ElMessage.info('请联系超级管理员重置密码')
+  fpForm.username = ''
+  fpForm.code = ''
+  fpForm.newPassword = ''
+  fpStep.value = 1
+  fpEmailMasked.value = ''
+  fpDialog.value = true
+}
+
+const fpStartCountdown = () => {
+  fpCountdown.value = 60
+  if (fpTimer) clearInterval(fpTimer)
+  fpTimer = setInterval(() => {
+    fpCountdown.value--
+    if (fpCountdown.value <= 0) clearInterval(fpTimer)
+  }, 1000)
+}
+
+const fpSendCode = async () => {
+  if (!fpForm.username.trim()) {
+    ElMessage.warning('请输入用户名')
+    return
+  }
+  fpSending.value = true
+  try {
+    const res = await api.post('/admin/password/forgot', { username: fpForm.username.trim() })
+    fpEmailMasked.value = res.data?.emailMasked || ''
+    fpStep.value = 2
+    fpStartCountdown()
+    ElMessage.success('验证码已发送')
+  } catch (e) {
+    // 拦截器已统一弹错，此处静默
+  } finally {
+    fpSending.value = false
+  }
+}
+
+const fpSubmit = async () => {
+  if (!fpForm.code.trim()) {
+    ElMessage.warning('请输入邮箱验证码')
+    return
+  }
+  if (fpForm.newPassword.length < 6 || fpForm.newPassword.length > 20) {
+    ElMessage.warning('新密码长度需为6-20位')
+    return
+  }
+  fpLoading.value = true
+  try {
+    await api.post('/admin/password/reset', {
+      username: fpForm.username.trim(),
+      code: fpForm.code.trim(),
+      newPassword: fpForm.newPassword
+    })
+    ElMessage.success('密码重置成功，请使用新密码登录')
+    fpDialog.value = false
+    form.username = fpForm.username
+    form.password = ''
+  } catch (e) {
+    // 拦截器已统一弹错，此处静默
+  } finally {
+    fpLoading.value = false
+  }
 }
 
 const handleAvatarSuccess = (response) => {
@@ -509,6 +643,18 @@ const handleRegister = async () => {
   width: 100%;
 }
 
+.fp-send-btn {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.fp-tip {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #909399;
+  line-height: 1.5;
+}
+
 .captcha-input {
   flex: 1;
 }
@@ -667,5 +813,119 @@ const handleRegister = async () => {
   .deco-blob {
     display: none;
   }
+}
+</style>
+
+<!-- 忘记密码弹窗 append-to-body 渲染在组件外，需非 scoped 样式 -->
+<style>
+.fp-dialog {
+  border-radius: 14px;
+}
+
+.fp-dialog .el-dialog__header {
+  padding: 24px 24px 0;
+}
+
+.fp-dialog .el-dialog__body {
+  padding: 20px 24px 8px;
+}
+
+.fp-dialog .el-dialog__footer {
+  padding: 8px 24px 20px;
+}
+
+.fp-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fp-header-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(30, 64, 175, 0.08);
+  color: var(--color-primary, #1e40af);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fp-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.3;
+}
+
+.fp-subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #909399;
+}
+
+.fp-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px 14px;
+  background: #f7f8fa;
+  border-radius: 8px;
+}
+
+.fp-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fp-step-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d8dbe2;
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.25s;
+}
+
+.fp-step-label {
+  font-size: 12px;
+  color: #909399;
+}
+
+.fp-step.active .fp-step-dot {
+  background: var(--color-primary, #1e40af);
+}
+
+.fp-step.active .fp-step-label {
+  color: var(--color-primary, #1e40af);
+  font-weight: 500;
+}
+
+.fp-step.done .fp-step-dot {
+  background: #67c23a;
+}
+
+.fp-step-line {
+  flex: 1;
+  height: 1px;
+  background: #d8dbe2;
+}
+
+.fp-step-line.done {
+  background: #67c23a;
+}
+
+.fp-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 </style>

@@ -1,6 +1,7 @@
 package com.poti.practice.controller;
 
 import com.poti.common.R;
+import com.poti.practice.mapper.AdminConfigMapper;
 import com.poti.practice.service.CompetitionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,28 @@ public class CompetitionController {
     @Autowired
     private CompetitionService competitionService;
 
+    @Autowired
+    private AdminConfigMapper adminConfigMapper;
+
+    /** 竞赛功能开关（后台「系统设置-业务开关-竞赛功能」，实时读取，缺失视为开启） */
+    private boolean isClosed() {
+        try {
+            return !adminConfigMapper.isEnabled("competition_enabled");
+        } catch (Exception e) {
+            log.warn("读取竞赛功能开关失败，默认放行", e);
+            return false;
+        }
+    }
+
     /** 竞赛分页列表：tab∈{signup报名中, ongoing进行中, ended已结束}，缺省全部 */
     @GetMapping("/page")
     public R<Map<String, Object>> page(@RequestHeader("X-User-Id") Long userId,
                                        @RequestParam(defaultValue = "1") Integer pageNum,
                                        @RequestParam(defaultValue = "10") Integer pageSize,
                                        @RequestParam(required = false) String tab) {
+        if (isClosed()) {
+            return R.error("竞赛功能暂未开放");
+        }
         try {
             return R.success(competitionService.pageList(userId, pageNum, pageSize, tab));
         } catch (Exception e) {
@@ -39,6 +56,9 @@ public class CompetitionController {
     @GetMapping("/{id}")
     public R<Map<String, Object>> detail(@RequestHeader("X-User-Id") Long userId,
                                          @PathVariable Long id) {
+        if (isClosed()) {
+            return R.error("竞赛功能暂未开放");
+        }
         try {
             return R.success(competitionService.detail(userId, id));
         } catch (Exception e) {
@@ -51,6 +71,9 @@ public class CompetitionController {
     @PostMapping("/{id}/signup")
     public R<Void> signup(@RequestHeader("X-User-Id") Long userId,
                           @PathVariable Long id) {
+        if (isClosed()) {
+            return R.error("竞赛功能暂未开放");
+        }
         try {
             competitionService.signup(userId, id);
             return R.success();
@@ -64,6 +87,9 @@ public class CompetitionController {
     @PostMapping("/{id}/start")
     public R<Map<String, Object>> start(@RequestHeader("X-User-Id") Long userId,
                                         @PathVariable Long id) {
+        if (isClosed()) {
+            return R.error("竞赛功能暂未开放");
+        }
         try {
             Map<String, Object> data = new java.util.HashMap<>();
             data.put("questions", competitionService.start(userId, id));
@@ -78,6 +104,9 @@ public class CompetitionController {
     @GetMapping("/{id}/review")
     public R<Map<String, Object>> review(@RequestHeader("X-User-Id") Long userId,
                                          @PathVariable Long id) {
+        if (isClosed()) {
+            return R.error("竞赛功能暂未开放");
+        }
         try {
             Map<String, Object> data = new java.util.HashMap<>();
             data.put("list", competitionService.review(userId, id));
@@ -93,6 +122,9 @@ public class CompetitionController {
     public R<Map<String, Object>> submit(@RequestHeader("X-User-Id") Long userId,
                                          @PathVariable Long id,
                                          @RequestBody Map<String, Object> body) {
+        if (isClosed()) {
+            return R.error("竞赛功能暂未开放");
+        }
         try {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> answers = (List<Map<String, Object>>) body.get("answers");
@@ -106,6 +138,9 @@ public class CompetitionController {
     /** 排行榜前50（已交卷者，成绩脱敏） */
     @GetMapping("/{id}/rank")
     public R<List<Map<String, Object>>> rank(@PathVariable Long id) {
+        if (isClosed()) {
+            return R.error("竞赛功能暂未开放");
+        }
         try {
             return R.success(competitionService.rank(id));
         } catch (Exception e) {
@@ -119,6 +154,9 @@ public class CompetitionController {
     public R<Map<String, Object>> myList(@RequestHeader("X-User-Id") Long userId,
                                          @RequestParam(defaultValue = "1") Integer pageNum,
                                          @RequestParam(defaultValue = "10") Integer pageSize) {
+        if (isClosed()) {
+            return R.error("竞赛功能暂未开放");
+        }
         try {
             return R.success(competitionService.myList(userId, pageNum, pageSize));
         } catch (Exception e) {

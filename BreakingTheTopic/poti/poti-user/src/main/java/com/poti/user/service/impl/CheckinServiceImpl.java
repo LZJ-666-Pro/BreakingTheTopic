@@ -3,10 +3,14 @@ package com.poti.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.poti.user.entity.CheckIn;
+import com.poti.user.entity.CheckinRewardLog;
 import com.poti.user.entity.UserStats;
+import com.poti.user.mapper.AdminConfigMapper;
 import com.poti.user.mapper.CheckInMapper;
+import com.poti.user.mapper.CheckinRewardLogMapper;
 import com.poti.user.mapper.UserStatsMapper;
 import com.poti.user.service.CheckinService;
+import com.poti.user.service.VipService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +24,26 @@ import java.util.Map;
 @Service
 public class CheckinServiceImpl extends ServiceImpl<CheckInMapper, CheckIn> implements CheckinService {
 
+    /** 连签奖励总开关（后台 sys_config，实时读取；缺失视为开启） */
+    private static final String ENABLED_KEY = "checkin_reward_enabled";
+
+    /** 连签里程碑档位与对应奖励天数配置键（默认 3 天送 1 天 / 7 送 3 / 15 送 7 / 30 送 15） */
+    private static final int[] REWARD_MILESTONES = {3, 7, 15, 30};
+    private static final String[] REWARD_DAY_KEYS = {
+            "checkin_reward_days_3", "checkin_reward_days_7", "checkin_reward_days_15", "checkin_reward_days_30"};
+    private static final int[] DEFAULT_REWARD_DAYS = {1, 3, 7, 15};
+
     @Autowired
     private UserStatsMapper userStatsMapper;
+
+    @Autowired
+    private AdminConfigMapper adminConfigMapper;
+
+    @Autowired
+    private CheckinRewardLogMapper checkinRewardLogMapper;
+
+    @Autowired
+    private VipService vipService;
 
     @Override
     @Transactional
@@ -177,10 +199,119 @@ public class CheckinServiceImpl extends ServiceImpl<CheckInMapper, CheckIn> impl
                     break;
                 }
             }
-            
+
             streak++;
         }
-        
+
         return streak;
+    }
+
+    /**
+     * 连签里程碑奖励发放。
+     * 事务说明：本方法读取后台跨库配置（@DS admin），若放入 doCheckIn 的 @Transactional 内，
+     * 事务连接会固定在主数据源导致 @DS 切换失效（SQL 打到 poti_user 报表不存在），
+     * 因此由 Controller 在 doCheckIn 事务提交后单独调用（方法自身无事务，单条语句各自提交）。
+     */
+    @Override
+    public Integer grantMilestoneReward(Long userId, int streakDays) {
+        try {
+            if (!adminConfigMapper.isEnabled(ENABLED_KEY)) {
+                return null;
+            }
+            int idx = milestoneIndex(streakDays);
+            if (idx < 0) {
+                return null;
+            }
+            int rewardDays = readRewardDays(idx);
+            if (rewardDays <= 0) {
+                return null;
+            }
+            // 本轮连签起点：断签归零后开启新一轮，cycle_start_date 变化即可再次获得同档奖励；
+            // 唯一键 uk_user_streak_cycle 保证同轮连签同一档位只发一次（含并发重复签到兜底）
+            LocalDate cycleStart = LocalDate.now().minusDays(streakDays - 1L);
+            LambdaQueryWrapper<CheckinRewardLog> granted = new LambdaQueryWrapper<>();
+            granted.eq(CheckinRewardLog::getUserId, userId)
+                    .eq(CheckinRewardLog::getStreakDays, streakDays)
+                    .eq(CheckinRewardLog::getCycleStartDate, cycleStart);
+            if (checkinRewardLogMapper.selectCount(granted) > 0) {
+                return null;
+            }
+            CheckinRewardLog rewardLog = new CheckinRewardLog();
+            rewardLog.setUserId(userId);
+            rewardLog.setStreakDays(streakDays);
+            rewardLog.setRewardDays(rewardDays);
+            rewardLog.setCycleStartDate(cycleStart);
+            checkinRewardLogMapper.insert(rewardLog);
+            vipService.extendMembership(userId, rewardDays);
+            log.info("签到奖励发放成功: userId={}, 连签{}天送{}天会员, 本轮起点{}", userId, streakDays, rewardDays, cycleStart);
+            return rewardDays;
+        } catch (Exception e) {
+            // 奖励失败不影响签到结果，仅记录日志便于人工补偿
+            log.error("签到奖励发放失败: userId={}, streakDays={}", userId, streakDays, e);
+            return null;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getRewardHint(int streakDays) {
+        try {
+            if (!adminConfigMapper.isEnabled(ENABLED_KEY)) {
+                return null;
+            }
+            int idx = nextMilestoneIndex(streakDays);
+            if (idx < 0) {
+                return null;
+            }
+            int rewardDays = readRewardDays(idx);
+            if (rewardDays <= 0) {
+                return null;
+            }
+            Map<String, Object> hint = new HashMap<>();
+            hint.put("nextStreakDays", REWARD_MILESTONES[idx]);
+            hint.put("remainDays", REWARD_MILESTONES[idx] - streakDays);
+            hint.put("rewardDays", rewardDays);
+            return hint;
+        } catch (Exception e) {
+            // 提示读取失败不展示即可，不影响签到状态
+            log.warn("读取签到奖励提示失败", e);
+            return null;
+        }
+    }
+
+    /** 当前连签天数命中的里程碑下标（精确匹配），未命中返回 -1 */
+    private int milestoneIndex(int streakDays) {
+        for (int i = 0; i < REWARD_MILESTONES.length; i++) {
+            if (REWARD_MILESTONES[i] == streakDays) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /** 下一个未达成里程碑下标（严格大于当前天数），全部达成返回 -1 */
+    private int nextMilestoneIndex(int streakDays) {
+        for (int i = 0; i < REWARD_MILESTONES.length; i++) {
+            if (REWARD_MILESTONES[i] > streakDays) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /** 读取档位奖励天数（sys_config 实时读取，后台改完即生效；缺失/非法按默认档位） */
+    private int readRewardDays(int idx) {
+        String value = adminConfigMapper.selectValueByKey(REWARD_DAY_KEYS[idx]);
+        if (value != null && !value.trim().isEmpty()) {
+            try {
+                int days = Integer.parseInt(value.trim());
+                if (days >= 0) {
+                    return days;
+                }
+                log.warn("{} 配置为负数，按默认奖励处理: {}", REWARD_DAY_KEYS[idx], value);
+            } catch (NumberFormatException e) {
+                log.warn("{} 配置非法，按默认奖励处理: {}", REWARD_DAY_KEYS[idx], value);
+            }
+        }
+        return DEFAULT_REWARD_DAYS[idx];
     }
 }

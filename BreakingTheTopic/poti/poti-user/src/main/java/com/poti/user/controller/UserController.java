@@ -403,6 +403,40 @@ public class UserController {
         }
     }
 
+    /**
+     * JWT 无感刷新（滑动续期）：旧 token 仍有效时换发新 token，活跃用户永不掉线；
+     * 已过期则拒绝，需重新登录。前端在小程序回前台时按剩余有效期节流调用。
+     */
+    @PostMapping("/refresh")
+    public R<Map<String, Object>> refreshToken(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return R.error("未登录");
+            }
+            String oldToken = authHeader.substring(7);
+            if (!jwtUtil.validateToken(oldToken)) {
+                return R.error("登录已过期，请重新登录");
+            }
+            Long userId = jwtUtil.getUserIdFromToken(oldToken);
+            User user = userService.getById(userId);
+            if (user == null || user.getStatus() == null || user.getStatus() != 1) {
+                return R.error("账号不可用，请重新登录");
+            }
+            String newToken = jwtUtil.refreshToken(oldToken);
+            if (newToken == null) {
+                return R.error("刷新失败，请重新登录");
+            }
+            Map<String, Object> result = new HashMap<>();
+            result.put("token", newToken);
+            result.put("userId", user.getId());
+            log.info("用户 token 无感刷新成功: {}", userId);
+            return R.success(result);
+        } catch (Exception e) {
+            log.error("token 刷新失败", e);
+            return R.error("刷新失败，请重新登录");
+        }
+    }
+
     @PostMapping("/login/phone")
     public R<Map<String, Object>> loginByPhone(@RequestBody Map<String, String> request) {
         try {

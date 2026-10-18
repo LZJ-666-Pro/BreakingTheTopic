@@ -62,11 +62,12 @@
 
             <el-form-item label="登录验证码">
               <el-switch v-model="siteForm.login_captcha_enabled" active-value="true" inactive-value="false" />
+              <span class="form-tip" style="margin-left: 10px">仅管理后台登录的图形验证码（不影响小程序短信验证码登录）</span>
             </el-form-item>
 
             <el-form-item label="竞赛功能">
               <el-switch v-model="siteForm.competition_enabled" active-value="true" inactive-value="false" />
-              <span class="form-tip" style="margin-left: 10px">竞赛模块未上线，暂不生效</span>
+              <span class="form-tip" style="margin-left: 10px">关闭后小程序竞赛中心不可用（列表/详情/报名/答题/成绩均拦截）</span>
             </el-form-item>
 
             <el-form-item label="讨论区">
@@ -76,7 +77,18 @@
 
             <el-form-item label="签到奖励">
               <el-switch v-model="siteForm.checkin_reward_enabled" active-value="true" inactive-value="false" />
-              <span class="form-tip" style="margin-left: 10px">奖励体系（积分/兑换）未上线，暂不生效</span>
+              <span class="form-tip" style="margin-left: 10px">真实生效：小程序签到成功即按下方档位自动发放会员时长，断签归零重新累计可循环再得</span>
+            </el-form-item>
+
+            <el-form-item label="连签奖励档位">
+              <div class="reward-tiers">
+                <div class="reward-tier" v-for="tier in rewardTiers" :key="tier.streak">
+                  <span class="tier-label">连签 {{ tier.streak }} 天送</span>
+                  <el-input-number v-model="siteForm['checkin_reward_days_' + tier.streak]" :min="0" :max="365" size="small" style="width: 100px" />
+                  <span class="tier-unit">天会员</span>
+                </div>
+              </div>
+              <div class="form-tip">保存后实时生效；填 0 表示该档位不发放；同一轮连签每档仅发一次，断签后重新累计可再次获得</div>
             </el-form-item>
 
             <el-form-item label="每日一题自动发布">
@@ -122,45 +134,49 @@
         </el-tab-pane>
 
         <el-tab-pane label="邮件设置" name="email">
-          <el-alert type="warning" :closable="false" show-icon
-            title="项目尚未接入邮件服务商，以下配置仅保存不生效" style="margin-bottom: 16px" />
+          <el-alert type="success" :closable="false" show-icon
+            title="真实生效：后台登录页「忘记密码」通过本邮箱发送验证码重置密码，修改保存后即时生效" style="margin-bottom: 12px" />
+          <el-alert type="info" :closable="false" show-icon
+            title="QQ邮箱填 smtp.qq.com（端口465）、163邮箱填 smtp.163.com（端口465）；用户名=邮箱地址；密码为授权码（邮箱设置中开启SMTP服务后生成，不是登录密码）。管理员账号需先在「管理员管理」中绑定邮箱" style="margin-bottom: 16px" />
           <el-form :model="siteForm" label-width="120px">
             <el-form-item label="SMTP服务器">
-              <el-input v-model="siteForm.email_smtp_host" placeholder="请输入SMTP服务器地址" />
+              <el-input v-model="siteForm.email_smtp_host" placeholder="如 smtp.qq.com" />
             </el-form-item>
-            
+
             <el-form-item label="SMTP端口">
               <el-input-number v-model="siteForm.email_smtp_port" :min="1" :max="65535" />
             </el-form-item>
-            
+
             <el-form-item label="SMTP用户名">
-              <el-input v-model="siteForm.email_smtp_username" placeholder="请输入SMTP用户名" />
+              <el-input v-model="siteForm.email_smtp_username" placeholder="发件邮箱地址" />
             </el-form-item>
-            
+
             <el-form-item label="SMTP密码">
-              <el-input v-model="siteForm.email_smtp_password" type="password" placeholder="请输入SMTP密码" show-password />
+              <el-input v-model="siteForm.email_smtp_password" type="password" placeholder="邮箱授权码，非登录密码" show-password />
             </el-form-item>
           </el-form>
         </el-tab-pane>
         
         <el-tab-pane label="短信设置" name="sms">
-          <el-alert type="warning" :closable="false" show-icon
-            title="短信当前为开发模式（验证码打印到服务日志），接入服务商后以下配置才生效" style="margin-bottom: 16px" />
+          <el-alert v-if="siteForm.sms_template_code" type="success" :closable="false" show-icon
+            title="已接入 Spug 推弹（push.spug.cc）：验证码短信实时生效，修改模板ID后保存即可切换" style="margin-bottom: 16px" />
+          <el-alert v-else type="warning" :closable="false" show-icon
+            title="短信当前为开发模式（验证码打印到服务日志）：在 push.spug.cc 创建验证码模板后，将模板ID填入下方并保存即接入" style="margin-bottom: 16px" />
           <el-form :model="siteForm" label-width="120px">
             <el-form-item label="AccessKey">
-              <el-input v-model="siteForm.sms_access_key" placeholder="请输入短信服务AccessKey" />
+              <el-input v-model="siteForm.sms_access_key" placeholder="传统短信服务商预留（阿里云等），Spug 无需填写" />
             </el-form-item>
-            
+
             <el-form-item label="AccessSecret">
-              <el-input v-model="siteForm.sms_access_secret" type="password" placeholder="请输入短信服务AccessSecret" show-password />
+              <el-input v-model="siteForm.sms_access_secret" type="password" placeholder="传统短信服务商预留（阿里云等），Spug 无需填写" show-password />
             </el-form-item>
-            
+
             <el-form-item label="短信签名">
-              <el-input v-model="siteForm.sms_sign_name" placeholder="请输入短信签名" />
+              <el-input v-model="siteForm.sms_sign_name" placeholder="Spug 签名随模板生效，无需填写" />
             </el-form-item>
-            
+
             <el-form-item label="短信模板ID">
-              <el-input v-model="siteForm.sms_template_code" placeholder="请输入短信模板ID" />
+              <el-input v-model="siteForm.sms_template_code" placeholder="粘贴 Spug「短信验证码」页的调用URL（或其最后一段编码）" />
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -178,6 +194,14 @@ import api from '../utils/api'
 const router = useRouter()
 const activeTab = ref('site')
 const loading = ref(false)
+
+// 连签奖励档位（对应配置键 checkin_reward_days_3/7/15/30）
+const rewardTiers = [
+  { streak: 3 },
+  { streak: 7 },
+  { streak: 15 },
+  { streak: 30 }
+]
 
 const siteForm = reactive({
   site_name: '',
@@ -200,6 +224,10 @@ const siteForm = reactive({
   competition_enabled: 'false',
   discussion_enabled: 'true',
   checkin_reward_enabled: 'true',
+  checkin_reward_days_3: 1,
+  checkin_reward_days_7: 3,
+  checkin_reward_days_15: 7,
+  checkin_reward_days_30: 15,
   daily_question_auto: 'false',
   daily_question_time: '08:00',
   default_page_size: 10,
@@ -224,8 +252,9 @@ const loadConfigs = async () => {
           // 价格为小数，用 parseFloat；空/非法时保留表单缺省值
           const parsed = parseFloat(configs[key])
           siteForm[key] = isNaN(parsed) ? siteForm[key] : parsed
-        } else if (key === 'upload_max_size' || key === 'email_smtp_port' || key === 'default_page_size') {
-          siteForm[key] = parseInt(configs[key]) || siteForm[key]
+        } else if (key === 'upload_max_size' || key === 'email_smtp_port' || key === 'default_page_size' || key.startsWith('checkin_reward_days_')) {
+          siteForm[key] = parseInt(configs[key])
+          if (isNaN(siteForm[key])) siteForm[key] = 0
         } else {
           siteForm[key] = configs[key]
         }
@@ -278,6 +307,29 @@ const handleSave = async () => {
   font-size: 12px;
   color: #999;
   margin-top: 5px;
+}
+
+.reward-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reward-tier {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tier-label {
+  font-size: 13px;
+  color: #606266;
+  width: 90px;
+}
+
+.tier-unit {
+  font-size: 13px;
+  color: #606266;
 }
 
 :deep(.el-tabs__content) {

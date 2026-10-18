@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return true;
         }
         String path = getRequestPath(request);
-        boolean excluded = properties.getExcludePaths().stream()
+        boolean excluded = properties.getAllExcludePaths().stream()
                 .anyMatch(pattern -> pathMatcher.match(pattern, path));
         if (excluded) {
             log.debug("鉴权过滤器放行白名单路径: {}", path);

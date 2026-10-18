@@ -49,4 +49,7 @@ public interface VipService {
 
     /** internal：题解查看校验——会员无限查看；非会员每日限 5 篇（Redis Set 按题去重计数），供 poti-question 转发调用 */
     Map<String, Object> checkSolutionView(Long userId, Long questionId);
+
+    /** 延长会员时长（签到奖励等内部场景）：未过期顺延 expire + days 天，否则 expire = now + days 天 */
+    void extendMembership(Long userId, int days);
 }

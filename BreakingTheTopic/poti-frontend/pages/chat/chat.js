@@ -43,8 +43,8 @@ Page({
       return
     }
     
-    // 头像地址兼容历史数据：老数据存的是 localhost，真机无法访问，统一替换为配置的服务地址
-    const fixAvatarUrl = (url) => (url || '').replace('http://localhost:8200', app.globalData.userUrl)
+    // 头像地址兼容历史数据：老数据存的是 localhost/旧 IP，统一把 host 部分替换为当前配置的服务地址
+    const fixAvatarUrl = (url) => (url ? url.replace(/^https?:\/\/[^/]+/, app.globalData.userUrl) : url)
     this.setData({
       userId: app.globalData.userId || 1,
       friendId: parseInt(options.friendId),
@@ -124,12 +124,8 @@ Page({
       },
       success: (res) => {
         if (res.data.code === 200) {
-          // 媒体地址兼容历史数据：老数据存的是 localhost/旧 IP，真机无法访问，统一替换为当前配置的服务地址
-          const fixMediaUrl = (url) => {
-            if (!url) return url
-            const m = url.match(/^https?:\/\/[^/]+(\/chat\/.+)$/)
-            return m ? app.globalData.userUrl + m[1] : url
-          }
+          // 媒体地址兼容历史数据：老数据存的是 localhost/旧 IP，统一把 host 部分替换为当前配置的服务地址
+          const fixMediaUrl = (url) => (url ? url.replace(/^https?:\/\/[^/]+/, app.globalData.userUrl) : url)
           const messages = (res.data.data || []).map(msg => ({
             ...msg,
             media_url: fixMediaUrl(msg.media_url)

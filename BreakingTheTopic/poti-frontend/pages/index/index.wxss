@@ -234,6 +234,15 @@ page {
   transform: scale(0.95);
 }
 
+/* 连签奖励进度提示：低饱和小字，不抢主数字视觉 */
+.reward-hint {
+  margin-top: 4rpx;
+  font-size: 20rpx;
+  color: #B0B0B0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .stats-divider {
   width: 1rpx;
   height: 48rpx;

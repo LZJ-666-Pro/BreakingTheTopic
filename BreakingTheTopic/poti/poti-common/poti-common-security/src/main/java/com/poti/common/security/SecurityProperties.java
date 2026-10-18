@@ -31,6 +31,8 @@ public class SecurityProperties {
 
             // ===== 用户服务公开接口 =====
             "/user/register", "/user/login/**", "/user/password/reset", "/user/avatar/upload",
+            // token 无感刷新（接口内部自行校验旧 token 有效性）
+            "/user/refresh",
             "/sms/**",
             "/config/**",
 
@@ -49,6 +51,10 @@ public class SecurityProperties {
 
             // ===== 管理后台登录 =====
             "/admin/login", "/admin/register", "/admin/captcha",
+            // token 无感刷新（接口内部自行校验旧 token 有效性）
+            "/admin/refresh",
+            // 忘记密码邮箱找回（接口内部校验账号、绑定邮箱与验证码）
+            "/admin/password/forgot", "/admin/password/reset",
 
             // ===== 监控、文档、静态资源 =====
             "/actuator/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**", "/doc.html",
@@ -96,8 +102,33 @@ public class SecurityProperties {
 
     /**
      * 免鉴权路径（Ant 风格）。默认值为 {@link #DEFAULT_EXCLUDE_PATHS}。
+     * <p>
+     * 注意：在 yml 中配置该属性会<b>整体替换</b>默认白名单（Spring List 绑定语义），
+     * 服务特有路径请改配 {@code additional-exclude-paths}，避免误删公共白名单。
      */
     private List<String> excludePaths = new ArrayList<>(DEFAULT_EXCLUDE_PATHS);
+
+    /**
+     * 增量免鉴权路径（Ant 风格），与默认白名单合并生效，不会覆盖 {@code exclude-paths}。
+     */
+    private List<String> additionalExcludePaths = new ArrayList<>();
+
+    /**
+     * 全量免鉴权路径 = 基础白名单 + 增量白名单。
+     */
+    public List<String> getAllExcludePaths() {
+        List<String> all = new ArrayList<>(excludePaths);
+        all.addAll(additionalExcludePaths);
+        return all;
+    }
+
+    public List<String> getAdditionalExcludePaths() {
+        return additionalExcludePaths;
+    }
+
+    public void setAdditionalExcludePaths(List<String> additionalExcludePaths) {
+        this.additionalExcludePaths = additionalExcludePaths;
+    }
 
     public boolean isEnabled() {
         return enabled;
