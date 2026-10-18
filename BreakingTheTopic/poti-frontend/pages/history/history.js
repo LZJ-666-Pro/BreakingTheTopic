@@ -158,30 +158,25 @@ Page({
   deleteItem(e) {
     const id = e.currentTarget.dataset.id
     const index = e.currentTarget.dataset.index
-    const app = getApp()
-    
+
     wx.showModal({
       title: '提示',
       content: '确定删除这条记录吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.request({
-            url: `${app.globalData.practiceUrl}/practice/record/${id}`,
-            method: 'DELETE',
-            header: {
-              'X-User-Id': app.globalData.userId || 1
-            },
-            success: (res) => {
-              if (res.data.code === 200) {
-                wx.showToast({ title: '已删除', icon: 'success' })
-                const historyList = this.data.historyList
-                historyList.splice(index, 1)
-                this.setData({ historyList })
-                this.loadStatistics()
-              } else {
-                wx.showToast({ title: '删除失败', icon: 'none' })
-              }
+          // 走 api 封装携带 Bearer token（裸请求仅 X-User-Id 会被服务端 401 拒绝）
+          practiceApi.removeRecord(id).then(response => {
+            if (response.code === 200) {
+              wx.showToast({ title: '已删除', icon: 'success' })
+              const historyList = this.data.historyList
+              historyList.splice(index, 1)
+              this.setData({ historyList })
+              this.loadStatistics()
+            } else {
+              wx.showToast({ title: response.msg || '删除失败', icon: 'none' })
             }
+          }).catch(() => {
+            wx.showToast({ title: '网络错误', icon: 'none' })
           })
         }
       }
@@ -189,35 +184,29 @@ Page({
   },
 
   clearAll() {
-    const app = getApp()
-    
     wx.showModal({
       title: '提示',
       content: '确定清空所有刷题记录吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.request({
-            url: `${app.globalData.practiceUrl}/practice/clear`,
-            method: 'DELETE',
-            header: {
-              'X-User-Id': app.globalData.userId || 1
-            },
-            success: (res) => {
-              if (res.data.code === 200) {
-                wx.showToast({ title: '已清空', icon: 'success' })
-                this.setData({ 
-                  historyList: [],
-                  statistics: {
-                    totalQuestionCount: 0,
-                    correctCount: 0,
-                    wrongCount: 0,
-                    correctRate: 0
-                  }
-                })
-              } else {
-                wx.showToast({ title: '清空失败', icon: 'none' })
-              }
+          // 走 api 封装携带 Bearer token
+          practiceApi.clearAllRecords().then(response => {
+            if (response.code === 200) {
+              wx.showToast({ title: '已清空', icon: 'success' })
+              this.setData({
+                historyList: [],
+                statistics: {
+                  totalQuestionCount: 0,
+                  correctCount: 0,
+                  wrongCount: 0,
+                  correctRate: 0
+                }
+              })
+            } else {
+              wx.showToast({ title: response.msg || '清空失败', icon: 'none' })
             }
+          }).catch(() => {
+            wx.showToast({ title: '网络错误', icon: 'none' })
           })
         }
       }
