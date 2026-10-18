@@ -73,6 +73,25 @@ public class CampController {
         }
     }
 
+    /** 加入训练营（internal 通道，供 AI 导师工具调用） */
+    @PostMapping("/internal/join")
+    public R<Map<String, Object>> joinCampInternal(@RequestParam("userId") Long userId,
+                                                   @RequestBody Map<String, Object> request) {
+        try {
+            Object raw = request.get("campId");
+            String campId = raw == null ? null : String.valueOf(raw);
+            if (campId == null || campId.trim().isEmpty()) {
+                return R.error("参数错误");
+            }
+            return R.success(campService.joinCamp(userId, campId));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return R.error(e.getMessage());
+        } catch (Exception e) {
+            log.error("internal加入训练营失败", e);
+            return R.error("加入训练营失败");
+        }
+    }
+
     /** 我的训练营列表 */
     @GetMapping("/my")
     public R<List<Map<String, Object>>> getMyCamps(@RequestHeader("X-User-Id") Long userId) {

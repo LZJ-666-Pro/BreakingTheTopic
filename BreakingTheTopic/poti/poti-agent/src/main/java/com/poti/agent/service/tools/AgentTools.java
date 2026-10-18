@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * - 每次执行写 agent_tool_log（内联记录，等价 AOP，便于追溯）；
  * - get_question_detail/get_daily_question 剥离 answer 字段（防作弊），search_questions 剥离答案/解析字段，
  *   收藏/每日一题/专题等接口本身不含答案字段；
- * - 写类工具仅开放低风险操作（收藏/签到/反馈），走各服务 internal 通道（服务间令牌鉴权）；
+ * - 写类工具仅开放低风险操作（收藏/签到/反馈/加入特训营），走各服务 internal 通道（服务间令牌鉴权）；
  * - 单次回答内调度步数超上限后，工具返回收敛提示，引导模型直接总结。
  */
 @Slf4j
@@ -428,6 +428,29 @@ public class AgentTools {
             return r != null && r.getCode() == 200
                     ? Map.of("submitted", true, "message", r.getData())
                     : null;
+        });
+    }
+
+    // ==================== 工具 17：加入特训营（写） ====================
+
+    @Tool("为当前用户加入指定的面试特训营。仅当用户明确表达想加入某个特训营时调用；必须先用 get_interview_camps 查到营ID并确认该营 joined != true（已加入则无需调用）；campId 必须来自 get_interview_camps 的返回结果，不可凭空编造。已加入、营已结束等业务失败会返回 ok:false 与原因，需如实告知用户")
+    public String join_camp(@ToolMemoryId Long memoryId,
+                            @P("特训营ID（必须来自 get_interview_camps 的返回结果）") String campId) {
+        return execute(memoryId, "join_camp", () -> {
+            if (campId == null || campId.isBlank()) {
+                return Map.of("ok", false, "reason", "缺少特训营ID，请先查询特训营列表");
+            }
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("campId", campId.trim());
+            R<Map<String, Object>> r = interviewFeignClient.joinCamp(userIdOf(memoryId), body);
+            if (r == null) {
+                return null;
+            }
+            if (r.getCode() == 200 && r.getData() != null) {
+                return r.getData();
+            }
+            // 业务失败（已加入/营已结束等）：如实带回原因，不谎报成功
+            return Map.of("ok", false, "reason", r.getMsg() == null ? "加入失败" : r.getMsg());
         });
     }
 
