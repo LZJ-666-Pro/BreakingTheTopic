@@ -124,6 +124,9 @@ sms:
       expire: 300
       cooldown: 60
       max-per-day: 10
+  dev:
+    # 本地开发未配置模板时打印验证码明文（仅限本机；生产环境严禁开启）
+    log-code: true
 
 management:
   health:

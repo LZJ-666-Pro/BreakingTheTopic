@@ -39,6 +39,13 @@ public class SmsServiceImpl implements SmsService {
     @Value("${sms.verify.code.max-per-day:10}")
     private int maxPerDay;
 
+    /**
+     * 开发模式下是否在日志打印验证码明文。默认关闭；
+     * 生产环境（未配置短信模板属于配置事故）也保持关闭，避免任何能看日志的人窃取任意手机号的验证码。
+     */
+    @Value("${sms.dev.log-code:false}")
+    private boolean devLogCode;
+
     private static final String CODE_PREFIX = "sms:code:";
     private static final String COOLDOWN_PREFIX = "sms:cooldown:";
     private static final String COUNT_PREFIX = "sms:count:";
@@ -56,7 +63,12 @@ public class SmsServiceImpl implements SmsService {
 
         String templateId = resolveTemplateId();
         if (templateId == null || templateId.isEmpty()) {
-            log.info("【开发模式】手机号 {} 的验证码为: {}", phone, code);
+            // 开发模式：未配置短信模板。明文日志仅在本机显式开启时打印，默认只提示从 Redis 获取
+            if (devLogCode) {
+                log.info("【开发模式】手机号 {} 的验证码为: {}", phone, code);
+            } else {
+                log.info("【开发模式】未配置短信模板，验证码已写入 Redis（键 sms:code:{}），明文日志未开启", phone);
+            }
         } else {
             boolean sent = sendViaSpug(phone, code, templateId);
             if (!sent) {

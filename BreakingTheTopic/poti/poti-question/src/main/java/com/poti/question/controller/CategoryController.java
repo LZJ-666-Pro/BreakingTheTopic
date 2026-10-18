@@ -111,6 +111,28 @@ public class CategoryController {
         }
     }
 
+    /**
+     * internal：全量分类 id+名称（服务间调用，错题统计等跨库解析分类名使用）
+     */
+    @GetMapping("/internal/names")
+    public R<List<Map<String, Object>>> internalCategoryNames() {
+        try {
+            LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Category::getDeleted, 0)
+                   .orderByAsc(Category::getSort);
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (Category c : categoryService.list(wrapper)) {
+                Map<String, Object> m = new LinkedHashMap<>();
+                m.put("id", c.getId());
+                m.put("name", c.getName());
+                list.add(m);
+            }
+            return R.success(list);
+        } catch (Exception e) {
+            return R.error("获取分类名称失败");
+        }
+    }
+
     @PostMapping("/save")
     public R<Category> saveCategory(@RequestBody Category category) {
         try {
