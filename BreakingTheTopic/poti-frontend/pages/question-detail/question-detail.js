@@ -20,6 +20,11 @@ const difficultyNames = {
 }
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    if (this.data.questionId) this.loadQuestionDetail(this.data.questionId)
+    wx.stopPullDownRefresh()
+  },
   data: {
     loading: true,
     questionId: null,

@@ -2,5 +2,7 @@
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index",
     "van-loading": "@vant/weapp/loading/index"
-  }
+  },
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

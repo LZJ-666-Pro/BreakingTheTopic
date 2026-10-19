@@ -2,6 +2,13 @@ const userApi = require('../../api/user.js')
 const guestUtils = require('../../utils/guest.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadUserInfo()
+    this.loadStatistics()
+    this.loadUnreadCount()
+    wx.stopPullDownRefresh()
+  },
   data: {
     userInfo: null,
     userId: null,

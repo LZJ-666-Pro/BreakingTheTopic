@@ -2,5 +2,7 @@
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index"
   },
-  "navigationBarTitleText": "模拟面试"
+  "navigationBarTitleText": "模拟面试",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

@@ -3,6 +3,11 @@ const { getCategoryIcon } = require('../../utils/categoryLogo.js')
 const PAGE_SIZE = 20
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadQuestions()
+    wx.stopPullDownRefresh()
+  },
   data: {
     categoryId: null,
     categoryName: '',

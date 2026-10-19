@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "面试特训营",
-  "usingComponents": {}
+  "usingComponents": {},
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

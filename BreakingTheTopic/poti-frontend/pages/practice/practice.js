@@ -244,6 +244,11 @@ const categoryColors = {
 const guestUtils = require('../../utils/guest.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadCategories()
+    wx.stopPullDownRefresh()
+  },
   data: {
     tagList: [{ key: 'all', name: '全部' }],
     tagNameMap: { all: '全部' },

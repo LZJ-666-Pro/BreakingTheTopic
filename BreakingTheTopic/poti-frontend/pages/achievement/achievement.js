@@ -1,6 +1,11 @@
 const userApi = require('../../api/user.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadUserAchievements()
+    wx.stopPullDownRefresh()
+  },
   data: {
     activeCategory: 'all',
     achievementSummary: {

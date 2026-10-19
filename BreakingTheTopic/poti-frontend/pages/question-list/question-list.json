@@ -3,5 +3,7 @@
     "van-loading": "@vant/weapp/loading/index",
     "van-icon": "@vant/weapp/icon/index"
   },
-  "navigationBarTitleText": "题目列表"
+  "navigationBarTitleText": "题目列表",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

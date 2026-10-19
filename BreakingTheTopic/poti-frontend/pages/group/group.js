@@ -1,6 +1,11 @@
 const app = getApp()
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadConfig()
+    wx.stopPullDownRefresh()
+  },
   data: {
     groups: [],
     wechatHelper: '',

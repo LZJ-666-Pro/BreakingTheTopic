@@ -2,6 +2,11 @@ const app = getApp()
 const { questionUrl } = app.globalData
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadDetail()
+    wx.stopPullDownRefresh()
+  },
   data: {
     id: null,
     info: null,

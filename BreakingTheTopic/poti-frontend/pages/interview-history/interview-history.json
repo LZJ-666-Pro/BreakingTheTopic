@@ -2,5 +2,7 @@
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index"
   },
-  "navigationBarTitleText": "面试记录"
+  "navigationBarTitleText": "面试记录",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

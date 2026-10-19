@@ -5,5 +5,7 @@
     "van-toast": "@vant/weapp/toast/index",
     "agent-fab": "/components/agent-fab/agent-fab"
   },
-  "navigationBarTitleText": "题目详情"
+  "navigationBarTitleText": "题目详情",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

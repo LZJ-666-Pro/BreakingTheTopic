@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "学习统计",
-  "usingComponents": {}
+  "usingComponents": {},
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "训练营详情",
-  "usingComponents": {}
+  "usingComponents": {},
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

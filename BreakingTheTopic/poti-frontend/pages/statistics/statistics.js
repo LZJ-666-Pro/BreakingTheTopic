@@ -16,6 +16,14 @@ function parseDayOfMonth(value) {
 }
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadData()
+    this.loadWrongStats()
+    this.loadCheckinStreak()
+    this.loadCalendar()
+    wx.stopPullDownRefresh()
+  },
   data: {
     // 总览统计
     statistics: {

@@ -2,6 +2,11 @@ const guestUtils = require('../../utils/guest.js')
 const favoriteApi = require('../../api/favorite.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadFavorites()
+    wx.stopPullDownRefresh()
+  },
   data: {
     searchKeyword: '',
     activeDifficulty: 'all',

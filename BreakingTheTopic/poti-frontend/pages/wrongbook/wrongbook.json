@@ -3,5 +3,7 @@
     "van-icon": "@vant/weapp/icon/index",
     "van-empty": "@vant/weapp/empty/index"
   },
-  "navigationBarTitleText": "错题本"
+  "navigationBarTitleText": "错题本",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

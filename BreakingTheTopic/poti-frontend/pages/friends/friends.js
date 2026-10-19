@@ -2,6 +2,13 @@ const app = getApp()
 const guestUtils = require('../../utils/guest.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadFriendList()
+    this.loadPendingRequests()
+    this.loadSentRequests()
+    wx.stopPullDownRefresh()
+  },
   data: {
     searchKeyword: '',
     searchResults: [],

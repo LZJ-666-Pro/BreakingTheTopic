@@ -20,6 +20,11 @@ function metaFor(title) {
 }
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.refreshList()
+    wx.stopPullDownRefresh()
+  },
   data: {
     list: [],
     pageNum: 1,

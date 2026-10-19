@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "加入交流群"
+  "navigationBarTitleText": "加入交流群",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

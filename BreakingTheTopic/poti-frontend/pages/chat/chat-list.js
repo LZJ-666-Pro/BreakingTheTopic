@@ -2,6 +2,12 @@ const app = getApp()
 const guestUtils = require('../../utils/guest.js')
 
 Page({
+  onPullDownRefresh() {
+    if (guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadConversations()
+    wx.stopPullDownRefresh()
+  },
+
   data: {
     conversations: []
   },

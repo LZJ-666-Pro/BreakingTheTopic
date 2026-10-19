@@ -1,6 +1,11 @@
 const guestUtils = require('../../utils/guest.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadStatus()
+    wx.stopPullDownRefresh()
+  },
   data: {
     vip: false,
     expireTimeText: '',

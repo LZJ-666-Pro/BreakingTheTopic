@@ -246,6 +246,14 @@ const categoryColors = {
 }
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadUserInfo()
+    this.loadStats()
+    this.loadDailyQuestion()
+    this.loadUnreadCount()
+    wx.stopPullDownRefresh()
+  },
   data: {
     userInfo: {},
     dailyQuestion: null,

@@ -2,5 +2,7 @@
   "navigationBarTitleText": "排行榜",
   "usingComponents": {
     "van-icon": "@vant/weapp/icon/index"
-  }
+  },
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

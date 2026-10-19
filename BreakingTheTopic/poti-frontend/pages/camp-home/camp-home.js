@@ -2,6 +2,11 @@ const app = getApp()
 const guestUtils = require('../../utils/guest.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    if (this.data.campId) this.loadHome()
+    wx.stopPullDownRefresh()
+  },
   data: {
     campId: '',
     camp: null,

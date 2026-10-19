@@ -39,6 +39,12 @@ function groupKeyOf(title) {
 }
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadTypes()
+    this.loadStatistics()
+    wx.stopPullDownRefresh()
+  },
   data: {
     hotTypes: [],
     groups: [],

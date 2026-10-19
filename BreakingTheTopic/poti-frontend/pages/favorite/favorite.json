@@ -3,5 +3,7 @@
     "van-icon": "@vant/weapp/icon/index",
     "van-empty": "@vant/weapp/empty/index"
   },
-  "navigationBarTitleText": "我的收藏"
+  "navigationBarTitleText": "我的收藏",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

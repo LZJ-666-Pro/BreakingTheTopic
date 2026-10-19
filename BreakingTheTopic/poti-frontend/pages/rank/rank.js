@@ -2,6 +2,11 @@ const userApi = require('../../api/user.js')
 const guestUtils = require('../../utils/guest.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadRankData()
+    wx.stopPullDownRefresh()
+  },
   data: {
     activeTab: 'total',
     activeSubTab: 'world',

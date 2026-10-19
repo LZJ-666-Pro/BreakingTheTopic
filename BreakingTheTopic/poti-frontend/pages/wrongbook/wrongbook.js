@@ -3,6 +3,13 @@ const wrongbookApi = require('../../api/wrongbook.js')
 const guestUtils = require('../../utils/guest.js')
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadWrongbook()
+    this.loadPracticeRecords()
+    this.loadInterviewWrong()
+    wx.stopPullDownRefresh()
+  },
   data: {
     activeTab: 'wrong',
     activeFilter: 'all',

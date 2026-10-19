@@ -4,6 +4,11 @@ const guestUtils = require('../../utils/guest.js')
 const OUTLINE_PREVIEW_COUNT = 7
 
 Page({
+  onPullDownRefresh() {
+    if (typeof guestUtils !== 'undefined' && guestUtils.checkGuest && guestUtils.checkGuest()) { wx.stopPullDownRefresh(); return }
+    this.loadDetail()
+    wx.stopPullDownRefresh()
+  },
   data: {
     campId: '',
     camp: null,

@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "刷题专题",
-  "usingComponents": {}
+  "usingComponents": {},
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }
