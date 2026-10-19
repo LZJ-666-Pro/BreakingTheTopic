@@ -236,7 +236,9 @@ Page({
         if (res.data && res.data.code === 200 && res.data.data) {
           this.setData({ streakDays: Number(res.data.data.streakDays) || 0 })
         }
-      }
+      },
+      // 连续天数为非关键指标，失败静默不打扰
+      fail: () => {}
     })
   },
 

@@ -44,6 +44,9 @@ Page({
             isEmpty: groups.length === 0 && !wechatHelper
           })
         }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
       }
     })
   },

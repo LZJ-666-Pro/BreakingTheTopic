@@ -116,6 +116,9 @@ Page({
           })
         }
       },
+      fail: () => {
+        wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
+      },
       complete: () => {
         this.setData({ loading: false })
       }
@@ -156,6 +159,9 @@ Page({
               } else {
                 wx.showToast({ title: '清空失败', icon: 'none' })
               }
+            },
+            fail: () => {
+              wx.showToast({ title: '网络异常，清空失败', icon: 'none' })
             }
           })
         }

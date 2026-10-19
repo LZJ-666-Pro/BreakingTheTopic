@@ -48,6 +48,9 @@ Page({
             !contactInfo.email && !contactInfo.weibo
           this.setData({ contactInfo, siteInfo, isAllEmpty })
         }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
       }
     })
   },
