@@ -36,6 +36,12 @@ public class AuthController {
     @Value("${poti.security.internal-token:}")
     private String internalToken;
 
+    /**
+     * 开发登录开关：仅本地联调使用，生产环境严禁开启（可凭 userId 换取任意用户 token）
+     */
+    @Value("${poti.auth.dev-endpoints:false}")
+    private boolean devEndpoints;
+
 /**
  * Handles the login request using WeChat's authentication flow
  * @param request Contains the WeChat authentication code
@@ -191,11 +197,15 @@ public class AuthController {
     @PostMapping("/dev/login")
     public R<Map<String, Object>> devLogin(@RequestBody Map<String, String> request) {
         try {
+            if (!devEndpoints) {
+                log.warn("开发登录接口已被禁用（poti.auth.dev-endpoints=false）");
+                return R.error("开发登录接口未开启");
+            }
             log.info("收到开发环境登录请求，请求参数：{}", request);
-            
+
             String userIdStr = request.get("userId");
             String uniqueId = request.get("uniqueId");
-            
+
             if (userIdStr == null && uniqueId == null) {
                 return R.error("请提供 userId 或 uniqueId");
             }
@@ -280,44 +290,6 @@ public class AuthController {
             return R.success(result);
         } catch (Exception e) {
             log.error("开发环境登录失败", e);
-            return R.error("登录失败：" + e.getMessage());
-        }
-    }
-
-    @PostMapping("/admin/login")
-    public R<Map<String, Object>> adminLogin(@RequestBody Map<String, String> request) {
-        try {
-            log.info("收到管理员登录请求");
-            
-            String username = request.get("username");
-            String password = request.get("password");
-            
-            if (username == null || password == null) {
-                return R.error("用户名或密码不能为空");
-            }
-            
-            if ("admin".equals(username) && "admin123".equals(password)) {
-                Long adminId = 1L;
-                String openid = "admin_" + adminId;
-                String token = jwtUtil.generateToken(adminId, openid);
-                
-                Map<String, Object> result = new HashMap<>();
-                result.put("token", token);
-                
-                Map<String, Object> user = new HashMap<>();
-                user.put("id", adminId);
-                user.put("nickname", "管理员");
-                user.put("username", username);
-                result.put("user", user);
-                
-                log.info("管理员登录成功");
-                return R.success(result);
-            }
-            
-            log.warn("管理员登录失败，用户名或密码错误");
-            return R.error("用户名或密码错误");
-        } catch (Exception e) {
-            log.error("管理员登录失败", e);
             return R.error("登录失败：" + e.getMessage());
         }
     }

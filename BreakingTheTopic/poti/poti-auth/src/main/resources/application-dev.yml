@@ -30,14 +30,17 @@ spring:
         min-idle: 0
 
 wx:
-  appid: wx920f3d57f4121af7
-  secret: 1a1df381bfb417d942beee26ef809b09
+  appid: ${WX_APPID:wx920f3d57f4121af7}
+  secret: ${WX_SECRET:1a1df381bfb417d942beee26ef809b09}
 
 jwt:
   secret: ${JWT_SECRET:poti2024secretkey1234567890abcdefghijklmnopqrstuvwxyz}
   expire: 86400000
 
 poti:
+  auth:
+    # 开发登录接口开关（凭 userId 换 token，仅本地联调；生产必须为 false）
+    dev-endpoints: true
   security:
     internal-token: ${INTERNAL_TOKEN:poti-internal-secret-2024}
 
