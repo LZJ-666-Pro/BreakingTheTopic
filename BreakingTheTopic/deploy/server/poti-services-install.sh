@@ -20,6 +20,7 @@ SERVICES=(
   "wrongbook|8500"
   "favorite|8600"
   "interview|8700"
+  "search|8800"
   "agent|8900"
 )
 

@@ -49,16 +49,14 @@ public class SearchController {
             }
 
             if (esEnabled && questionRepository != null) {
-                return searchWithElasticsearch(keyword, categoryId, pageNum, pageSize);
+                try {
+                    return searchWithElasticsearch(keyword, categoryId, pageNum, pageSize);
+                } catch (Exception esEx) {
+                    log.warn("ES 检索不可用，自动降级数据库检索: {}", esEx.getMessage());
+                }
             }
 
-            R<Map<String, Object>> dbResult = questionClient.searchQuestions(keyword, categoryId, difficulty, pageNum, pageSize);
-
-            if (dbResult != null && dbResult.getData() != null) {
-                return R.success(dbResult.getData());
-            }
-
-            return R.success(getEmptyResult());
+            return searchFromDatabase(keyword, categoryId, difficulty, pageNum, pageSize);
         } catch (Exception e) {
             log.error("搜索题目失败", e);
             return R.success(getEmptyResult());
@@ -77,17 +75,32 @@ public class SearchController {
                                                          @RequestParam(defaultValue = "10") Integer pageSize) {
         try {
             if (esEnabled && questionRepository != null) {
-                return searchWithElasticsearch(keyword, categoryId, pageNum, pageSize);
+                try {
+                    return searchWithElasticsearch(keyword, categoryId, pageNum, pageSize);
+                } catch (Exception esEx) {
+                    log.warn("ES 检索不可用，自动降级数据库检索: {}", esEx.getMessage());
+                }
             }
-            R<Map<String, Object>> dbResult = questionClient.searchQuestions(keyword, categoryId, difficulty, pageNum, pageSize);
-            if (dbResult != null && dbResult.getData() != null) {
-                return R.success(dbResult.getData());
-            }
-            return R.success(getEmptyResult());
+            return searchFromDatabase(keyword, categoryId, difficulty, pageNum, pageSize);
         } catch (Exception e) {
             log.error("internal 搜索题目失败", e);
             return R.success(getEmptyResult());
         }
+    }
+
+    /**
+     * 数据库降级检索：ES 未启用或运行中不可用时走 question 服务 /question/search（LIKE 匹配题干/内容/解析/标签/分类名）
+     */
+    private R<Map<String, Object>> searchFromDatabase(String keyword, Long categoryId, Integer difficulty, Integer pageNum, Integer pageSize) {
+        try {
+            R<Map<String, Object>> dbResult = questionClient.searchQuestions(keyword, categoryId, difficulty, pageNum, pageSize);
+            if (dbResult != null && dbResult.getData() != null) {
+                return R.success(dbResult.getData());
+            }
+        } catch (Exception e) {
+            log.error("数据库降级检索失败", e);
+        }
+        return R.success(getEmptyResult());
     }
 
     private R<Map<String, Object>> searchWithElasticsearch(String keyword, Long categoryId, Integer pageNum, Integer pageSize) {
@@ -195,11 +208,56 @@ public class SearchController {
                         break;
                     }
                 }
+            } else {
+                collectSuggestFromDatabase(result, kw, lower);
             }
         } catch (Exception e) {
-            log.error("搜索联想失败", e);
+            log.warn("ES 联想不可用，降级数据库联想: {}", e.getMessage());
+            collectSuggestFromDatabase(result, kw, lower);
         }
         return R.success(result);
+    }
+
+    /**
+     * 数据库降级联想：ES 未启用或不可用时，从 question 服务的 LIKE 检索结果中提取候选词（分类名/标签/短题干）
+     */
+    private void collectSuggestFromDatabase(List<String> result, String keyword, String lower) {
+        try {
+            R<Map<String, Object>> db = questionClient.searchQuestions(keyword, null, null, 1, 50);
+            if (db == null || db.getData() == null) {
+                return;
+            }
+            Object listObj = db.getData().get("list");
+            if (!(listObj instanceof List)) {
+                return;
+            }
+            for (Object o : (List<?>) listObj) {
+                if (result.size() >= 10) {
+                    return;
+                }
+                if (!(o instanceof Map)) {
+                    continue;
+                }
+                Map<?, ?> item = (Map<?, ?>) o;
+                Object title = item.get("title");
+                if (title instanceof String) {
+                    String t = ((String) title).trim();
+                    if (t.length() <= 25) {
+                        collectCandidate(result, t, lower);
+                    }
+                }
+                Object tags = item.get("tags");
+                if (tags instanceof String) {
+                    collectTags(result, (String) tags, lower);
+                }
+                Object categoryName = item.get("categoryName");
+                if (categoryName instanceof String) {
+                    collectCandidate(result, (String) categoryName, lower);
+                }
+            }
+        } catch (Exception e) {
+            log.error("数据库联想降级失败", e);
+        }
     }
 
     private void collectCandidate(List<String> result, String candidate, String lower) {
