@@ -18,6 +18,10 @@ Thumbs.db
 # ===== 日志 =====
 *.log
 
+# ===== 生产密钥（严禁入库） =====
+deploy/secrets.env
+deploy/*.pem
+
 # ===== 运行数据 =====
 uploads/
 avatars/
