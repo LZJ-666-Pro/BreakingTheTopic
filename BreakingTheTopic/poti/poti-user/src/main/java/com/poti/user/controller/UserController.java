@@ -8,6 +8,7 @@ import com.poti.user.entity.User;
 import com.poti.user.mapper.AdminConfigMapper;
 import com.poti.user.service.SmsService;
 import com.poti.user.service.UserService;
+import com.poti.user.util.ImageCompressor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -239,6 +240,8 @@ public class UserController {
             log.info("目标文件路径: {}", destFile.getAbsolutePath());
             
             file.transferTo(destFile.getAbsoluteFile());
+            // 落盘后立即压缩：避免几 MB 的原图直接对外提供（公网隧道下加载会极慢）
+            ImageCompressor.compressAvatar(destFile, extension);
             
             String avatarUrl = buildAvatarUrl(fileName);
             
@@ -284,6 +287,8 @@ public class UserController {
             log.info("目标文件路径: {}", destFile.getAbsolutePath());
             
             file.transferTo(destFile.getAbsoluteFile());
+            // 落盘后立即压缩：避免几 MB 的原图直接对外提供（公网隧道下加载会极慢）
+            ImageCompressor.compressAvatar(destFile, extension);
             
             String avatarUrl = buildAvatarUrl(fileName);
             

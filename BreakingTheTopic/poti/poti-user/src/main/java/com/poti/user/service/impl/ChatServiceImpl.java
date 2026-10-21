@@ -6,6 +6,7 @@ import com.poti.user.entity.Message;
 import com.poti.user.mapper.ConversationMapper;
 import com.poti.user.mapper.MessageMapper;
 import com.poti.user.service.ChatService;
+import com.poti.user.util.ImageCompressor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -183,6 +184,11 @@ public class ChatServiceImpl implements ChatService {
             
             File destFile = new File(absoluteUploadPath + File.separator + fileName);
             file.transferTo(destFile);
+
+            // 聊天图片压缩（语音文件不动）
+            if (type != null && type == 2) {
+                ImageCompressor.compressChatImage(destFile, extension);
+            }
             
             String prefix = (chatUrlPrefix == null || chatUrlPrefix.trim().isEmpty())
                     ? "/chat/" : chatUrlPrefix;
