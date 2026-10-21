@@ -223,9 +223,13 @@ public class AuthController {
                 }
             }
             
-            String userQueryUrl = "http://127.0.0.1:8200/user/info";
+            // 走内部接口：/user/internal/info 由安全过滤器按 X-Internal-Token 放行，
+            // 不需要用户 JWT（若调用 /user/info 会因缺少 JWT 返回 401）
+            String userQueryUrl = "http://127.0.0.1:8200/user/internal/info";
             if (userId != null) {
                 userQueryUrl += "?userId=" + userId;
+            } else if (uniqueId != null) {
+                userQueryUrl += "?uniqueId=" + uniqueId;
             }
             
             try {

@@ -107,6 +107,31 @@ spring:
           predicates:
             - Path=/checkin/**
 
+        # —— 内网穿透收敛路由：小程序/管理端全部流量经 gateway 单入口 ——
+        - id: poti-agent
+          uri: lb://poti-agent
+          predicates:
+            - Path=/agent/**
+
+        # 头像/聊天媒体静态资源（poti-user 内部 WebMvcConfig 映射）
+        - id: poti-avatar-static
+          uri: lb://poti-user
+          predicates:
+            - Path=/avatars/**
+
+        - id: poti-chat-media
+          uri: lb://poti-user
+          predicates:
+            - Path=/chat/**
+
+        # 管理端 axios baseURL=/api，admin 服务接口本身无 /api 前缀，需剥离
+        - id: poti-admin-api
+          uri: lb://poti-admin
+          predicates:
+            - Path=/api/**
+          filters:
+            - StripPrefix=1
+
 
 management:
   endpoints:

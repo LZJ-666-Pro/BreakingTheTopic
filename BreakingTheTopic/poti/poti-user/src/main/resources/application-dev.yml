@@ -96,11 +96,13 @@ avatar:
   upload:
     path: ./uploads/avatars/
   url:
-    prefix: ${AVATAR_URL_PREFIX:http://10.16.145.198:8200/avatars/}
+    # 留空 = 数据库只存相对路径（/avatars/xxx.jpg），由小程序按当前 baseUrl 拼接，
+    # 本地 http、公网 https 隧道都能正确显示；如需 CDN 可显式配置前缀
+    prefix: ${AVATAR_URL_PREFIX:}
 
 wx:
   appid: ${WX_APPID:wx920f3d57f4121af7}
-  secret: ${WX_SECRET:1a1df381bfb417d942beee26ef809b09}
+  secret: ${WX_SECRET:fc200ba4a52ba6ca8d898f937c0965ae}
   pay:
     # 微信支付总开关：false 或商户参数不全时自动降级为模拟支付（点击支付即成功）
     enabled: ${WX_PAY_ENABLED:false}

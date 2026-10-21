@@ -47,7 +47,7 @@ public class UserController {
     @Value("${avatar.upload.path:./uploads/avatars/}")
     private String avatarUploadPath;
 
-    @Value("${avatar.url.prefix:http://localhost:8200/avatars/}")
+    @Value("${avatar.url.prefix:}")
     private String avatarUrlPrefix;
 
     @GetMapping("/info")
@@ -65,6 +65,35 @@ public class UserController {
         } catch (Exception e) {
             log.error("获取用户信息失败", e);
             return R.error("获取用户信息失败");
+        }
+    }
+
+    /**
+     * 内部接口：供 poti-auth 的开发登录（/auth/dev/login）查询用户。
+     * 路径包含 /internal/，由安全过滤器按 X-Internal-Token 校验内部调用，
+     * 不依赖用户 JWT，避免把 /user/info 暴露成免鉴权接口。
+     */
+    @GetMapping("/internal/info")
+    @Operation(summary = "内部查询用户信息", description = "仅供服务间内部调用，需携带内部令牌")
+    public R<User> getInternalUserInfo(@RequestParam(value = "userId", required = false) Long userId,
+                                       @RequestParam(value = "uniqueId", required = false) String uniqueId) {
+        try {
+            User user;
+            if (userId != null) {
+                user = userService.getById(userId);
+            } else if (uniqueId != null && !uniqueId.isEmpty()) {
+                user = userService.getOne(
+                        new LambdaQueryWrapper<User>().eq(User::getUniqueId, uniqueId), false);
+            } else {
+                return R.error("请提供 userId 或 uniqueId");
+            }
+            if (user == null) {
+                return R.error("用户不存在");
+            }
+            return R.success(user);
+        } catch (Exception e) {
+            log.error("内部查询用户信息失败", e);
+            return R.error("内部查询用户信息失败");
         }
     }
 
@@ -168,6 +197,17 @@ public class UserController {
         }
     }
 
+    /**
+     * 生成头像访问地址。
+     * 默认只存相对路径（/avatars/xxx.jpg），由前端按当前 baseUrl 拼接，
+     * 这样本地 http、公网 https 隧道都能正确显示；如配置了 CDN 前缀则直接使用该前缀。
+     */
+    private String buildAvatarUrl(String fileName) {
+        String prefix = (avatarUrlPrefix == null || avatarUrlPrefix.trim().isEmpty())
+                ? "/avatars/" : avatarUrlPrefix;
+        return prefix + fileName;
+    }
+
     @PostMapping("/avatar")
     public R<String> uploadAvatar(@RequestHeader("X-User-Id") Long userId,
                                    @RequestParam("file") MultipartFile file) {
@@ -200,7 +240,7 @@ public class UserController {
             
             file.transferTo(destFile.getAbsoluteFile());
             
-            String avatarUrl = avatarUrlPrefix + fileName;
+            String avatarUrl = buildAvatarUrl(fileName);
             
             LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.eq(User::getId, userId).set(User::getAvatarUrl, avatarUrl);
@@ -245,7 +285,7 @@ public class UserController {
             
             file.transferTo(destFile.getAbsoluteFile());
             
-            String avatarUrl = avatarUrlPrefix + fileName;
+            String avatarUrl = buildAvatarUrl(fileName);
             
             log.info("头像上传成功: {}", avatarUrl);
             return R.success(avatarUrl);

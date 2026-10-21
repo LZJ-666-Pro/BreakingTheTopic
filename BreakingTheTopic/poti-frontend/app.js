@@ -1,8 +1,11 @@
 const config = require('./config/index.js')
+const imageUtil = require('./utils/image.js')
 
 App({
   onLaunch() {
     console.log('小程序启动')
+    // 统一归一化接口返回的图片地址（相对路径 / 内网绝对地址 → 当前 baseUrl）
+    this.installMediaUrlNormalizer()
     // 每次冷启动重置 AI 悬浮球收起状态，避免用户永久找不到入口
     wx.removeStorageSync('agentFabClosed')
     this.checkLogin()
@@ -21,12 +24,45 @@ App({
     console.error('小程序错误', msg)
   },
 
+  /**
+   * 给 wx.request 装一个响应拦截：自动把返回数据里的头像/聊天媒体地址
+   * 归一化为当前 baseUrl 下的绝对地址。
+   * 后端只存相对路径（/avatars/xxx.jpg），这样切本地 http / 公网 https 都能显示。
+   */
+  installMediaUrlNormalizer() {
+    if (this._mediaUrlPatched) return
+    this._mediaUrlPatched = true
+
+    const rawRequest = wx.request
+    wx.request = function (options) {
+      if (options && typeof options.success === 'function') {
+        const originSuccess = options.success
+        options.success = function (res) {
+          try {
+            if (res && res.data) {
+              imageUtil.normalizeDeep(res.data, 0)
+            }
+          } catch (e) {
+            console.warn('图片地址归一化失败', e)
+          }
+          return originSuccess(res)
+        }
+      }
+      return rawRequest(options)
+    }
+  },
+
   checkLogin() {
     const token = wx.getStorageSync('token')
     if (token) {
       this.globalData.token = token
       this.globalData.userId = wx.getStorageSync('userId')
-      this.globalData.userInfo = wx.getStorageSync('userInfo')
+      const cachedUser = wx.getStorageSync('userInfo')
+      if (cachedUser && cachedUser.avatarUrl) {
+        cachedUser.avatarUrl = imageUtil.resolveImageUrl(cachedUser.avatarUrl)
+        wx.setStorageSync('userInfo', cachedUser)
+      }
+      this.globalData.userInfo = cachedUser
     }
   },
 

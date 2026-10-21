@@ -35,7 +35,8 @@ public class ChatServiceImpl implements ChatService {
     @Value("${chat.upload.path:./uploads/chat/}")
     private String chatUploadPath;
     
-    @Value("${chat.url.prefix:http://localhost:8200/chat/}")
+    // 留空表示只存相对路径（/chat/images/xxx.jpg），由前端按当前 baseUrl 拼接
+    @Value("${chat.url.prefix:}")
     private String chatUrlPrefix;
     
     @Override
@@ -183,7 +184,9 @@ public class ChatServiceImpl implements ChatService {
             File destFile = new File(absoluteUploadPath + File.separator + fileName);
             file.transferTo(destFile);
             
-            String fileUrl = chatUrlPrefix + subDir + fileName;
+            String prefix = (chatUrlPrefix == null || chatUrlPrefix.trim().isEmpty())
+                    ? "/chat/" : chatUrlPrefix;
+            String fileUrl = prefix + subDir + fileName;
             log.info("文件上传成功: {}", fileUrl);
             
             return Result.success(fileUrl);

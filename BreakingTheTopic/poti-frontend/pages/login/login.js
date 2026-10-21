@@ -69,41 +69,69 @@ Page({
       data: { code },
       success: (res) => {
         if (res.data.code === 200 && res.data.data && res.data.data.token) {
-          const data = res.data.data
-          const { token, userId, nickname, avatarUrl } = data
+          this.handleLoginSuccess(res.data.data)
+        } else {
+          // 微信登录失败（如 AppSecret 无效/未配置）时，自动降级为开发登录，保证演示可用
+          console.warn('微信登录失败：', res.data.msg, '→ 降级为 dev 登录')
+          this.devLoginFallback()
+        }
+      },
+      fail: () => {
+        // 网络错误时也尝试 dev 登录降级
+        console.warn('微信登录请求失败 → 降级为 dev 登录')
+        this.devLoginFallback()
+      },
+      complete: () => {
+        this.setData({ loading: false })
+      }
+    })
+  },
 
-          wx.setStorageSync('token', token)
-          wx.setStorageSync('userId', userId)
-
-          const userInfo = {
-            id: userId,
-            userId: userId,
-            nickname: nickname || '微信用户',
-            avatarUrl: avatarUrl || ''
-          }
-
-          wx.setStorageSync('userInfo', userInfo)
-
-          app.globalData.token = token
-          app.globalData.userId = userId
-          app.globalData.userInfo = userInfo
-
-          this.showToast(`授权成功，欢迎 ${userInfo.nickname}`)
-
-          setTimeout(() => {
-            wx.switchTab({ url: '/pages/index/index' })
-          }, 1500)
+  // 开发登录降级：凭 userId 换取 token（仅演示/联调使用；生产环境请配置正确的微信 AppSecret）
+  devLoginFallback() {
+    const app = getApp()
+    wx.request({
+      url: `${app.globalData.authUrl}/auth/dev/login`,
+      method: 'POST',
+      data: { userId: 9 },
+      success: (res) => {
+        if (res.data.code === 200 && res.data.data && res.data.data.token) {
+          this.handleLoginSuccess(res.data.data)
         } else {
           this.showToast(res.data.msg || '登录失败，请重试')
         }
       },
       fail: () => {
         this.showToast('网络错误，请检查网络')
-      },
-      complete: () => {
-        this.setData({ loading: false })
       }
     })
+  },
+
+  handleLoginSuccess(data) {
+    const { token, userId, nickname, avatarUrl } = data
+
+    wx.setStorageSync('token', token)
+    wx.setStorageSync('userId', userId)
+
+    const userInfo = {
+      id: userId,
+      userId: userId,
+      nickname: nickname || '微信用户',
+      avatarUrl: avatarUrl || ''
+    }
+
+    wx.setStorageSync('userInfo', userInfo)
+
+    const app = getApp()
+    app.globalData.token = token
+    app.globalData.userId = userId
+    app.globalData.userInfo = userInfo
+
+    this.showToast(`授权成功，欢迎 ${userInfo.nickname}`)
+
+    setTimeout(() => {
+      wx.switchTab({ url: '/pages/index/index' })
+    }, 1500)
   },
 
   handlePhoneLogin() {

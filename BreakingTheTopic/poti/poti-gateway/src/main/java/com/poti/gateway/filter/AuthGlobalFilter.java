@@ -59,6 +59,13 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/search/questions",
             "/actuator",
             "/monitor",
+            // 静态资源（头像、聊天图片/语音、后台上传文件）：
+            // 文件名是 UUID，不含敏感业务数据，且小程序 <image> 无法携带 Authorization 头，
+            // 必须放行，否则头像一律 401 显示不出来
+            "/avatars/",
+            "/chat/images/",
+            "/chat/voices/",
+            "/uploads/",
             "/admin/login",
             "/admin/register",
             "/admin/captcha",
