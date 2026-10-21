@@ -184,6 +184,33 @@ public class SearchController {
     }
 
     /**
+     * 记录一次搜索：写入用户搜索历史（登录用户）+ 累计热搜分值。
+     * 前端在提交搜索时调用，此前接口缺失导致 404、热搜榜也一直不更新。
+     */
+    @PostMapping("/record")
+    public R<Void> recordSearch(@RequestHeader(value = "X-User-Id", required = false) Long userId,
+                                @RequestBody(required = false) Map<String, String> body) {
+        String keyword = body == null ? null : body.get("keyword");
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return R.success();
+        }
+        String kw = keyword.trim();
+        if (kw.length() > 50) {
+            kw = kw.substring(0, 50);
+        }
+        try {
+            if (userId != null) {
+                searchCacheService.addSearchHistory(userId, kw);
+            }
+            searchCacheService.incrementHotSearch(kw);
+        } catch (Exception e) {
+            // 统计类写入失败不影响用户搜索
+            log.warn("记录搜索关键词失败: {}", kw, e);
+        }
+        return R.success();
+    }
+
+    /**
      * 搜索联想：根据输入前缀从题库（题干/标签/分类名）提取候选词
      */
     @GetMapping("/suggest")
