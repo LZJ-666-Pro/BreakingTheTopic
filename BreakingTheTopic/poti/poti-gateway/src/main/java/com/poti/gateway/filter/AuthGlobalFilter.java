@@ -65,6 +65,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/search/question",
             "/search/questions",
             "/search/hot",
+            // 系统配置（联系方式、群配置等只读项，服务端也放行）
+            "/config/",
             "/actuator",
             "/monitor",
             // 静态资源（头像、聊天图片/语音、后台上传文件）：

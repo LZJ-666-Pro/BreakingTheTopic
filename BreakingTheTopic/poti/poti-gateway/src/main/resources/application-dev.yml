@@ -42,6 +42,24 @@ spring:
           predicates:
             - Path=/sms/**
 
+        # 好友关系（FriendshipController，位于 poti-user）
+        - id: poti-friendship
+          uri: lb://poti-user
+          predicates:
+            - Path=/friendship/**
+
+        # 会员/VIP（VipController，位于 poti-user）
+        - id: poti-vip
+          uri: lb://poti-user
+          predicates:
+            - Path=/vip/**
+
+        # 系统配置（SystemConfigController：联系方式、群配置等，位于 poti-user）
+        - id: poti-config
+          uri: lb://poti-user
+          predicates:
+            - Path=/config/**
+
 
         - id: poti-auth
           uri: lb://poti-auth
@@ -60,6 +78,12 @@ spring:
           predicates:
             - Path=/practice/**
 
+        # 竞赛（CompetitionController，位于 poti-practice）
+        - id: poti-competition
+          uri: lb://poti-practice
+          predicates:
+            - Path=/competition/**
+
 
         - id: poti-wrongbook
           uri: lb://poti-wrongbook
@@ -77,6 +101,12 @@ spring:
           uri: lb://poti-interview
           predicates:
             - Path=/interview/**
+
+        # 面试训练营 CampController：前端 /camp/list、/camp/detail、/camp/join、/camp/checkin
+        - id: poti-camp
+          uri: lb://poti-interview
+          predicates:
+            - Path=/camp/**
 
 
         - id: poti-search
