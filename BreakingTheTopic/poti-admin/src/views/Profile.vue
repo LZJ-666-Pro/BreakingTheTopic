@@ -95,7 +95,8 @@ const formRef = ref(null)
 const passwordFormRef = ref(null)
 const loading = ref(false)
 const passwordLoading = ref(false)
-const uploadUrl = ref('http://localhost:8088/admin/upload/avatar')
+// 走 /api 代理（nginx / vite 转发到网关 → poti-admin），避免写死 localhost:8088
+const uploadUrl = ref('/api/admin/upload/avatar')
 
 const form = reactive({
   username: '',

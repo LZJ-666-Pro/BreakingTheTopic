@@ -155,7 +155,8 @@ const categoryChart = ref(null)
 let difficultyChartInstance = null
 let categoryChartInstance = null
 
-const userUrl = import.meta.env.VITE_USER_URL || 'http://localhost:8200'
+// 走同源代理（vite / nginx 均有 /user-api 转发到用户服务），避免写死主机名
+const userUrl = import.meta.env.VITE_USER_URL || '/user-api'
 
 const stats = ref({
   questionCount: 0,
