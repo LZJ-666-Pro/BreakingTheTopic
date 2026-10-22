@@ -34,3 +34,6 @@ _*
 ~$*
 *.docx
 query
+# 本地敏感配置（API Key 等），严禁提交
+secret.env
+.env.local
