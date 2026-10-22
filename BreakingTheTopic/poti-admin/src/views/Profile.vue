@@ -16,7 +16,7 @@
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
           >
-            <img v-if="form.avatar" :src="form.avatar" class="avatar" />
+            <img v-if="form.avatar" :src="avatarSrc" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
         </el-form-item>
@@ -82,12 +82,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '../stores/user'
 import api from '../utils/api'
+import { mediaUrl } from '../utils/media'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -112,6 +113,9 @@ const passwordForm = reactive({
   newPassword: '',
   confirmPassword: ''
 })
+
+// 头像显示地址：加版本参数，避开浏览器里可能残留的坏缓存
+const avatarSrc = computed(() => mediaUrl(form.avatar))
 
 const rules = {
   nickname: [

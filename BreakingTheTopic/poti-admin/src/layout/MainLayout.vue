@@ -65,7 +65,7 @@
             </el-tooltip>
             <el-dropdown trigger="click">
               <div class="user-dropdown">
-                <el-avatar :size="32" :src="userStore.userInfo?.avatar">
+                <el-avatar :size="32" :src="topAvatar">
                   {{ userStore.userInfo?.nickname?.charAt(0) || 'A' }}
                 </el-avatar>
                 <span class="user-name">{{ userStore.userInfo?.nickname || '管理员' }}</span>
@@ -106,6 +106,7 @@
 import { ref, computed, watch, markRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
+import { mediaUrl } from '../utils/media'
 import {
   HomeFilled,
   Folder,
@@ -138,6 +139,9 @@ import {
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+
+// 右上角头像地址（加版本参数，避开浏览器里可能残留的坏缓存）
+const topAvatar = computed(() => mediaUrl(userStore.userInfo?.avatar))
 
 // 登录进入主布局后刷新「系统默认分页条数」缓存，供各列表页初始化 pageSize
 import { loadDefaultPageSize } from '../utils/config'
